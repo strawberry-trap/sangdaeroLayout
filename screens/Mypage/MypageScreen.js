@@ -1,52 +1,50 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { Badge, Button, ListItem, Input } from 'react-native-elements';
 
 export default function MypageScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.profile}>
-        <View style={styles.profilePicture}>
-          <Text style={styles.profilePictureText}>Profile picture</Text>
-          <Button style={styles.profilePictureButton} title="Change Profile"/>
-        </View>
         <View style={styles.profileName}>
-          <Text style={styles.profileNameText}>Name(NickName)</Text>
+          <Text style={styles.profileNameText}>이름(별명)</Text>
+          <Input style={styles.profileNicknameText}
+            placeholder='별명'/>
           <View style={styles.profileNickname}>
-            <Text style={styles.profileNicknameText}>NickName</Text>
-            <Button style={styles.profileNicknameButton} title="Change NickName"/>
+            <Button style={styles.profileNicknameButton} title="별명 변경"/>
           </View>
         </View>
       </View>
       <View style={styles.link}>
-        <Button style={styles.linkButton} title="Request List"/>
-        <Button style={styles.linkButton} title="Donation List"/>
-        <Button style={styles.linkButton} title="Community List"/>
-        <Button style={styles.linkButton} title="QnA List"/>
+        <Button style={styles.linkButton} title="요청"/>
+        <Button style={styles.linkButton} title="후원"/>
+        <Button style={styles.linkButton} title="커뮤니티"/>
+        <Button style={styles.linkButton} title="문의"/>
       </View>
       <View style={styles.interest}>
-        <Text style={styles.interestTitle}>Available Service</Text>
+        <Text style={styles.interestTitle}>가능한 서비스</Text>
         <View>
           <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>Drive</Text>
+            <Text style={styles.interestCategoryTitle}>차량 지원</Text>
             <Button style={styles.interestButton} title="on/off"/>
           </View>
           <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>Talk</Text>
+            <Text style={styles.interestCategoryTitle}>말벗</Text>
             <Button style={styles.interestButton} title="on/off"/>
           </View>
           <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>Shopping</Text>
+            <Text style={styles.interestCategoryTitle}>장보기</Text>
             <Button style={styles.interestButton} title="on/off"/>
           </View>
         </View>
       </View>
       <View style={styles.config}>
-        <Button style={styles.configButton} title="Config"/>
-        <Button style={styles.configButton} title="LogOut"/>
-        <Button style={styles.configButton} title="Withdraw"/>
+        <Button style={styles.configButton} title="설정"/>
+        <Button style={styles.configButton} title="로그아웃"/>
+        <Button style={styles.configButton} title="탈퇴"/>
       </View>
     </ScrollView>
   );

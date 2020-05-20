@@ -2,9 +2,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as React from 'react';
 
 import TabBarIcon from '../components/TabBarIcon';
-import HomeScreen from '../screens/Home/HomeScreen';
-import RequestScreen from '../screens/Request/RequestScreen';
-import DonationScreen from '../screens/Donation/DonationScreen';
+
+import LoginScreen from '../screens/Login/LoginScreen';
+import ActivityScreen from '../screens/Activity/ActivityScreen';
+import BoardScreen from '../screens/Board/BoardScreen';
+import RequestScreen from '../screens/Activity/RequestScreen';
+import BoardDetailScreen from '../screens/Board/BoardDetailScreen';
 import MypageScreen from '../screens/Mypage/MypageScreen';
 
 const BottomTab = createBottomTabNavigator();
@@ -21,31 +24,47 @@ export default function BottomTabNavigator({ navigation, route }) {
   return (
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
       <BottomTab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="로그인"
+        component={LoginScreen}
         options={{
-          title: 'Home',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="Request"
-        component={RequestScreen}
-        options={{
-          title: 'Request',
+          title: 'Login',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-heart" />,
         }}
       />
       <BottomTab.Screen
-        name="Donation"
-        component={DonationScreen}
+        name="관심사"
+        component={ActivityScreen}
         options={{
-          title: 'Donation',
+          title: 'Interest',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-heart" />,
+        }}
+      />
+      <BottomTab.Screen
+        name="활동"
+        component={BoardScreen}
+        options={{
+          title: 'Activity',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
+        }}
+      />
+      <BottomTab.Screen
+        name="요청"
+        component={RequestScreen}
+        options={{
+          title: 'Request',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
         }}
       />
       <BottomTab.Screen
-        name="Mypage"
+        name="활동 내용"
+        component={BoardDetailScreen}
+        options={{
+          title: 'Detail',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
+        }}
+      />
+      <BottomTab.Screen
+        name="개인"
         component={MypageScreen}
         options={{
           title: 'Mypage',

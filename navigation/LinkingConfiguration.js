@@ -6,9 +6,11 @@ export default {
     Root: {
       path: 'root',
       screens: {
-        Home: 'home',
+        Login: 'login',
+        Interest: 'interest',
+        Activity: 'activity',
         Request: 'request',
-        Donation: 'donation',
+        Detail: 'detail',
         Mypage: 'mypage ',
       },
     },

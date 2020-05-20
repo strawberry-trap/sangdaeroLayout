@@ -1,8 +1,60 @@
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { Badge, Button, ListItem } from 'react-native-elements'
+
+import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { MonoText } from '../../components/StyledText';
+
+const status = [
+  'Before matching',
+  'During matching',
+  'Finish matching',
+  'Doing Activity',
+  'Finish Activity',
+  'Cancled Activity'
+]
+
+const list = [
+  {
+    name:'1',
+    subtitle:status[0],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+  {
+    name:'2',
+    subtitle:status[1],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+  {
+    name:'3',
+    subtitle:status[2],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+  {
+    name:'4',
+    subtitle:status[3],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+  {
+    name:'5',
+    subtitle:status[4],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+  {
+    name:'6',
+    subtitle:status[5],
+    badgeValue:'1+',
+    badgeStatus:'success'
+  },
+]
 
 export default function HomeScreen() {
   return (
@@ -13,12 +65,18 @@ export default function HomeScreen() {
             <Text style={styles.titleText}>Notice</Text>
             <Button title='+' style={styles.titleButton}/>
           </View>
-          <View style={styles.list}>
-            <Text style={styles.post}>1</Text>
-            <Text style={styles.post}>2</Text>
-            <Text style={styles.post}>3</Text>
-            <Text style={styles.post}>4</Text>
-            <Text style={styles.post}>5</Text>
+          <View>
+            {
+              list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  title={l.name}
+                  subtitle={l.subtitle}
+                  badge={{value: l.badgeValue, status: l.badgeStatus}}
+                  chevron
+                />
+              ))
+            }
           </View>
         </View>
         <View style={styles.categoryEven}>
