@@ -7,6 +7,9 @@ import useCachedResources from './hooks/useCachedResources';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 
+import LoginScreen from './screens/Login/LoginScreen';
+import ActivityStackScreen from './screens/Activity/ActivityStackScreen'
+
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -19,8 +22,13 @@ export default function App(props) {
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
         <NavigationContainer linking={LinkingConfiguration}>
-          <Stack.Navigator>
-            <Stack.Screen name="상대로" component={BottomTabNavigator} />
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="Log" component={LoginScreen} />
+            <Stack.Screen name="Main" component={BottomTabNavigator} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>

@@ -4,41 +4,43 @@ import * as React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-export default function DonationDetailScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.title}>
-        <Text style={styles.postCategory}>Category</Text>
-        <Text style={styles.postTitle}>Title</Text>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.postContent}>Donation Content</Text>
-      </View>
-      <View style={styles.account}>
-        <Text style={styles.accountMessage}>Bank Account</Text>
-        <Text style={styles.accountMessage}>Explanation</Text>
-      </View>
-      <View style={styles.form}>
-        <View style={styles.formCategory}>
-          <Text style={styles.formTitle}>Receipt</Text>
-          <Text style={styles.formContent}>Content</Text>  
+export default class DonationDetailScreen extends React.Component {
+  render() {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.title}>
+          <Text style={styles.postCategory}>Category</Text>
+          <Text style={styles.postTitle}>Title</Text>
         </View>
-        <View style={styles.formCategory}>
-          <Text style={styles.formTitle}>Name</Text>  
-          <Text style={styles.formContent}>Content</Text>  
+        <View style={styles.content}>
+          <Text style={styles.postContent}>Donation Content</Text>
         </View>
-        <View style={styles.formCategory}>
-          <Text style={styles.formTitle}>Phone number</Text>  
-          <Text style={styles.formContent}>Content</Text>  
+        <View style={styles.account}>
+          <Text style={styles.accountMessage}>Bank Account</Text>
+          <Text style={styles.accountMessage}>Explanation</Text>
         </View>
-        <View style={styles.formCategory}>
-          <Text style={styles.formTitle}>Business License</Text>  
-          <Text style={styles.formContent}>Content</Text>  
+        <View style={styles.form}>
+          <View style={styles.formCategory}>
+            <Text style={styles.formTitle}>Receipt</Text>
+            <Text style={styles.formContent}>Content</Text>  
+          </View>
+          <View style={styles.formCategory}>
+            <Text style={styles.formTitle}>Name</Text>  
+            <Text style={styles.formContent}>Content</Text>  
+          </View>
+          <View style={styles.formCategory}>
+            <Text style={styles.formTitle}>Phone number</Text>  
+            <Text style={styles.formContent}>Content</Text>  
+          </View>
+          <View style={styles.formCategory}>
+            <Text style={styles.formTitle}>Business License</Text>  
+            <Text style={styles.formContent}>Content</Text>  
+          </View>
         </View>
-      </View>
-      <Button title="Submit"/>
-    </ScrollView>
-  );
+        <Button title="Submit"/>
+      </ScrollView>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

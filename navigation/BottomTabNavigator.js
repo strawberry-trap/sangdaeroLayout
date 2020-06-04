@@ -1,14 +1,18 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import TabBarIcon from '../components/TabBarIcon';
 
 import LoginScreen from '../screens/Login/LoginScreen';
+import HomeStackScreen from '../screens/Home/HomeStackScreen'
 import ActivityScreen from '../screens/Activity/ActivityScreen';
 import BoardScreen from '../screens/Board/BoardScreen';
 import RequestScreen from '../screens/Activity/RequestScreen';
 import BoardDetailScreen from '../screens/Board/BoardDetailScreen';
 import MypageScreen from '../screens/Mypage/MypageScreen';
+import BoardStackScreen from '../screens/Board/BoardStackScreen';
+import ActivityStackScreen from '../screens/Activity/ActivityStackScreen';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -18,75 +22,103 @@ export default function BottomTabNavigator({ navigation, route }) {
   // currently active tab. Learn more in the documentation:
   // https://reactnavigation.org/docs/en/screen-options-resolution.html
 
-
-  //navigation.setOptions({ headerTitle: getHeaderTitle(route) });
+/*
+  navigation.setOptions({
+    headerTitle: getHeaderTitle(route),
+    headerLeft: () => (
+      <View style={styles.leftIconContainer}>
+        <TabBarIcon name='ios-menu'/>
+      </View>
+    ),
+    headerRight: () => (
+      <View style={styles.rightIconContainer}>
+        <TabBarIcon name='ios-person-add'/>
+        <TabBarIcon name='ios-notifications'/>
+      </View>
+    )
+  });
+  */
 
   return (
-    <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
+    <BottomTab.Navigator
+      initialRouteName={INITIAL_ROUTE_NAME}
+      tabBarOptions={{
+        activeTintColor: 'rgb(1, 192, 99)',
+        inactiveTintColor: 'gray',
+      }}
+      >
       <BottomTab.Screen
-        name="로그인"
-        component={LoginScreen}
+        name="Home"
+        component={HomeStackScreen}
         options={{
-          title: 'Login',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-heart" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="관심사"
-        component={ActivityScreen}
-        options={{
-          title: 'Interest',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-heart" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="활동"
-        component={BoardScreen}
-        options={{
-          title: 'Activity',
+          title: '홈',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
         }}
       />
       <BottomTab.Screen
-        name="요청"
+        name="Activity"
+        component={ActivityStackScreen}
+        options={{
+          title: '요청하기',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-chatbubbles" />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Request"
         component={RequestScreen}
         options={{
-          title: 'Request',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
+          title: '후원하기',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-filing" />,
         }}
       />
       <BottomTab.Screen
-        name="활동 내용"
-        component={BoardDetailScreen}
-        options={{
-          title: 'Detail',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="개인"
+        name="Mypage"
         component={MypageScreen}
         options={{
-          title: 'Mypage',
+          title: '내정보',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-person" />,
         }}
       />
     </BottomTab.Navigator>
   );
 }
+
 /*
 function getHeaderTitle(route) {
   const routeName = route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
 
   switch (routeName) {
-    case 'Home':
-      return 'Home Screen';
+    case 'Login':
+      return '로그인';
+    case 'Interest':
+      return '관심사 목록';
+    case 'Activity':
+      return '활동 목록';
     case 'Request':
-      return 'Request Screen';
-    case 'Donation':
-      return 'Donation Screen';
+      return '요청 목록';
+    case 'Detail':
+      return '활동 내용';
     case 'Mypage':
-      return 'MyPage Screen';
+      return '회원 정보';
   }
 }
 */
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  icon: {
+    paddingLeft: 10
+  },
+  leftIconContainer: {
+    flexDirection: "row",
+    justifyContent:'center',
+    width: 60,
+  },
+  rightIconContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: 120,
+  }
+});

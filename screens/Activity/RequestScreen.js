@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem, Input } from 'react-native-elements';
 import { Picker } from '@react-native-community/picker';
@@ -34,6 +34,21 @@ function _fetchPost() {
 
 
 export default class RequestScreen extends React.Component {
+
+  createTwoButtonAlert = () =>
+  Alert.alert(
+    "한동대학교 청소",
+    "요청하기",
+    [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel"
+      },
+      { text: "OK", onPress: () => Alert.alert("요청되었습니다") }
+    ],
+    { cancelable: false }
+  );
 
   state = {
     index: '1',
@@ -83,22 +98,48 @@ export default class RequestScreen extends React.Component {
           onValueChange={(itemValue) =>
             this.setState({index: itemValue})
           }>
-          <Picker.Item label="물건 나누기" value='1' />
-          <Picker.Item label="차량 지원" value='2' />
-          <Picker.Item label="말벗" value='3' />
-          <Picker.Item label="청소" value='4' />
-          <Picker.Item label="물품 요청" value='5' />
+          <Picker.Item label="차량지원" value='1' />
+          <Picker.Item label="환경미화" value='2' />
+          <Picker.Item label="장보기" value='3' />
+          <Picker.Item label="물건 전달" value='4' />
+          <Picker.Item label="재능기부" value='5' />
+          <Picker.Item label="행사지원" value='6' />
+          <Picker.Item label="아동센터" value='7' />
+          <Picker.Item label="심리상담" value='9' />
         </Picker>
-        <View style={{flexDirection:'row'}}>
-          <Text style={{flex:1}}>지원자</Text>
-          <Text style={{flex:5}} name='name'>이름</Text>
-        </View>
         <Button
-          title="요청하기"
+          title='활동 시간'
+        />
+
+
+        <Input
+          name='title'
+          placeholder='시작 시간 : 2020-06-01 14:00'
+          leftIcon={
+            <TabBarIcon name="ios-clipboard"/>
+          }
+        />
+        <Input
+        name='title'
+        placeholder='종료 시간 : 2020-06-01 14:30'
+        leftIcon={
+          <TabBarIcon name="ios-clipboard"/>
+        }
+        />
+        <Button
+          title='지원자'
+        />
+        <Input
+        name='title'
+        placeholder='지원자'
+        leftIcon={
+          <TabBarIcon name="ios-clipboard"/>
+        }
+        />
+        <Button
+          title="등록하기"
           onPress={
-            ()=>{
-              this._fetchPost('http://saevom06.cafe24.com/test/post', {user:'data'}
-            )}}
+            ()=>this.createTwoButtonAlert()}
         />
       </ScrollView>
     );

@@ -5,49 +5,51 @@ import { StyleSheet, Text, View } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem, Input } from 'react-native-elements';
 
-export default function MypageScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.profile}>
-        <View style={styles.profileName}>
-          <Text style={styles.profileNameText}>이름(별명)</Text>
-          <Input style={styles.profileNicknameText}
-            placeholder='별명'/>
-          <View style={styles.profileNickname}>
-            <Button style={styles.profileNicknameButton} title="별명 변경"/>
+export default class MypageScreen extends React.Component {
+  render() {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.profile}>
+          <View style={styles.profileName}>
+            <Text style={styles.profileNameText}>?씠由?(蹂꾨챸)</Text>
+            <Input style={styles.profileNicknameText}
+              placeholder='蹂꾨챸'/>
+            <View style={styles.profileNickname}>
+              <Button style={styles.profileNicknameButton} title="蹂꾨챸 蹂?寃?"/>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={styles.link}>
-        <Button style={styles.linkButton} title="요청"/>
-        <Button style={styles.linkButton} title="후원"/>
-        <Button style={styles.linkButton} title="커뮤니티"/>
-        <Button style={styles.linkButton} title="문의"/>
-      </View>
-      <View style={styles.interest}>
-        <Text style={styles.interestTitle}>가능한 서비스</Text>
-        <View>
-          <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>차량 지원</Text>
-            <Button style={styles.interestButton} title="on/off"/>
-          </View>
-          <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>말벗</Text>
-            <Button style={styles.interestButton} title="on/off"/>
-          </View>
-          <View style={styles.interestCategory}>
-            <Text style={styles.interestCategoryTitle}>장보기</Text>
-            <Button style={styles.interestButton} title="on/off"/>
+        <View style={styles.link}>
+          <Button style={styles.linkButton} title="?슂泥?"/>
+          <Button style={styles.linkButton} title="?썑?썝"/>
+          <Button style={styles.linkButton} title="而ㅻ?ㅻ땲?떚"/>
+          <Button style={styles.linkButton} title="臾몄쓽"/>
+        </View>
+        <View style={styles.interest}>
+          <Text style={styles.interestTitle}>媛??뒫?븳 ?꽌鍮꾩뒪</Text>
+          <View>
+            <View style={styles.interestCategory}>
+              <Text style={styles.interestCategoryTitle}>李⑤웾 吏??썝</Text>
+              <Button style={styles.interestButton} title="on/off"/>
+            </View>
+            <View style={styles.interestCategory}>
+              <Text style={styles.interestCategoryTitle}>留먮쿁</Text>
+              <Button style={styles.interestButton} title="on/off"/>
+            </View>
+            <View style={styles.interestCategory}>
+              <Text style={styles.interestCategoryTitle}>?옣蹂닿린</Text>
+              <Button style={styles.interestButton} title="on/off"/>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={styles.config}>
-        <Button style={styles.configButton} title="설정"/>
-        <Button style={styles.configButton} title="로그아웃"/>
-        <Button style={styles.configButton} title="탈퇴"/>
-      </View>
-    </ScrollView>
-  );
+        <View style={styles.config}>
+          <Button style={styles.configButton} title="?꽕?젙"/>
+          <Button style={styles.configButton} title="濡쒓렇?븘?썐"/>
+          <Button style={styles.configButton} title="?깉?눜"/>
+        </View>
+      </ScrollView>
+    )
+  }
 }
 
 function OptionButton({ icon, label, onPress, isLastOption }) {

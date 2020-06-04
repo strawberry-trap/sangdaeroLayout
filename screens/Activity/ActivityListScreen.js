@@ -19,50 +19,68 @@ export default class BoardScreen extends React.Component {
   ];
 
   title = [
-    '물건 나눔',
-    '차량 지원',
-    '청소',
-    '차량 지원',
-    '물건 나눔',
-    '장보기'
+    '활동 1',
+    '활동 2',
+    '활동 3',
+    '활동 4',
+    '활동 5',
+    '활동 6'
   ];
 
   list = [
     {
-      name:this.title[0],
-      subtitle:this.status[0],
+      name:'한동대학교 청소',
+      subtitle:'환경미화',
       badgeValue:this.status[0],
       badgeStatus:'error'
     },
     {
-      name:this.title[1],
-      subtitle:this.status[1],
+      name:'포항 성모병원 차량 지원',
+      subtitle:'차량 지원',
       badgeValue:this.status[1],
-      badgeStatus:'success'
-    },
-    {
-      name:this.title[2],
-      subtitle:this.status[2],
-      badgeValue:this.status[2],
-      badgeStatus:'primary'
-    },
-    {
-      name:this.title[3],
-      subtitle:this.status[3],
-      badgeValue:this.status[3],
-      badgeStatus:'success'
-    },
-    {
-      name:this.title[4],
-      subtitle:this.status[4],
-      badgeValue:this.status[4],
       badgeStatus:'warning'
     },
     {
-      name:this.title[5],
-      subtitle:this.status[5],
-      badgeValue:this.status[5],
-      badgeStatus:'error'
+      name:'양덕동 주거지 환경 미화',
+      subtitle:'환경미화',
+      badgeValue:this.status[1],
+      badgeStatus:'warning'
+    },
+    {
+      name:'양덕동 거주 어르신 장보기 대행',
+      subtitle:'장보기',
+      badgeValue:this.status[1],
+      badgeStatus:'warning'
+    },
+    {
+      name:'나눔 물건 전달',
+      subtitle:'물건 전달',
+      badgeValue:this.status[2],
+      badgeStatus:'success'
+    },
+    {
+      name:'은퇴 노인 재취업 직업 교육',
+      subtitle:'재능기부',
+      badgeValue:this.status[2],
+      badgeStatus:'success'
+    },
+    {
+      name:'복지관 체육대회 스태프',
+      subtitle:'행사 지원',
+      badgeValue:this.status[3],
+      badgeStatus:'primary'
+    },
+    {
+      name:'포항지역아동센터 선생님',
+      subtitle:'아동센터',
+      badgeValue:this.status[3],
+      badgeStatus:'primary'
+    },
+    {
+      name:'청소년 수련관 심리상담',
+      subtitle:'심리상담',
+      badgeValue:this.status[3],
+      badgeStatus:'primary'
     },
   ];
 
@@ -73,16 +91,21 @@ export default class BoardScreen extends React.Component {
           {
             this.list.map((l, i) => (
               <ListItem
+                containerStyle={styles.item}
                 key={i}
                 title={l.name}
                 subtitle={l.subtitle}
                 badge={{value: l.badgeValue, status: l.badgeStatus}}
                 chevron
-                onPress={() => this.props.navigation.navigate('Detail')}
+                onPress={() => this.props.navigation.navigate('활동 내용')}
               />
             ))
           }
         </View>
+        <Button 
+            title="목록"
+            onPress={() => this.props.navigation.goBack()}
+            />
       </ScrollView>
     );
   }
@@ -100,16 +123,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 0,
   },
-  post: {
-    backgroundColor: '#CCC',
-    padding: 3,
-    flexDirection: 'row',
-  },
-  postTitle: {
-    flex: 1,
-    alignSelf: 'flex-start'
-  },
-  postButton: {
-    alignSelf: 'flex-end'
+  item: {
+    margin:5,
   },
 });

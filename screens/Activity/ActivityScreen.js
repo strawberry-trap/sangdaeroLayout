@@ -6,71 +6,72 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ButtonGroup, ListItem } from 'react-native-elements';
 
 
-const bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
-var count = 1;
-const list = [
-  {
-    name:'활동 요청',
-    subtitle:'활동 요청',
-    badgeValue:'1+',
-    badgeStatus:'success'
-  },
-  {
-    name:'물건 나눔 신청',
-    subtitle:'물건 나눔 신청',
-    badgeValue:'1+',
-    badgeStatus:'success'
-  },
-  {
-    name:'차량 지원',
-    subtitle:'차량 지원',
-    badgeValue:'1+',
-    badgeStatus:'success'
-  },
-  {
-    name:'말벗',
-    subtitle:'말벗',
-    badgeValue:'2+',
-    badgeStatus:'error'
-  },
-  {
-    name:'청소',
-    subtitle:'청소',
-    badgeValue:'3+',
-    badgeStatus:'primary'
-  },
-  {
-    name:'물품 전달',
-    subtitle:'물품 전달',
-    badgeValue:'4+',
-    badgeStatus:'warning'
+
+
+export default class ActivityScreen extends React.Component {
+  bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
+  count = 1;
+  fixList =[
+    {
+      name:'물건 나눔',
+      subtitle:'물건 나눔',
+      badgeValue:'2',
+      badgeStatus:'success'
+    },
+    {
+      name:'요청하기',
+      subtitle:'요청하기',
+      badgeValue:'4',
+      badgeStatus:'success'
+    },
+  ]
+  list = [
+    {
+      name:'활동 조회',
+      subtitle:'활동 조회',
+      badgeValue:'20',
+      badgeStatus:'success'
+    },
+  ]
+
+  render() {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+        <View>
+          <ListItem
+            key={0}
+            title={this.fixList[0].name}
+            subtitle={this.fixList[0].subtitle}
+            badge={{value: this.fixList[0].badgeValue, status: this.fixList[0].badgeStatus}}
+            chevron
+            onPress={() => this.props.navigation.navigate('Request')}
+          />
+          <ListItem
+            key={1}
+            title={this.fixList[1].name}
+            subtitle={this.fixList[1].subtitle}
+            badge={{value: this.fixList[1].badgeValue, status: this.fixList[1].badgeStatus}}
+            chevron
+            onPress={() => this.props.navigation.navigate('Request')}
+          />
+          {
+            this.list.map((l, i) => (
+              <ListItem
+                key={i+2}
+                title={l.name}
+                subtitle={l.subtitle}
+                badge={{value: l.badgeValue, status: l.badgeStatus}}
+                chevron
+                onPress={() => this.props.navigation.navigate('활동 목록')}
+              />
+            ))
+          }
+        </View>
+
+      </ScrollView>
+    )
   }
-]
-
-export default function ActivityScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-
-      <View>
-        {
-          list.map((l, i) => (
-            <ListItem
-              key={i}
-              title={l.name}
-              subtitle={l.subtitle}
-              badge={{value: l.badgeValue, status: l.badgeStatus}}
-              chevron
-            />
-          ))
-        }
-      </View>
-
-
-      <ButtonGroup
-        buttons={bottomButtons}
-      />
-    </ScrollView>
-  );
 }
 
 /*
@@ -147,6 +148,10 @@ export default function ActivityScreen() {
         badge='warning'
         badgeStatus='warning'
         isLastOption/>
+
+        <ButtonGroup
+        buttons={bottomButtons}
+      />
 */
 
 function Menu() {

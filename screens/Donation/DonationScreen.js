@@ -4,31 +4,33 @@ import * as React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-export default function DonationScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.post}>
-        <Text style={styles.postCategory}>Category</Text>
-        <Text style={styles.postTitle}>Notice</Text>
-        <Button title='+' style={styles.postButton}/>
-      </View>
-      <View style={styles.post}>
-        <Text style={styles.postCategory}>Category</Text>
-        <Text style={styles.postTitle}>Notice</Text>
-        <Button title='+' style={styles.postButton}/>
-      </View>
-      <View style={styles.post}>
-        <Text style={styles.postCategory}>Category</Text>
-        <Text style={styles.postTitle}>Notice</Text>
-        <Button title='+' style={styles.postButton}/>
-      </View>
-      <View style={styles.post}>
-        <Text style={styles.postCategory}>Category</Text>
-        <Text style={styles.postTitle}>Notice</Text>
-        <Button title='+' style={styles.postButton}/>
-      </View>
-    </ScrollView>
-  );
+export default class DonationScreen extends React.Component {
+  render () {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.post}>
+          <Text style={styles.postCategory}>Category</Text>
+          <Text style={styles.postTitle}>Notice</Text>
+          <Button title='+' style={styles.postButton}/>
+        </View>
+        <View style={styles.post}>
+          <Text style={styles.postCategory}>Category</Text>
+          <Text style={styles.postTitle}>Notice</Text>
+          <Button title='+' style={styles.postButton}/>
+        </View>
+        <View style={styles.post}>
+          <Text style={styles.postCategory}>Category</Text>
+          <Text style={styles.postTitle}>Notice</Text>
+          <Button title='+' style={styles.postButton}/>
+        </View>
+        <View style={styles.post}>
+          <Text style={styles.postCategory}>Category</Text>
+          <Text style={styles.postTitle}>Notice</Text>
+          <Button title='+' style={styles.postButton}/>
+        </View>
+      </ScrollView>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

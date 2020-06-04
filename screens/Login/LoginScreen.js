@@ -160,10 +160,16 @@ export default class LoginScreen extends Component {
             <View>
                 <Text
                 style={{color : 'rgb(1, 192, 99)', letterSpacing:1 ,fontSize:30, marginBottom:30, textAlign:'center'}}
-                >{this.state.userName} 님, 환영합니다!</Text>
+                >{this.state.userName} 환영합니다</Text>
                 <Text
                 style={{color : 'rgb(1, 192, 99)', letterSpacing:2 ,fontSize:20, marginBottom:30, textAlign:'center'}}
                 >{this.state.userEmail}</Text>
+                <Button 
+                  title="시작하기"
+                  onPress={() => this.props.navigation.navigate('Main', {
+                    userEmail: this.state.userEmail, userName: this.state.userName, userId: this.state.userId
+                  })}
+                  />
 
             </View>
 
