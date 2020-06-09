@@ -1,14 +1,91 @@
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem } from 'react-native-elements'
 
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import { MonoText } from '../../components/StyledText';
 
+import Dialog from "react-native-dialog";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 export default class HomeScreen extends React.Component {
+
+  state = {
+    allActivities: [],
+    showList: false,
+
+    // for dialog
+    dialogVisible: false, 
+    isDatePickerVisible: false, // date picker in dialog
+    finalConfirmDialog: false,
+
+    // additional data to send to the web server
+    userSelectedActivity: {},
+    userSelectedDateTime: null, 
+    userSelectedInterestCategory: {},
+    serverUrl: '',
+    type: 0,
+  }
+
+  showDatePicker = () => {
+    this.setState({ isDatePickerVisible: true });
+  };
+ 
+  hideDatePicker = () => {
+    this.setState({ isDatePickerVisible: false });
+  };
+
+  handleConfirm = (date) => {
+    this.setState({ userSelectedDateTime: date});
+    this.hideDatePicker();
+  };
+
+  fetchPost(url, data) {
+    // var url = 'http://saevom06.cafe24.com/test/post';
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        //credentials: 'include',
+
+        body: JSON.stringify(data),
+      }).then((res) => { });
+      console.log(url);
+      //console.warn('fetch successful', url);
+      console.log(data);
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
+  }
+
+  constructor(props) {
+    super(props);
+    this.userMemo='';
+
+    try {
+      // get first five activites from server
+      let url = "http://saevom06.cafe24.com/activitydata/getActivities"
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+          this.setState({ allActivities: responseInJson }); // assign data to state variable
+          this.setState({ showList: true });
+        })
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   status = [
     'Before matching',
     'During matching',
@@ -63,6 +140,60 @@ export default class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+          
+        <View>
+          <DateTimePickerModal
+            isVisible={this.state.isDatePickerVisible}
+            mode="datetime"
+            onConfirm={this.handleConfirm}
+            onCancel={this.hideDatePicker}
+          />
+        </View>
+
+        <Dialog.Container visible={this.state.dialogVisible}>
+          <Dialog.Title style={{ color: 'rgb(1, 192, 99)' }}>{this.state.userSelectedActivity.title}</Dialog.Title>
+
+          <Dialog.Description children="1">
+            {this.state.userSelectedActivity.status}
+          </Dialog.Description>
+
+          <Dialog.Description children="1">
+            {this.state.userSelectedInterestCategory.name}
+          </Dialog.Description>
+
+          <Dialog.Description children="1">
+            {this.state.userSelectedActivity.deadline}
+          </Dialog.Description>
+
+          <Dialog.Input autoFocus underlineColorAndroid='rgb(1, 192, 99)' placeholder="메모를 입력해 주세요." onChangeText={(memo) => { this.userMemo = memo; }}
+          ></Dialog.Input>
+
+          <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='rgb(1, 192, 99)' onPress={
+            () => {
+              this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
+                id: this.state.userSelectedActivity.id, // id of the activity that user chose
+                name: 'HyunWoo',//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+                email: '21400045@handong.edu',// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+                memo: this.userMemo,
+              });
+              this.setState({ dialogVisible: false });
+            }
+          } />
+
+          <Dialog.Button label="이용자 지원" title="이용자 지원" color='rgb(1, 192, 99)' onPress={
+            () => {
+              this.fetchPost('http://saevom06.cafe24.com/requestdata/newRegister', { //  ** NEED REST CONTROLLER URL **
+                id: this.state.userSelectedActivity.id,
+                name: this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+                email: this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+                memo: this.userMemo,
+              });
+              this.setState({ dialogVisible: false });
+            }
+          } />
+          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+        </Dialog.Container>
+          
           <View style={styles.categoryOdd}>
             <View style={styles.title}>
               <Text style={styles.titleText}>Notice</Text>
@@ -72,20 +203,35 @@ export default class HomeScreen extends React.Component {
                 onPress={() => this.props.navigation.navigate('Activity', { screen : 'Interest', intial : false})}
                 />
             </View>
-            <View>
-              {
-                this.list.map((l, i) => (
-                  <ListItem
-                    key={i}
-                    title={l.name}
-                    subtitle={l.subtitle}
-                    badge={{value: l.badgeValue, status: l.badgeStatus}}
-                    chevron
-                    onPress={() => this.props.navigation.navigate('Activity', { screen : 'ActivityDetail', intial : false})}
-                  />
-                ))
+
+            <SafeAreaView style={{ flex: 1, alignItems: 'flex-start' }}>
+            <FlatList
+              data={this.state.allActivities}
+              renderItem={
+                ({ item }) => (
+                  <View style={{ margin: 3, flex:1, flexDirection:'row' }}>
+                    <Button
+                      title={item.title}
+                      buttonStyle={{ height: '100%' }}
+                      titleStyle={{ color: 'rgb(1, 192, 99)', fontSize: 23 }}
+                      containerStyle={{width: '100%', marginLeft:0}}
+                      raised
+                      type="outline"
+                      onPress={() => {
+                        // this.props.navigation.navigate('ActivityListScreen', {data: item}); // code for sending selected data when navigating
+                        this.setState({userSelectedActivity:item});
+                        this.setState({userSelectedInterestCategory:item.interestCategory});
+                        this.setState({ dialogVisible: true });
+                      }}
+                    />
+                  </View>
+                )
               }
-            </View>
+              keyExtractor={(item) => item.id.toString()}
+            >
+            </FlatList>
+          </SafeAreaView>
+
           </View>
           <View style={styles.categoryEven}>
             <View style={styles.title}>
