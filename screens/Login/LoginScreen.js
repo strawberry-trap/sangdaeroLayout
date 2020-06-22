@@ -110,7 +110,11 @@ export default class LoginScreen extends Component {
       });
       if (result.type === 'success') {
         if (this._isMounted) {
-          this.setState({ userName: result.user.name, userEmail: result.user.email, userId: result.user.id, loggedIn: true });
+          console.log(result.user.id);
+          this.setState({loggedIn: true });
+
+          global.googleUserName = result.user.name;
+          global.googleUserEmail = result.user.email;
         }
         this.onSignIn(result); // call onSignIn method here.
         return result.accessToken;
@@ -160,15 +164,13 @@ export default class LoginScreen extends Component {
             <View>
                 <Text
                 style={{color : 'rgb(1, 192, 99)', letterSpacing:1 ,fontSize:30, marginBottom:30, textAlign:'center'}}
-                >{this.state.userName} 환영합니다</Text>
+                >{global.googleUserName} 환영합니다</Text>
                 <Text
                 style={{color : 'rgb(1, 192, 99)', letterSpacing:2 ,fontSize:20, marginBottom:30, textAlign:'center'}}
-                >{this.state.userEmail}</Text>
+                >{global.googleUserEmail}</Text>
                 <Button 
                   title="시작하기"
-                  onPress={() => this.props.navigation.navigate('Main', {
-                    userEmail: this.state.userEmail, userName: this.state.userName, userId: this.state.userId
-                  })}
+                  onPress={() => this.props.navigation.navigate('Main')}
                   />
 
             </View>

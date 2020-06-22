@@ -9,32 +9,90 @@ import { Badge, Button, ButtonGroup, ListItem } from 'react-native-elements';
 
 
 export default class ActivityScreen extends React.Component {
-  bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
-  count = 1;
-  fixList =[
-    {
-      name:'물건 나눔',
-      subtitle:'물건 나눔',
-      badgeValue:'2',
-      badgeStatus:'success'
-    },
-    {
-      name:'요청하기',
-      subtitle:'요청하기',
-      badgeValue:'4',
-      badgeStatus:'success'
-    },
-  ]
-  list = [
-    {
-      name:'활동 조회',
-      subtitle:'활동 조회',
-      badgeValue:'20',
-      badgeStatus:'success'
-    },
-  ]
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: [],
+      isLoading: true,
+    }
+    this.bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
+
+    this.fixList =[
+      {
+        name:'물건 나눔',
+        subtitle:'물건 나눔',
+        badgeValue:'2',
+        badgeStatus:'success'
+      },
+      {
+        name:'요청하기',
+        subtitle:'요청하기',
+        badgeValue:'4',
+        badgeStatus:'success'
+      },
+      {
+        name:'내 활동',
+        subtitle:'내 활동',
+        badgeValue:'4',
+        badgeStatus:'success'
+      },
+    ]
+/*
+    this.list = [];
+
+    var url = 'http://saevom06.cafe24.com/interestdata/getAll';
+
+    // get the interest categories from server, as soon as this component is created.
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          async: false
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+          for (var i = 0; i < responseInJson.length; i++) {
+            this.list.push({
+              id:responseInJson[i].id,
+              name:responseInJson[i].name,
+            })
+            console.log(this.list);
+          }
+        })
+    } catch (e) {
+      console.warn(e);
+    }
+    */
+  }
+  
+  componentDidMount() {
+    fetch('http://saevom06.cafe24.com/interestdata/getAll', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        async: false
+      },
+    })
+    .then((response) => response.json())
+    .then((responseInJson) => {
+      this.setState({data:responseInJson});
+      console.log(this.state.data);
+    })
+    .catch((e) => console.log(e))
+    .finally(() => {
+      this.setState({isLoading:false});
+    })
+  }
+
+  
 
   render() {
+    const { data, isLoading } = this.state;
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
@@ -55,24 +113,42 @@ export default class ActivityScreen extends React.Component {
             chevron
             onPress={() => this.props.navigation.navigate('Request')}
           />
-          {
-            this.list.map((l, i) => (
+          <ListItem
+            key={2}
+            title={this.fixList[2].name}
+            subtitle={this.fixList[2].subtitle}
+            badge={{value: this.fixList[2].badgeValue, status: this.fixList[2].badgeStatus}}
+            chevron
+            onPress={() => this.props.navigation.navigate('활동 목록')}
+          />
+          { isLoading ? <View/> : (
+            data.map((l, i) => (
               <ListItem
                 key={i+2}
                 title={l.name}
-                subtitle={l.subtitle}
-                badge={{value: l.badgeValue, status: l.badgeStatus}}
                 chevron
-                onPress={() => this.props.navigation.navigate('활동 목록')}
+                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id})}
               />
             ))
-          }
+          )}
         </View>
 
       </ScrollView>
     )
   }
 }
+/*
+{
+  this.list.map((l, i) => (
+    <ListItem
+      key={i+2}
+      title={l.name}
+      chevron
+      onPress={() => this.props.navigation.navigate('활동 목록')}
+    />
+  ))
+}
+*/
 
 /*
       <OptionButton
@@ -153,30 +229,6 @@ export default class ActivityScreen extends React.Component {
         buttons={bottomButtons}
       />
 */
-
-function Menu() {
-  console.log(bottomButtons.length);
-  return (
-    <View style={{ flexDirection:'row', flex:1}}>
-      <Button
-        title={bottomButtons[0]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[1]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[2]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[3]}
-        buttonStyle={{flex:1}}
-      />
-    </View>
-  )
-}
 
 function OptionButton({ icon, label, badge, badgeStatus, onPress, isLastOption }) {
   return (
