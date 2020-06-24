@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as firebase from 'firebase';
-import * as Expo from "expo";
 import * as Google from 'expo-google-app-auth';
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Feather';
@@ -161,26 +160,6 @@ export default class LoginScreen extends Component {
     );
   }
 }
-
-/*
-<View>
-            {this.state.loggedIn && // when Google user is logged in, this component appears
-            <View>
-                <Text
-                style={{color : 'rgb(1, 192, 99)', letterSpacing:1 ,fontSize:30, marginBottom:30, textAlign:'center'}}
-                >{global.googleUserName} 환영합니다</Text>
-                <Text
-                style={{color : 'rgb(1, 192, 99)', letterSpacing:2 ,fontSize:20, marginBottom:30, textAlign:'center'}}
-                >{global.googleUserEmail}</Text>
-                <Button 
-                  title="시작하기"
-                  onPress={() => this.props.navigation.navigate('Main')}
-                  />
-
-            </View>
-          }
-        </View>
-*/
 
 const styles = StyleSheet.create({
   container: {

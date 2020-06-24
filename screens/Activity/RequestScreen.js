@@ -91,20 +91,83 @@ export default class RequestScreen extends React.Component {
     }
   }
 
+  state = {
+    index:1,
+    isDataLoaded: false,
+    isDatePickerVisible: false, // date picker
+    isStartTime:false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
+    startTime: null, // data to send to the web server
+    endTime: null, // data to send to the web server
+
+    interestCategoryId : 0,
+    interestCategoryName : ""
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state ={
+      interestCategoryId: props.route.params.interestType,
+      interestCategoryName: props.route.params.interestName
+    }
+
+    // get interest categories from server
+    var url = 'http://saevom06.cafe24.com/interestdata/getAll';
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+
+          // save each category
+          for (var i = 0; i < responseInJson.length; i++) {
+            interestCategory.push(responseInJson[i]);
+          }
+          this.setState({ isDataLoaded: true });
+        })
+    } catch (e) {
+      this.setState({ isDataLoaded: false });
+      console.warn('[failed getting interest categories from server: RequestScreen.js]', e);
+    }
+  }
+
+    // datetime picker
+    _showDatePicker = () => {
+      this.setState({ isDatePickerVisible: true });
+    };
+   
+    _hideDatePicker = () => {
+      this.setState({ isDatePickerVisible: false });
+    };
+  
+    _handleConfirm = (date) => {
+      if (this.state.isStartTime == true){
+        this.setState({ startTime: date});
+      } else {
+        this.setState({endTime: date});
+      }
+
+      this._hideDatePicker();
+    };
+
   createTwoButtonAlert = () =>
-  Alert.alert(
-    "한동대학교 청소",
-    "요청하기",
-    [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel"
-      },
-      { text: "OK", onPress: () => Alert.alert("요청되었습니다") }
-    ],
-    { cancelable: false }
-  );
+    Alert.alert(
+      "한동대학교 청소",
+      "요청하기",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => Alert.alert("요청되었습니다") }
+      ],
+      { cancelable: false }
+    );
 
   state = {
     index: '1',
@@ -119,7 +182,7 @@ export default class RequestScreen extends React.Component {
           'Content-Type': 'application/json'
         },
         //credentials: 'include',
-  
+
         body: JSON.stringify(data),
       });
       console.log(url);
@@ -226,9 +289,9 @@ export default class RequestScreen extends React.Component {
       </ScrollView>
     );
   }
-  
-}
 
+
+}
 
 const styles = StyleSheet.create({
   container: {
