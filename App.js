@@ -1,39 +1,75 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, Text } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 
 import useCachedResources from './hooks/useCachedResources';
-import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 
 import LoginScreen from './screens/Login/LoginScreen';
-import ActivityStackScreen from './screens/Activity/ActivityStackScreen'
+import BottomTabNavigator from './navigation/BottomTabNavigator';
 
 const Stack = createStackNavigator();
 
-export default function App(props) {
-  const isLoadingComplete = useCachedResources();
+export default class App extends React.Component {
 
-  if (!isLoadingComplete) {
-    return null;
-  } else {
-    return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-        <NavigationContainer linking={LinkingConfiguration}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="Log" component={LoginScreen} />
-            <Stack.Screen name="Main" component={BottomTabNavigator} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </View>
-    );
+  state = {
+    appIsReady : false,
   }
+
+  async componentDidMount() {
+    try {
+      await SplashScreen.preventAutoHideAsync();
+    } catch (e) {
+      console.warn(e);
+    }
+    this.prepareResources();
+  }
+
+  prepareResources = async() => {
+    await performAPICalls();
+    await downloadAssets();
+
+    this.setState({ appIsReady : true }, async() => {
+      await SplashScreen.hideAsync();
+    })
+  }
+
+  render() {
+    if (!this.state.appIsReady) {
+      console.log('Loading');
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      )
+    } else {
+      return (
+        <View style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
+          <NavigationContainer linking={LinkingConfiguration}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="Log" component={LoginScreen} />
+              <Stack.Screen name="Main" component={BottomTabNavigator} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
+      );
+    }
+  }
+}
+
+async function performAPICalls() {
+  console.log('APIcalls');
+}
+
+async function downloadAssets() {
+  console.log('Download');
 }
 
 const styles = StyleSheet.create({

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert, TouchableOpacity, Image } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ButtonGroup } from 'react-native-elements'
 
@@ -20,8 +20,7 @@ export default class ActivityDetailScreen extends React.Component {
       '취소된 활동'
     ];
 
-
-
+    console.log(this.state.data.activityUsers);
 
     if (this.state.data.deadline.charAt(4) != '년') {
       if (this.state.data.deadline == null) {
@@ -113,57 +112,125 @@ export default class ActivityDetailScreen extends React.Component {
         // }).then(result => result.json())
         //     .catch(error => console.error('Error: ', error))
         //     .then(response => console.log('Success', response));
+  }
+
+  getImage(props) {
+    var path;
+
+    switch(props) {
+      case 0:
+        path = require('../../assets/images/status_0.png');
+        break;
+      case 1:
+        path = require('../../assets/images/status_1.png');
+        break;
+      case 2:
+        path = require('../../assets/images/status_2.png');
+        break;
+      case 3:
+        path = require('../../assets/images/status_3.png');
+        break;
+      case 4:
+        path = require('../../assets/images/status_4.png');
+        break;
+      default:
+        path = require('../../assets/images/status_5.png');
+        break;
     }
+
+    return (
+      <Image
+          source={path}
+          style={styles.statusButton}
+      />
+    )
+  }
+    
 
 
   render() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={{padding:10}} />
-        <View style={styles.title}>
-          <Text style={styles.postTitle}>{this.state.data.title}</Text>
-          <Text style={styles.postCategory}>{this.state.data.interestCategory.name}</Text>
+        <View style={styles.box}>
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>{this.state.data.title}</Text>
+              {this.getImage(this.state.data.status)}
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>마감 기한</Text>
+                <Text style={styles.content}>{this.state.data.deadline}</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>관심사</Text>
+                <Text style={styles.content}>{this.state.data.interestCategory.name}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.line}/>
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>담당인원</Text>
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>봉사자</Text>
+                <Text style={styles.content}>윤하늘</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>이용자</Text>
+                <Text style={styles.content}>김준서</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.line}/>
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>활동내용</Text>
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>활동기간</Text>
+                <View style={styles.date}>
+                <Text style={styles.time}>{this.state.data.startTime} ~</Text>
+                <Text style={styles.time}>{this.state.data.endTime}</Text>
+                </View>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>장소</Text>
+                <Text style={styles.content}>경북 포항시 북구 흥해읍 한동로 558</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>세부내용</Text>
+                <Text style={styles.content}>어르신에게 말벗 해드리기</Text>
+              </View>
+            </View>
+          </View>
         </View>
-        <View style={styles.title}>
-          <Text style={styles.postTitle}>마감 기한 : {this.state.data.deadline}</Text>
-          <Text style={styles.postCategory}>{this.status[this.state.data.status]}</Text>  
+        <TouchableOpacity onPress={()=>console.log("add")}>
+          <Text style={styles.button}>
+            봉사자 지원
+          </Text>
+        </TouchableOpacity>
+        <View style={styles.photoButtons}>
+          <TouchableOpacity onPress={()=>console.log("add")}>
+            <Text style={styles.startButton}>
+              시작 사진 전송
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=>console.log("add")}>
+            <Text style={styles.endButton}>
+              종료 사진 전송
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={{paddingTop:30, borderBottomWidth: 1, alignSelf:'stretch'}} />
-        <View style={styles.form}>
-          <View style={styles.formCategory}>
-            <Text style={styles.formName}>봉사자</Text>
-            <Text style={styles.formPhone}>전화번호</Text>  
-          </View>
-          <View style={styles.formCategory}>
-            <Text style={styles.formContentName}>김준서</Text>  
-            <Text style={styles.formContentPhone}>010-XXXX-XXXX</Text>  
-          </View>
-        </View>
-        <View style={styles.form}>
-          <View style={styles.formCategory}>
-            <Text style={styles.formName}>이용자</Text>
-            <Text style={styles.formPhone}>전화번호</Text>  
-          </View>
-          <View style={styles.formCategory}>
-            <Text style={styles.formContentName}>이용호</Text>  
-            <Text style={styles.formContentPhone}>010-XXXX-XXXX</Text>  
-          </View>
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.contentTitle}>활동 내용</Text>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>활동 기간</Text>
-            <Text style={styles.contentDetail}>{this.state.data.startTime} ~ {this.state.data.endTime}</Text>
-          </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>장소</Text>
-            <Text style={styles.contentDetail}>{this.state.data.place}</Text>
-          </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>세부 내용</Text>
-            <Text style={styles.contentDetail}>{this.state.data.content}</Text>
-          </View>
-        </View>
+      </ScrollView>
+    )
+  }
+}
+
+/*
         <ButtonGroup
           buttons={['봉사자 지원', '이용자 지원', '목록']}
           containerStyle={{backgroundColor: 'rgb(155, 249, 153)', marginTop:30}}
@@ -189,10 +256,7 @@ export default class ActivityDetailScreen extends React.Component {
             ]
             )}
         />
-      </ScrollView>
-    )
-  }
-}
+*/
 
 function ButtonList(type) {
   switch(type) {
@@ -208,110 +272,108 @@ function ButtonList(type) {
   }
 }
 
-/*
-        <View style={{flexDirection:'row'}}>
-          <Button title="봉사자 지원"/>
-          <Button title="이용자 지원"/>
-          <Button 
-            title="목록"
-            onPress={() => this.props.navigation.popToTop()}
-            />
-        </View>
-        */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 0,
-    alignItems: 'center',
+    paddingTop: 25,
     padding: 3,
   },
+  box: {
+    flex:1,
+    padding:20,
+    paddingTop:15,
+    paddingBottom:20,
+    backgroundColor:'#FFF',
+    marginBottom:25,
+    marginLeft:8,
+    marginRight:8,
+    borderRadius:25,
+    elevation:2,
+  },
+  list: {
+    marginTop:10,
+    marginBottom:10,
+  },
+  line: {
+    marginTop: 10,
+    marginBottom: 10,
+    borderTopWidth:1,
+    borderColor:'rgb(220, 220, 220)'
+  },
+  titleList: {
+    flexDirection:'row',
+    marginBottom: 7,
+  },
   title:{
-    flexDirection: 'row',
-    paddingStart: 10,
-    paddingEnd: 10,
-  },
-  postTitle: {
-    flex: 3,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 18,
-    padding: 5,
-  },
-  postCategory: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 18,
-    padding: 5,
-  },
-  form: {
-    alignSelf: 'stretch',
-    padding: 10,
-    paddingTop: 30,
-    paddingBottom: 30,
-    borderBottomWidth: 1,
-  },
-  formCategory: {
     flex: 1,
     flexDirection: 'row',
-    alignSelf: 'center',
-  },
-  formName: {
-    flex: 1,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 15,
     padding: 2,
+    fontSize:20,
+    fontWeight:'bold',
   },
-  formPhone: {
-    flex: 3,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 15,
-    padding: 2,
+  dataList:{
+    padding:5
   },
-  formContentName: {
-    flex: 1,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(215, 252, 214)',
-    fontSize: 15,
-    padding: 2,
+  data: {
+    flexDirection:'row',
+    marginTop:3,
+    marginBottom:3,
   },
-  formContentPhone: {
-    flex: 3,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(215, 252, 214)',
-    fontSize: 15,
-    padding: 2,
+  header: {
+    flex:3,
+    fontSize:14,
   },
   content: {
-    padding: 10,
-    paddingTop: 30,
-    paddingBottom: 30,
-    borderBottomWidth: 1,
-    alignSelf: 'stretch',
+    flex:10,
+    fontSize:14,
   },
-  contentTitle: {
-    backgroundColor: 'rgb(155, 249, 153)',
-    alignSelf: 'stretch',
-    fontSize: 15,
-    padding: 2,
+  date: {
+    flex:10,
   },
-  contentCategory: {
-    backgroundColor: 'rgb(215, 252, 214)',
-    alignSelf: 'stretch',
+  time: {
     flex:1,
-    fontSize: 13,
-    padding: 2,
   },
-  contentDetail: {
-    backgroundColor: 'rgb(215, 252, 214)',
-    alignSelf: 'stretch',
-    flex:5,
-    fontSize: 13,
-    padding: 2,
+  statusButton: {
+    width:90,
+    height:35,
+    resizeMode:'contain',
   },
+  button: {
+    textAlign:'center',
+    marginLeft:35,
+    marginRight:35,
+    fontSize:22,
+    color:'#FFF',
+    backgroundColor:'rgb(29,140,121)',
+    borderRadius:50,
+    padding:8,
+  },
+  photoButtons: {
+    flexDirection: 'row',
+    justifyContent:'center',
+  },
+  startButton: {
+    flex:1,
+    textAlign:'center',
+    marginLeft:0,
+    marginRight:10,
+    fontSize:22,
+    color:'#FFF',
+    backgroundColor:'rgb(1, 192, 99)',
+    borderRadius:50,
+    padding:8,
+  },
+  endButton: {
+    flex:1,
+    textAlign:'center',
+    marginLeft:10,
+    marginRight:0,
+    fontSize:22,
+    color:'#FFF',
+    backgroundColor:'rgb(29,140,121)',
+    borderRadius:50,
+    padding:8,
+  }
 });
