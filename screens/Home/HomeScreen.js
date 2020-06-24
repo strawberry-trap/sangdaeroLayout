@@ -137,6 +137,9 @@ export default class HomeScreen extends React.Component {
   testList =[];
 
   render() {
+
+    console.disableYellowBox = true;
+    
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -153,15 +156,19 @@ export default class HomeScreen extends React.Component {
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title style={{ color: 'rgb(1, 192, 99)' }}>{this.state.userSelectedActivity.title}</Dialog.Title>
 
-          <Dialog.Description children="1">
+          <Dialog.Description >
+            {global.googleUserName}
+          </Dialog.Description>
+
+          <Dialog.Description >
             {this.state.userSelectedActivity.status}
           </Dialog.Description>
 
-          <Dialog.Description children="1">
+          <Dialog.Description >
             {this.state.userSelectedInterestCategory.name}
           </Dialog.Description>
 
-          <Dialog.Description children="1">
+          <Dialog.Description >
             {this.state.userSelectedActivity.deadline}
           </Dialog.Description>
 

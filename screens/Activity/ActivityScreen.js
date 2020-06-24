@@ -1,211 +1,98 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ButtonGroup, ListItem } from 'react-native-elements';
+import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
+import { Button, ListItem } from 'react-native-elements';
 
-
+let buttonList = [];
+let interestCategory = [];
 
 export default class ActivityScreen extends React.Component {
-  bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
-  count = 1;
-  fixList =[
-    {
-      name:'물건 나눔',
-      subtitle:'물건 나눔',
-      badgeValue:'2',
-      badgeStatus:'success'
-    },
-    {
-      name:'요청하기',
-      subtitle:'요청하기',
-      badgeValue:'4',
-      badgeStatus:'success'
-    },
-  ]
-  list = [
-    {
-      name:'활동 조회',
-      subtitle:'활동 조회',
-      badgeValue:'20',
-      badgeStatus:'success'
-    },
-  ]
+
+  state = {
+    type:0,
+    showButtons: false, // for rendering buttons after fetch() is executed
+  }
+
+  constructor(props) {
+    super(props);
+
+    // get the interest categories from server, as soon as this component is created.
+    var url = 'http://saevom06.cafe24.com/interestdata/getAll';
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+
+          // receive the interest categories(관심사 목록) from server, and add an attribute(action) to 'interest category'  
+          for (var i = 0; i < responseInJson.length; i++) {
+            let givenType = responseInJson[i]["id"];
+
+            responseInJson[i]["action"] = () => {
+              this.setState({ type: givenType });
+              
+              this.props.navigation.navigate('Request',
+              {
+                //interestType: responseInJson["id"],
+                //interestName: responseInJson["name"],
+                interestType: 1,
+                interestName: '환경 미화',
+              })
+            }
+            interestCategory.push(responseInJson[i]);
+          } // at this point, each elements of interest category is like { id:1, name:"driving", action: () => {...} }
+
+          // render buttons with 'interest category' information
+          buttonList = interestCategory.map(
+            buttonInfo => {
+              return (
+                <View style={[{ width: "90%", margin: 20, backgroundColor: "white" }]}>
+                  <Button
+                    key={buttonInfo.id}
+                    buttonStyle={{ backgroundColor: 'rgb(1, 192, 99)', height: 50, width: 400 }}
+                    titleStyle={{ fontSize: 23 }}
+                    title={buttonInfo.name}
+                    raised
+                    onPress={buttonInfo.action} // onPress actions are already defined in fetch()
+                  />
+                </View>
+              );
+            }
+          );
+          // after getting all the data, render the buttons
+          this.setState({ showButtons: true });
+        })
+    } catch (e) {
+      console.warn('[TestScreen.js try-catch error log]', e);
+    }
+  }
 
   render() {
-    return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
-        <View>
-          <ListItem
-            key={0}
-            title={this.fixList[0].name}
-            subtitle={this.fixList[0].subtitle}
-            badge={{value: this.fixList[0].badgeValue, status: this.fixList[0].badgeStatus}}
-            chevron
-            onPress={() => this.props.navigation.navigate('Request')}
-          />
-          <ListItem
-            key={1}
-            title={this.fixList[1].name}
-            subtitle={this.fixList[1].subtitle}
-            badge={{value: this.fixList[1].badgeValue, status: this.fixList[1].badgeStatus}}
-            chevron
-            onPress={() => this.props.navigation.navigate('Request')}
-          />
-          {
-            this.list.map((l, i) => (
-              <ListItem
-                key={i+2}
-                title={l.name}
-                subtitle={l.subtitle}
-                badge={{value: l.badgeValue, status: l.badgeStatus}}
-                chevron
-                onPress={() => this.props.navigation.navigate('활동 목록')}
-              />
-            ))
-          }
+    if (this.state.showButtons == true) {
+      return (
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+          <View style={styles.container}>
+            <ScrollView>
+              <View>{buttonList}</View>
+            </ScrollView>
+          </View>
+        </ScrollView>
+      )
+    } else {
+      return (
+        <View style={styles.container}>
+          <Text>Data is loading...</Text>
         </View>
-
-      </ScrollView>
-    )
+      );
+    }
   }
-}
-
-/*
-      <OptionButton
-        label='Request'
-        badge='10+'
-        badgeStatus='success'
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
-      
-      <OptionButton
-        label='Donation'
-        badge='20+'
-        badgeStatus='success'
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
-
-      <OptionButton
-        label={buttonText()}
-        badge='success'
-        badgeStatus='success'
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
-
-      <OptionButton
-        label={buttonText()}
-        badge='error'
-        badgeStatus='error'
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
-
-      <OptionButton
-        label={buttonText()}
-        badge='primary'
-        badgeStatus='primary'
-        onPress={() => WebBrowser.openBrowserAsync('https://reactnavigation.org')}
-      />
-      
-      <OptionButton
-        label={buttonText()}
-        badge='warning'
-        badgeStatus='warning'
-        onPress={() => WebBrowser.openBrowserAsync('https://forums.expo.io')}
-        isLastOption
-      />
-
-      <OutlineButton
-        label='Request'
-        badge='warning'
-        badgeStatus='warning'/>
-
-      <OutlineButton
-        label='Donation'
-        badge='warning'
-        badgeStatus='warning'/>
-
-      <OutlineButton
-        label={buttonText()}
-        badge='warning'
-        badgeStatus='warning'/>
-
-      <OutlineButton
-        label={buttonText()}
-        badge='warning'
-        badgeStatus='warning'/>
-      
-      <OutlineButton
-        label={buttonText()}
-        badge='warning'
-        badgeStatus='warning'/>
-
-      <OutlineButton
-        label={buttonText()}
-        badge='warning'
-        badgeStatus='warning'
-        isLastOption/>
-
-        <ButtonGroup
-        buttons={bottomButtons}
-      />
-*/
-
-function Menu() {
-  console.log(bottomButtons.length);
-  return (
-    <View style={{ flexDirection:'row', flex:1}}>
-      <Button
-        title={bottomButtons[0]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[1]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[2]}
-        buttonStyle={{flex:1}}
-      />
-      <Button
-        title={bottomButtons[3]}
-        buttonStyle={{flex:1}}
-      />
-    </View>
-  )
-}
-
-function OptionButton({ icon, label, badge, badgeStatus, onPress, isLastOption }) {
-  return (
-    <RectButton style={[styles.option, isLastOption && styles.lastOption]} onPress={onPress}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>{label}</Text>
-        </View>
-        <View style={styles.optionBadgeContainer}>
-          <Badge style={styles.badge} value={badge} status={badgeStatus}/>
-        </View>
-      </View>
-    </RectButton>
-  );
-}
-
-function OutlineButton({ icon, label, badge, badgeStatus, onPress, isLastOption }) {
-  return (
-    <Button onPress={onPress} type='outline' title={label}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>{label}</Text>
-        </View>
-        <View style={styles.optionBadgeContainer}>
-          <Badge style={styles.badge} value={badge} status={badgeStatus}/>
-        </View>
-      </View>
-    </Button>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -230,15 +117,15 @@ const styles = StyleSheet.create({
   },
   optionTextContainer: {
     flexDirection: 'row',
-    flex:4
+    flex: 4
   },
   optionText: {
     fontSize: 15,
     alignSelf: 'flex-start',
     marginTop: 1,
   },
-  touch:{
-    flexDirection:'row',
+  touch: {
+    flexDirection: 'row',
   },
   optionTextContainer: {
     flex: 1,

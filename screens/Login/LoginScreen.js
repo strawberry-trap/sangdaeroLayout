@@ -111,6 +111,10 @@ export default class LoginScreen extends Component {
       if (result.type === 'success') {
         if (this._isMounted) {
           this.setState({ userName: result.user.name, userEmail: result.user.email, userId: result.user.id, loggedIn: true });
+        
+          // store email and name in global variable
+          global.googleUserName = result.user.name;
+          global.googleUserEmail = result.user.email;
         }
         this.onSignIn(result); // call onSignIn method here.
         return result.accessToken;
@@ -172,19 +176,12 @@ export default class LoginScreen extends Component {
                   />
 
             </View>
-
-            
           }
         </View>
-
-
-
-
       </View>
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   container: {
