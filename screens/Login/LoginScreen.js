@@ -110,9 +110,12 @@ export default class LoginScreen extends Component {
       });
       if (result.type === 'success') {
         if (this._isMounted) {
+
+        
+
+
           console.log(result.user.id);
           this.setState({loggedIn: true });
-
           global.googleUserName = result.user.name;
           global.googleUserEmail = result.user.email;
         }
@@ -174,19 +177,12 @@ export default class LoginScreen extends Component {
                   />
 
             </View>
-
-            
           }
         </View>
-
-
-
-
       </View>
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   container: {
