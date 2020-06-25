@@ -32,16 +32,14 @@ export default class ActivityScreen extends React.Component {
           // receive the interest categories(관심사 목록) from server, and add an attribute(action) to 'interest category'  
           for (var i = 0; i < responseInJson.length; i++) {
             let givenType = responseInJson[i]["id"];
-
+            let givenName = responseInJson[i]["name"];
             responseInJson[i]["action"] = () => {
               this.setState({ type: givenType });
               
               this.props.navigation.navigate('Request',
               {
-                //interestType: responseInJson["id"],
-                //interestName: responseInJson["name"],
-                interestType: 1,
-                interestName: '환경 미화',
+                interestType: givenType,
+                interestName: givenName,
               })
             }
             interestCategory.push(responseInJson[i]);

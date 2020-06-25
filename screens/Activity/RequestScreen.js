@@ -12,8 +12,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 let interestCategory = [];
 let title="";
+let memo="";
 
-let dataFromActivityScreen;
 export default class RequestScreen extends React.Component {
 
   state = {
@@ -35,6 +35,9 @@ export default class RequestScreen extends React.Component {
       interestCategoryId: props.route.params.interestType,
       interestCategoryName: props.route.params.interestName
     }
+
+    // picker selected value
+    this.setState({index:this.state.interestCategoryId});
 
     // get interest categories from server
     var url = 'http://saevom06.cafe24.com/interestdata/getAll';
@@ -79,27 +82,12 @@ export default class RequestScreen extends React.Component {
       this._hideDatePicker();
     };
 
-  createTwoButtonAlert = () =>
-    Alert.alert(
-      "한동대학교 청소",
-      "요청하기",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        },
-        { text: "OK", onPress: () => Alert.alert("요청되었습니다") }
-      ],
-      { cancelable: false }
-    );
+    goBack(){
+      this.props.navigation.navigate('Interest');
+    }
+  
 
-  state = {
-    index: '1',
-  };
-
-  _fetchPost(url, data) {
-    // var url = 'http://saevom06.cafe24.com/test/post';
+  fetchPost(url, data) {
     try {
       fetch(url, {
         method: 'POST',
@@ -107,8 +95,6 @@ export default class RequestScreen extends React.Component {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-        //credentials: 'include',
-
         body: JSON.stringify(data),
       });
       console.log(url);
@@ -119,7 +105,6 @@ export default class RequestScreen extends React.Component {
   }
 
   render() {
-    console.log(this.state.interestCategoryId);
     if (this.state.isDataLoaded == true) {
       return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -145,6 +130,7 @@ export default class RequestScreen extends React.Component {
             <Input
               name='title'
               placeholder='제목'
+              onChangeText={(input) => { this.title = input; }}
               leftIcon={
                 <TabBarIcon name="ios-clipboard" />
               }
@@ -154,22 +140,9 @@ export default class RequestScreen extends React.Component {
               <Text style={styles.postCategory}>카테고리</Text>
             </View>
 
-            <Picker
-              name='category'
-              selectedValue={this.state.index}
-              style={{ height: 50, width: 200 }}
-              mode='dropdown'
-              onValueChange={(itemValue) =>
-                this.setState({ index: itemValue })
-              }>
-
-              {
-                interestCategory.map((interest) => {
-                  return (<Picker.Item label={interest.name} value={interest.id} key={interest.id} selectedValue={this.state.interestCategoryId} />)
-                })
-              }
-
-            </Picker>
+            <View>
+            <Text>{this.state.interestCategoryName}</Text>
+            </View>
 
             <View style={styles.category}>
               <Text style={styles.postCategory}>활동 시간</Text>
@@ -193,6 +166,15 @@ export default class RequestScreen extends React.Component {
               }
             />
 
+            <Input
+              name='memo'
+              placeholder='메모'
+              onChangeText={(input) => { this.memo = input; }}
+              leftIcon={
+                <TabBarIcon name="ios-clipboard" />
+              }
+            />
+
             <View style={{margin:10}}>
             </View>
           </View>
@@ -203,7 +185,29 @@ export default class RequestScreen extends React.Component {
             <Button
               title="등록하기"
               onPress={
-                () => this.createTwoButtonAlert()}
+                () => {
+                  // send request to the web server
+                  const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
+
+                  // data validation check
+                  if (this.title == undefined) this.title="제목이 입력되지 않았습니다."
+                  if (this.memo == undefined) this.memo="메모가 입력되지 않았습니다."
+                  if (this.state.startTime == undefined) this.setState({startTime:"0000-00-00T00:00:00.000Z"})
+                  if (this.state.endTime == undefined) this.setState({endTime:"0000-00-00T00:00:00.000Z"})
+
+                  this.fetchPost(url, {
+                    id: this.state.interestCategoryId,
+                    name: global.googleUserName,
+                    email: global.googleUserEmail,
+                    startTime: this.state.startTime,
+                    endTime:this.state.endTime,
+                    title: this.title,
+                    memo: this.memo,
+                  })
+                  Alert.alert("봉사 신청이 등록 되었습니다!");
+                  this.props.navigation.navigate('Interest');
+                }
+              }
             />
           </View>
 
