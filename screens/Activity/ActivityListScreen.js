@@ -14,6 +14,7 @@ export default class ActivityListScreen extends React.Component {
 
     this.state = {
       id: props.route.params.id,
+      name: props.route.params.name,
       data: [],
       isLoading: true,
     }
@@ -118,7 +119,7 @@ export default class ActivityListScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('요청하기', {test:'test'})}>
+        <TouchableOpacity onPress={() => this.props.navigation.navigate('요청하기', {test:'test',categoryName:this.state.name, categoryId:this.state.id})}>
           <Text style={styles.button}>
             새로운 활동 추가하기 +
           </Text>

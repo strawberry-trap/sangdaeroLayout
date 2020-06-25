@@ -74,7 +74,7 @@ export default class ActivityScreen extends React.Component {
                 key={i+2}
                 title={l.name}
                 chevron={{size:30}}
-                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id})}
+                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id, name:l.name})}
                 containerStyle={styles.item}
                 titleStyle={styles.text}
               />

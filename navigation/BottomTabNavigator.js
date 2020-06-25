@@ -13,7 +13,7 @@ import BoardDetailScreen from '../screens/Board/BoardDetailScreen';
 import MypageScreen from '../screens/Mypage/MypageScreen';
 import BoardStackScreen from '../screens/Board/BoardStackScreen';
 import ActivityStackScreen from '../screens/Activity/ActivityStackScreen';
-
+import NoticeStackScreen from '../screens/Notice/NoticeStackScreen';
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
@@ -65,9 +65,9 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
       <BottomTab.Screen
         name="Activity1"
-        component={ActivityStackScreen}
+        component={NoticeStackScreen}
         options={{
-          title: '후원하기',
+          title: '공지사항',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-filing" />,
         }}
       />
