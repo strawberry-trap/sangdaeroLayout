@@ -1,134 +1,126 @@
+import { Ionicons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-
-import { Button, ListItem } from 'react-native-elements';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { Badge, Button, ButtonGroup, ListItem } from 'react-native-elements';
 
 let buttonList = [];
 let interestCategory = [];
 
 export default class ActivityScreen extends React.Component {
-
-  state = {
-    type:0,
-    showButtons: false, // for rendering buttons after fetch() is executed
-  }
-
   constructor(props) {
     super(props);
 
-    // get the interest categories from server, as soon as this component is created.
-    var url = 'http://saevom06.cafe24.com/interestdata/getAll';
-    try {
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-      }).then((response) => response.json())
-        .then((responseInJson) => {
-
-          // receive the interest categories(관심사 목록) from server, and add an attribute(action) to 'interest category'  
-          for (var i = 0; i < responseInJson.length; i++) {
-            let givenType = responseInJson[i]["id"];
-            let givenName = responseInJson[i]["name"];
-            responseInJson[i]["action"] = () => {
-              this.setState({ type: givenType });
-              
-              this.props.navigation.navigate('Request',
-              {
-                interestType: givenType,
-                interestName: givenName,
-              })
-            }
-            interestCategory.push(responseInJson[i]);
-          } // at this point, each elements of interest category is like { id:1, name:"driving", action: () => {...} }
-
-          // render buttons with 'interest category' information
-          buttonList = interestCategory.map(
-            buttonInfo => {
-              return (
-                <View style={[{ width: "90%", margin: 20, backgroundColor: "white" }]}>
-                  <Button
-                    key={buttonInfo.id}
-                    buttonStyle={{ backgroundColor: 'rgb(1, 192, 99)', height: 50, width: 400 }}
-                    titleStyle={{ fontSize: 23 }}
-                    title={buttonInfo.name}
-                    raised
-                    onPress={buttonInfo.action} // onPress actions are already defined in fetch()
-                  />
-                </View>
-              );
-            }
-          );
-          // after getting all the data, render the buttons
-          this.setState({ showButtons: true });
-        })
-    } catch (e) {
-      console.warn('[TestScreen.js try-catch error log]', e);
+    this.state = {
+      data: [],
+      isLoading: true,
     }
+    this.bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
+
+    this.fixList =[
+      {
+        name:'물건 나눔',
+        subtitle:'물건 나눔',
+        badgeValue:'2',
+        badgeStatus:'success'
+      },
+      {
+        name:'요청하기',
+        subtitle:'요청하기',
+        badgeValue:'4',
+        badgeStatus:'success'
+      },
+      {
+        name:'내 활동',
+        subtitle:'내 활동',
+        badgeValue:'4',
+        badgeStatus:'success'
+      },
+    ]
+  }
+  
+  componentDidMount() {
+    fetch('http://saevom06.cafe24.com/interestdata/getAll', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        async: false
+      },
+    })
+    .then((response) => response.json())
+    .then((responseInJson) => {
+      this.setState({data:responseInJson});
+      console.log(this.state.data);
+    })
+    .catch((e) => console.log(e))
+    .finally(() => {
+      this.setState({isLoading:false});
+    })
   }
 
+  
+
   render() {
+    const { data, isLoading } = this.state;
 
-    if (this.state.showButtons == true) {
-      return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-
-          <View style={styles.container}>
-            <ScrollView>
-              <View>{buttonList}</View>
-            </ScrollView>
-          </View>
-        </ScrollView>
-      )
-    } else {
-      return (
-        <View style={styles.container}>
-          <Text>Data is loading...</Text>
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View>
+          { isLoading ? <View/> : (
+            data.map((l, i) => (
+              <ListItem
+                key={i+2}
+                title={l.name}
+                chevron={{size:30}}
+                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id, name:l.name})}
+                containerStyle={styles.item}
+                titleStyle={styles.text}
+              />
+            ))
+          )}
         </View>
-      );
-    }
+
+      </ScrollView>
+    )
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#rgb(220,220,220)',
   },
   contentContainer: {
-    paddingTop: 0,
+    paddingTop: 15,
   },
-  option: {
-    backgroundColor: '#CCC',
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    marginBottom: 15,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    borderColor: '#ededed',
+  item: {
+    flex:1,
+    padding:18,
+    backgroundColor:'#FFF',
+    margin:8,
+    borderRadius:10,
+    height:90,
+    elevation:2,
   },
-  lastOption: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  listBox: {
+    padding: 3,
   },
-  optionTextContainer: {
-    flexDirection: 'row',
-    flex: 4
+  list: {
+    flex:1,
+    padding: 5,
+    paddingRight:10,
+    paddingBottom: 8,
+    marginTop: 3,
+    flexDirection:'row',
+    borderBottomWidth:0.5,
+    borderColor:'rgb(220,220,220)',
   },
-  optionText: {
-    fontSize: 15,
-    alignSelf: 'flex-start',
-    marginTop: 1,
-  },
-  touch: {
-    flexDirection: 'row',
-  },
-  optionTextContainer: {
-    flex: 1,
-    alignContent: 'flex-end',
-  },
-  badge: {
-  },
+  text: {
+    fontSize:25,
+    fontWeight:'bold',
+    paddingLeft:20,
+    color:'rgb(29,140,121)',
+  }
 });

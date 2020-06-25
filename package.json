@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "~10.0.6",
-    "@react-native-community/datetimepicker": "^2.4.0",
+    "@react-native-community/datetimepicker": "^2.4.2",
     "@react-native-community/masked-view": "0.1.6",
     "@react-native-community/picker": "^1.5.1",
     "@react-navigation/bottom-tabs": "^5.3.1",
@@ -25,6 +25,8 @@
     "expo-font": "~8.1.0",
     "expo-google-app-auth": "^8.1.0",
     "expo-google-sign-in": "^8.1.0",
+    "expo-image-picker": "^8.3.0",
+    "expo-linear-gradient": "~8.1.0",
     "expo-linking": "^1.0.1",
     "expo-splash-screen": "^0.2.3",
     "expo-web-browser": "~8.2.0",

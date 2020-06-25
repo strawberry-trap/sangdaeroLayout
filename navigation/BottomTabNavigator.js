@@ -64,8 +64,8 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
       <BottomTab.Screen
-        name="Request"
-        component={RequestScreen}
+        name="Activity1"
+        component={ActivityStackScreen}
         options={{
           title: '후원하기',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-filing" />,

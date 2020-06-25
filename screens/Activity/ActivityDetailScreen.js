@@ -1,7 +1,11 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert, TouchableOpacity, Image } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ButtonGroup } from 'react-native-elements'
+import * as ImagePicker from 'expo-image-picker'; // for image access
+import Dialog from "react-native-dialog";
+
+let formData = new FormData();
 
 export default class ActivityDetailScreen extends React.Component {
   constructor(props) {
@@ -9,7 +13,29 @@ export default class ActivityDetailScreen extends React.Component {
 
     this.state = {
       data: props.route.params.data,
+      isUserRelated: 0, // for three cases: volunteer = 1, benefiting-user = 2, not related = 0
+      image: null, // check if image is selected or not
+      dialogVisible: false, // dialog for image picking
+      pictureSendingUrl:"",
     };
+
+    // check if user is related to this activity. Default is not-related.
+    // 1) check if volunteer
+    for (var i = 0; i < this.state.data.activityVolunteers.length; i++) {
+      if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
+        this.setState({ isUserRelated: 1 });
+        console.log("current user is volunteer");
+        break;
+      }
+    }
+    // 2) check if benefiting-user
+    for (var i = 0; i < this.state.data.activityUsers.length; i++) {
+      if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
+        this.setState({ isUserRelated: 2 });
+        console.log("current user is benefiting-user");
+        break;
+      }
+    }
 
     this.status = [
       '매칭 전',
@@ -20,9 +46,6 @@ export default class ActivityDetailScreen extends React.Component {
       '취소된 활동'
     ];
 
-
-
-
     if (this.state.data.deadline.charAt(4) != '년') {
       if (this.state.data.deadline == null) {
         if (this.state.data.startTime == null) {
@@ -31,21 +54,105 @@ export default class ActivityDetailScreen extends React.Component {
           this.state.data.deadline = this.state.data.startTime;
         }
       }
-  
+
       if (this.state.data.deadline != '없음') {
         this.state.data.deadline = this.parseDate(this.state.data.deadline);
       }
-  
+
       this.state.data.startTime = this.parseDate(this.state.data.startTime);
       this.state.data.endTime = this.parseDate(this.state.data.endTime);
     }
-    
+
   };
+
+  // image picker
+  async takeAndUploadPhotoAsync(url) {
+    // Display the camera to the user and wait for them to take a photo or to cancel
+    // the action
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    } else {
+      console.log('image selecting error!');
+      return;
+    }
+
+    // ImagePicker saves the taken photo to disk and returns a local URI to it
+    let localUri = result.uri;
+    let filename = localUri.split('/').pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    // Upload the image using the fetch and FormData APIs
+    // Assume "photo" is the name of the form field the server expects
+    // formData.append('image', { uri: localUri, name: filename, type });
+    this.formData = new FormData();
+    this.formData.append('image', { uri: localUri, name: filename, type });
+    this.formData.append('name', global.googleUserName);
+    this.formData.append('email', global.googleUserEmail);
+    this.formData.append('id', this.state.data.id);
+
+    this.setState({pictureSendingUrl:url});
+  }
+
+  async pickImageFromGallery(url) {
+    // Display the camera to the user and wait for them to take a photo or to cancel
+    // the action
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      // aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    } else {
+      console.log('image selecting error!');
+      return;
+    }
+    console.log(result);
+
+    // ImagePicker saves the taken photo to disk and returns a local URI to it
+    let localUri = result.uri;
+    let filename = localUri.split('/').pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    // Upload the image using the fetch and FormData APIs
+    // Assume "photo" is the name of the form field the server expects
+    // formData.append('image', { uri: localUri, name: filename, type });
+    this.formData = new FormData();
+    this.formData.append('image', { uri: localUri, name: filename, type });
+    this.formData.append('name', global.googleUserName);
+    this.formData.append('email', global.googleUserEmail);
+    this.formData.append('id', this.state.data.id);
+
+    this.setState({pictureSendingUrl:url});
+  }
+
+  async sendPictureToServer(url){
+    return await fetch(url, {
+      method: 'POST',
+      body: this.formData,
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    }).then(() => { console.log('success', url) });
+  }
 
   parseDate(date) {
     console.log(date);
     var splitDash = date.split('-');
-      
+
     var year = splitDash[0] + '년 ';
     var month = splitDash[1] + '월 ';
 
@@ -61,109 +168,228 @@ export default class ActivityDetailScreen extends React.Component {
   }
 
   createTwoButtonAlert = () =>
-  Alert.alert(
-    "시작 사진 전송",
-    "",
-    [
-      {
-        text: "취소",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel"
-      },
-      { text: "갤러리",
-        onPress: () => Alert.alert("지원되었습니다")
-      },
-      { text: "카메라",
-        onPress: () => Alert.alert("지원되었습니다")
-      }
-    ],
-    { cancelable: false }
-  );
+    Alert.alert(
+      "시작 사진 전송",
+      "",
+      [
+        {
+          text: "취소",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "갤러리",
+          onPress: () => Alert.alert("지원되었습니다")
+        },
+        {
+          text: "카메라",
+          onPress: () => Alert.alert("지원되었습니다")
+        }
+      ],
+      { cancelable: false }
+    );
 
   submit = () => { // for some examples, they don't use async
 
 
-        // console.warn(collection); // for debugging
+    // console.warn(collection); // for debugging
 
-        // HTTP post here
-        var url = 'http://saevom06.cafe24.com/activitydata/getActivities';
-        try {
-            fetch(url, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            }).then(
-              (res)=> res.json())
-              .then((resJson) => {
-                console.log(resJson);
-              })
-        } catch(e){
-            console.warn('fetch failed');
-            console.warn(e);
-            
-        }
-        // fetch(url, {
-        //     method: 'POST', // or 'PUT'
-        //     body: JSON.stringify(collection),
-        //     headers: new Headers({
-        //         'Content-Type': 'application/json'
-        //     })
-        // }).then(result => result.json())
-        //     .catch(error => console.error('Error: ', error))
-        //     .then(response => console.log('Success', response));
+    // HTTP post here
+    var url = 'http://saevom06.cafe24.com/activitydata/getActivities';
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(
+        (res) => res.json())
+        .then((resJson) => {
+          console.log(resJson);
+        })
+    } catch (e) {
+      console.warn('fetch failed');
+      console.warn(e);
+
+    }
+    // fetch(url, {
+    //     method: 'POST', // or 'PUT'
+    //     body: JSON.stringify(collection),
+    //     headers: new Headers({
+    //         'Content-Type': 'application/json'
+    //     })
+    // }).then(result => result.json())
+    //     .catch(error => console.error('Error: ', error))
+    //     .then(response => console.log('Success', response));
+  }
+
+  getImage(props) {
+    var path;
+
+    switch (props) {
+      case 0:
+        path = require('../../assets/images/status_0.png');
+        break;
+      case 1:
+        path = require('../../assets/images/status_1.png');
+        break;
+      case 2:
+        path = require('../../assets/images/status_2.png');
+        break;
+      case 3:
+        path = require('../../assets/images/status_3.png');
+        break;
+      case 4:
+        path = require('../../assets/images/status_4.png');
+        break;
+      default:
+        path = require('../../assets/images/status_5.png');
+        break;
     }
 
+    return (
+      <Image
+        source={path}
+        style={styles.statusButton}
+      />
+    )
+  }
 
   render() {
+
+    let { image } = this.state;
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={{padding:10}} />
-        <View style={styles.title}>
-          <Text style={styles.postTitle}>{this.state.data.title}</Text>
-          <Text style={styles.postCategory}>{this.state.data.interestCategory.name}</Text>
+        <View style={styles.box}>
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>{this.state.data.title}</Text>
+              {this.getImage(this.state.data.status)}
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>마감 기한</Text>
+                <Text style={styles.content}>{this.state.data.deadline}</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>관심사</Text>
+                <Text style={styles.content}>{this.state.data.interestCategory.name}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>담당인원</Text>
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>봉사자</Text>
+                <Text style={styles.content}>윤하늘</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>이용자</Text>
+                <Text style={styles.content}>김준서</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>활동내용</Text>
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>활동기간</Text>
+                <View style={styles.date}>
+                  <Text style={styles.time}>{this.state.data.startTime} ~</Text>
+                  <Text style={styles.time}>{this.state.data.endTime}</Text>
+                </View>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>장소</Text>
+                <Text style={styles.content}>경북 포항시 북구 흥해읍 한동로 558</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>세부내용</Text>
+                <Text style={styles.content}>어르신에게 말벗 해드리기</Text>
+              </View>
+            </View>
+          </View>
         </View>
-        <View style={styles.title}>
-          <Text style={styles.postTitle}>마감 기한 : {this.state.data.deadline}</Text>
-          <Text style={styles.postCategory}>{this.status[this.state.data.status]}</Text>  
-        </View>
-        <View style={{paddingTop:30, borderBottomWidth: 1, alignSelf:'stretch'}} />
-        <View style={styles.form}>
-          <View style={styles.formCategory}>
-            <Text style={styles.formName}>봉사자</Text>
-            <Text style={styles.formPhone}>전화번호</Text>  
-          </View>
-          <View style={styles.formCategory}>
-            <Text style={styles.formContentName}>김준서</Text>  
-            <Text style={styles.formContentPhone}>010-XXXX-XXXX</Text>  
-          </View>
-        </View>
-        <View style={styles.form}>
-          <View style={styles.formCategory}>
-            <Text style={styles.formName}>이용자</Text>
-            <Text style={styles.formPhone}>전화번호</Text>  
-          </View>
-          <View style={styles.formCategory}>
-            <Text style={styles.formContentName}>이용호</Text>  
-            <Text style={styles.formContentPhone}>010-XXXX-XXXX</Text>  
-          </View>
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.contentTitle}>활동 내용</Text>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>활동 기간</Text>
-            <Text style={styles.contentDetail}>{this.state.data.startTime} ~ {this.state.data.endTime}</Text>
-          </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>장소</Text>
-            <Text style={styles.contentDetail}>{this.state.data.place}</Text>
-          </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={styles.contentCategory}>세부 내용</Text>
-            <Text style={styles.contentDetail}>{this.state.data.content}</Text>
-          </View>
-        </View>
+
+
+        <Dialog.Container visible={this.state.dialogVisible}>
+          <Dialog.Title style={{ color: 'rgb(1, 192, 99)' }}>사진을 업로드해 주세요.</Dialog.Title>
+          <View style={{ margin: 30 }}></View>
+
+          {image && <Text style={{ fontSize: 15 }}>
+            아래 이미지를 전송하시겠습니까?
+          </Text>}
+          {image && <View style={{ margin: 10 }}></View>}
+          {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+          {image && <View style={[{ width: "50%", margin: 20, backgroundColor: "white" }]}>
+            <Button
+              buttonStyle={{ backgroundColor: 'orange', height: 40 }}
+              titleStyle={{ fontSize: 23 }}
+
+              onPress={() => {
+                this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
+                  Alert.alert('전송 완료!', '확인을 눌러 카테고리 선택 화면으로 돌아갑니다.', [{
+                    text: '확인',
+                    onPress: () => { 
+                      this.setState({dialogVisible:false});
+                      this.props.navigation.navigate('활동 목록'); }
+                  }]);
+                });
+ 
+              }}
+
+              title="전송하기"
+              raised
+            >
+            </Button>
+
+          </View>}
+
+          <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='rgb(1, 192, 99)' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
+          <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='rgb(1, 192, 99)' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
+          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+        </Dialog.Container>
+
+
+        {this.state.isUserRelated == 0 && <TouchableOpacity onPress={() => console.log("add")}>
+          <Text style={styles.button}>
+            봉사자 지원
+          </Text>
+        </TouchableOpacity>}
+
+        {(this.state.isUserRelated == 0 || this.state.isUserRelated == 0) && <View style={styles.photoButtons}>
+          <TouchableOpacity onPress={() => {
+            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadStartImg"});
+            this.setState({ dialogVisible: true });
+          }}>
+            <Text style={styles.startButton}>
+              시작 사진 전송
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadEndImg"});
+            this.setState({ dialogVisible: true });
+          }}>
+            <Text style={styles.endButton}>
+              종료 사진 전송
+            </Text>
+          </TouchableOpacity>
+        </View>}
+      </ScrollView>
+    )
+  }
+}
+
+/*
         <ButtonGroup
           buttons={['봉사자 지원', '이용자 지원', '목록']}
           containerStyle={{backgroundColor: 'rgb(155, 249, 153)', marginTop:30}}
@@ -189,13 +415,10 @@ export default class ActivityDetailScreen extends React.Component {
             ]
             )}
         />
-      </ScrollView>
-    )
-  }
-}
+*/
 
 function ButtonList(type) {
-  switch(type) {
+  switch (type) {
     case 'unRegister':
       console.log('UnRegister');
       break;
@@ -208,110 +431,108 @@ function ButtonList(type) {
   }
 }
 
-/*
-        <View style={{flexDirection:'row'}}>
-          <Button title="봉사자 지원"/>
-          <Button title="이용자 지원"/>
-          <Button 
-            title="목록"
-            onPress={() => this.props.navigation.popToTop()}
-            />
-        </View>
-        */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 0,
-    alignItems: 'center',
+    paddingTop: 25,
     padding: 3,
   },
-  title:{
+  box: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 15,
+    paddingBottom: 20,
+    backgroundColor: '#FFF',
+    marginBottom: 25,
+    marginLeft: 8,
+    marginRight: 8,
+    borderRadius: 25,
+    elevation: 2,
+  },
+  list: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  line: {
+    marginTop: 10,
+    marginBottom: 10,
+    borderTopWidth: 1,
+    borderColor: 'rgb(220, 220, 220)'
+  },
+  titleList: {
     flexDirection: 'row',
-    paddingStart: 10,
-    paddingEnd: 10,
+    marginBottom: 7,
   },
-  postTitle: {
-    flex: 3,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 18,
-    padding: 5,
-  },
-  postCategory: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 18,
-    padding: 5,
-  },
-  form: {
-    alignSelf: 'stretch',
-    padding: 10,
-    paddingTop: 30,
-    paddingBottom: 30,
-    borderBottomWidth: 1,
-  },
-  formCategory: {
+  title: {
     flex: 1,
     flexDirection: 'row',
-    alignSelf: 'center',
-  },
-  formName: {
-    flex: 1,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 15,
     padding: 2,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  formPhone: {
+  dataList: {
+    padding: 5
+  },
+  data: {
+    flexDirection: 'row',
+    marginTop: 3,
+    marginBottom: 3,
+  },
+  header: {
     flex: 3,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(155, 249, 153)',
-    fontSize: 15,
-    padding: 2,
-  },
-  formContentName: {
-    flex: 1,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(215, 252, 214)',
-    fontSize: 15,
-    padding: 2,
-  },
-  formContentPhone: {
-    flex: 3,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgb(215, 252, 214)',
-    fontSize: 15,
-    padding: 2,
+    fontSize: 14,
   },
   content: {
-    padding: 10,
-    paddingTop: 30,
-    paddingBottom: 30,
-    borderBottomWidth: 1,
-    alignSelf: 'stretch',
+    flex: 10,
+    fontSize: 14,
   },
-  contentTitle: {
-    backgroundColor: 'rgb(155, 249, 153)',
-    alignSelf: 'stretch',
-    fontSize: 15,
-    padding: 2,
+  date: {
+    flex: 10,
   },
-  contentCategory: {
-    backgroundColor: 'rgb(215, 252, 214)',
-    alignSelf: 'stretch',
-    flex:1,
-    fontSize: 13,
-    padding: 2,
+  time: {
+    flex: 1,
   },
-  contentDetail: {
-    backgroundColor: 'rgb(215, 252, 214)',
-    alignSelf: 'stretch',
-    flex:5,
-    fontSize: 13,
-    padding: 2,
+  statusButton: {
+    width: 90,
+    height: 35,
+    resizeMode: 'contain',
   },
+  button: {
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  },
+  photoButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  startButton: {
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: 0,
+    marginRight: 10,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(1, 192, 99)',
+    borderRadius: 50,
+    padding: 8,
+  },
+  endButton: {
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: 10,
+    marginRight: 0,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  }
 });

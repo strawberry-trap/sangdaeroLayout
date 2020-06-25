@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as firebase from 'firebase';
 import * as Expo from "expo";
 import * as Google from 'expo-google-app-auth';
@@ -110,14 +110,10 @@ export default class LoginScreen extends Component {
       });
       if (result.type === 'success') {
         if (this._isMounted) {
-
-        
-
-
-          console.log(result.user.id);
-          this.setState({loggedIn: true });
           global.googleUserName = result.user.name;
           global.googleUserEmail = result.user.email;
+
+          this.setState({loggedIn: true });
         }
         this.onSignIn(result); // call onSignIn method here.
         return result.accessToken;
@@ -128,41 +124,46 @@ export default class LoginScreen extends Component {
     catch (e) {
       return { error: true };
     }
+
+    
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
+  handleOnPress =() => {
+    console.log('onPress');
+  }
+
   render() {
     return (
       <View style={styles.container}>
-
-        <View style={[{ width: "90%", margin: 20, backgroundColor: "white" }]}>
         {!this.state.loggedIn &&
-          <Button
-            buttonStyle={{ backgroundColor: 'rgb(1, 192, 99)', height: 50 }}
-            titleStyle={{ fontSize: 23 }}
-            onPress={() => this.signInWithGoogleAsync()}
-            title="Google Login"
-            raised
-            icon={
-              <View style={{ marginRight: 10 }}>
-                <Icon
-                  style={{ marginRight: 5 }}
-                  reverse
-                  size={20}
-                  name='user'
-                  type='feather'
-                  color='white'
-                />
-              </View>
-            }
-          />
+        <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
+          <TouchableOpacity style={styles.button} onPress={() => this.signInWithGoogleAsync()}>
+            <Image
+              style={styles.logo}
+              source={require('../../assets/images/google_logo.png')}
+            />
+            <Text style={styles.text}>
+              Google 아이디로 로그인
+            </Text>
+            <View style={styles.space}/>
+          </TouchableOpacity>
+        </ImageBackground>
         }
-        </View>
 
-        <View>
+        {this.state.loggedIn && this.props.navigation.navigate('Main')}
+        
+        
+      </View>
+    );
+  }
+}
+
+/*
+<View>
             {this.state.loggedIn && // when Google user is logged in, this component appears
             <View>
                 <Text
@@ -179,16 +180,50 @@ export default class LoginScreen extends Component {
             </View>
           }
         </View>
-      </View>
-    );
-  }
-}
+*/
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
   },
+  imageBackground: {
+    flex:1,
+    flexDirection:'column-reverse',
+    resizeMode:'cover',
+  },
+  button: {
+    margin: 10,
+    marginBottom: 95,
+    height: 50,
+    borderRadius:50,
+    borderColor:'#FFF',
+    borderWidth:1,
+    backgroundColor:'rgba(255,255,255,0.25)',
+    flexDirection:'row',
+  },
+  logo: {
+    width:28,
+    height:28,
+    marginTop:11,
+    marginLeft:35,
+    marginRight:10,
+  },
+  space: {
+    width:28,
+    height:28,
+    marginTop:11,
+    marginRight:35,
+    marginLeft:10,
+  },
+  text: {
+    flex:1,
+    fontSize:16,
+    paddingLeft:15,
+    textAlign:'center',
+    textAlignVertical: 'center',
+    color:'#FFF',
+  }
 });

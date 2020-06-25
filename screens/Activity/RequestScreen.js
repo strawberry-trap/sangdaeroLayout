@@ -1,91 +1,174 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert, Platform, TouchableHighlightBase } from 'react-native';
+import { StyleSheet, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem, Input } from 'react-native-elements';
 import { Picker } from '@react-native-community/picker';
 import TabBarIcon from '../../components/TabBarIcon';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-// date picker
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
-let interestCategory = [];
-let title="";
-let memo="";
+let title = "";
+let memo = "";
 
 export default class RequestScreen extends React.Component {
 
   state = {
-    index:1,
+    index: 1,
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
-    isStartTime:false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
+    isStartTime: false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
     startTime: null, // data to send to the web server
     endTime: null, // data to send to the web server
-
-    interestCategoryId : 0,
-    interestCategoryName : ""
+    startTimeDataForServer: null,
+    endTimeDataForServer: null,
+    test: null,
+    interestCategoryId: 0,
   }
 
   constructor(props) {
     super(props);
 
-    this.state ={
-      interestCategoryId: props.route.params.interestType,
-      interestCategoryName: props.route.params.interestName
+    var date = new Date();
+
+    this.state = {
+      test: props.route.params.test,
+      categoryId: props.route.params.categoryId,
+      categoryName: props.route.params.categoryName,
+
+      startTime: this.parseDate(date),
+      endTime: this.parseDate(date),
+    }
+  }
+
+  parseDate(newDate) {
+
+    var year = this.addZero(newDate.getFullYear());
+    var month = this.addZero(newDate.getMonth() + 1);
+    var date = this.addZero(newDate.getDate());
+    var day = newDate.getDay();
+
+    switch (day) {
+      case 0:
+        day = "일";
+        break;
+      case 1:
+        day = "월";
+        break;
+      case 2:
+        day = "화";
+        break;
+      case 3:
+        day = "수";
+        break;
+      case 4:
+        day = "목";
+        break;
+      case 5:
+        day = "금";
+        break;
+      default:
+        day = "토";
+        break;
     }
 
-    // picker selected value
-    this.setState({index:this.state.interestCategoryId});
+    var hour = newDate.getHours();
+    var ampm;
+    if (hour < 12) {
+      ampm = "오전";
+    } else {
+      ampm = "오후";
 
-    // get interest categories from server
-    var url = 'http://saevom06.cafe24.com/interestdata/getAll';
-    try {
-      fetch(url, {
-        method: 'GET',
+      hour = hour - 12;
+    }
+    hour = this.addZero(hour);
+    var minute = this.addZero(newDate.getMinutes());
+
+    return year + "년 " + month + "월 " + date + "일(" + day + ")" + ampm + " " + hour + "시 " + minute + "분";
+  }
+
+  parseDateForServer(newDate){
+    
+    var year = this.addZero(newDate.getFullYear());
+    var month = this.addZero(newDate.getMonth() + 1);
+    var date = this.addZero(newDate.getDate());
+    var day = newDate.getDay();
+    var hour = newDate.getHours();
+    hour = this.addZero(hour);
+    var minute = this.addZero(newDate.getMinutes());
+
+    // YYYY-MM-DD HH:MM:00 (seconds are fixed to '00')
+    var startTimeForServer = year+"-"+month+"-"+date+" "+hour+":"+minute+":00";
+    return startTimeForServer;
+  }
+
+  addZero(num) {
+    if (num < 10) {
+      return "0" + num;
+    } else {
+      return num;
+    }
+  }
+
+  async sendRequestToServer() {
+
+    // send request to the web server
+    const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
+
+    // data validation check
+    if (this.title == undefined) this.title = "제목이 입력되지 않았습니다."
+    if (this.memo == undefined) this.memo = "메모가 입력되지 않았습니다."
+
+    const data = {
+      id: this.state.categoryId,
+      name: global.googleUserName,
+      email: global.googleUserEmail,
+      startTime: this.state.startTime,
+      endTime: this.state.endTime,
+      title: this.title,
+      memo: this.memo,
+    }
+
+    return await fetch(url, {
+        method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-      }).then((response) => response.json())
-        .then((responseInJson) => {
-
-          // save each category
-          for (var i = 0; i < responseInJson.length; i++) {
-            interestCategory.push(responseInJson[i]);
-          }
-          this.setState({ isDataLoaded: true });
-        })
-    } catch (e) {
-      this.setState({ isDataLoaded: false });
-      console.warn('[failed getting interest categories from server: RequestScreen.js]', e);
-    }
+        body: JSON.stringify(data),
+      }).then(()=>{
+        Alert.alert("등록 완료","새로운 봉사활동 요청이 등록 되었습니다!");
+      });
   }
 
-    // datetime picker
-    _showDatePicker = () => {
-      this.setState({ isDatePickerVisible: true });
-    };
-   
-    _hideDatePicker = () => {
-      this.setState({ isDatePickerVisible: false });
-    };
-  
-    _handleConfirm = (date) => {
-      if (this.state.isStartTime == true){
-        this.setState({ startTime: date});
-      } else {
-        this.setState({endTime: date});
-      }
-
-      this._hideDatePicker();
-    };
-
-    goBack(){
-      this.props.navigation.navigate('Interest');
-    }
-  
+  createTwoButtonAlert = () => {
+    Alert.alert(
+      "새로운 봉사활동을 요청합니다.",
+      "정말 요청하시겠습니까?",
+      [
+        {
+          text: "확인", onPress: () => {
+            console.log('서버로 보내진 시작시간 : ', this.state.startTimeDataForServer);
+            console.log('서버로 보내진 종료 시간 : ', this.state.endTimeDataForServer);
+            console.log('서버로 보내진 사용자 이름 : ', global.googleUserName);
+            const result = this.sendRequestToServer();
+            if (result == 1){
+              Alert.alert("새로운 봉사활동 요청이 등록되었습니다!");
+            }
+          }
+        },
+        {
+          text: "취소",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+  state = {
+    index: '1',
+  };
 
   fetchPost(url, data) {
     try {
@@ -95,6 +178,8 @@ export default class RequestScreen extends React.Component {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
+        //credentials: 'include',
+
         body: JSON.stringify(data),
       });
       console.log(url);
@@ -102,129 +187,119 @@ export default class RequestScreen extends React.Component {
     } catch (e) {
       console.warn('fetch failed', e, url);
     }
-  }
+  };
+
+  showDatePicker = () => {
+    this.setState({ isDatePickerVisible: true });
+  };
+
+  hideDatePicker = () => {
+    this.setState({ isDatePickerVisible: false });
+  };
+
+  handleConfirm = (date) => {
+    if (this.state.isStartTime == true) {
+      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
+
+      if (this.state.startTime > this.state.endTime) {
+        this.setState({ endTime: this.state.startTime, endTimeDataForServer:this.state.startTimeDataForServer });
+      }
+    } else {
+      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
+
+      if (this.state.startTime > this.state.endTime) {
+        this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
+      }
+    }
+    this.hideDatePicker();
+  };
 
   render() {
-    if (this.state.isDataLoaded == true) {
-      return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View>
+          <DateTimePickerModal
+            isVisible={this.state.isDatePickerVisible}
+            mode="datetime"
+            display="spinner"
+            onConfirm={this.handleConfirm}
+            onCancel={this.hideDatePicker}
+          />
+        </View>
 
-          <View>
-            <DateTimePickerModal
-              isVisible={this.state.isDatePickerVisible}
-              mode="datetime"
-              display="spinner"
-              onConfirm={this._handleConfirm}
-              onCancel={this._hideDatePicker}
-            />
-          </View>
-
-          <View style={{ margin: 30 }}>
-          </View>
-
-          <View style={styles.roundedBackground}>
-            <View style={styles.title}>
-              <Text style={styles.postTitle}>제목</Text>
+        <View style={styles.box}>
+          <View style={styles.list}>
+            <View>
+              <Text style={styles.title}>제목</Text>
             </View>
-
             <Input
               name='title'
-              placeholder='제목'
+              placeholder='제목을 입력하세요'
               onChangeText={(input) => { this.title = input; }}
-              leftIcon={
-                <TabBarIcon name="ios-clipboard" />
-              }
             />
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.title}>카테고리</Text>
 
-            <View style={styles.category}>
-              <Text style={styles.postCategory}>카테고리</Text>
+            <Text style={styles.text} name='category'>
+              {this.state.categoryName}
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.title}>활동시간</Text>
+            <View style={styles.time}>
+              <TouchableOpacity
+                onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
+                }>
+                <Text style={styles.timeText}>시작시간 선택</Text>
+              </TouchableOpacity>
+              <View style={styles.timeList}>
+                <Text style={styles.date}>{this.state.startTime.substring(0, 16)}</Text>
+                <Text style={styles.date}>{this.state.startTime.substring(16, 26)}</Text>
+              </View>
             </View>
+            <View style={styles.time}>
+              <TouchableOpacity
+                onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
+                }>
+                <Text style={styles.timeText}>종료시간 선택</Text>
+              </TouchableOpacity>
+              <View style={styles.timeList}>
+                <Text style={styles.date}>{this.state.endTime.substring(0, 16)}</Text>
+                <Text style={styles.date}>{this.state.endTime.substring(16, 26)}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.title}>지원자</Text>
+            <Text style={styles.text}>
+              {global.googleUserName}
+            </Text>
+          </View>
 
+          <View style={styles.list}>
             <View>
-            <Text>{this.state.interestCategoryName}</Text>
+              <Text style={styles.title}>메모</Text>
             </View>
-
-            <View style={styles.category}>
-              <Text style={styles.postCategory}>활동 시간</Text>
-            </View>
-
-            <Button
-              title='시작 시간'
-              onPress={
-                ()=>{
-                  this.setState({ isStartTime:true ,isDatePickerVisible: true });
-                }
-              }
-            />
-
-            <Button
-              title='종료 시간'
-              onPress={
-                ()=>{
-                  this.setState({ isStartTime:false ,isDatePickerVisible: true });
-                }
-              }
-            />
-
             <Input
               name='memo'
-              placeholder='메모'
+              placeholder='메모를 입력하세요'
               onChangeText={(input) => { this.memo = input; }}
-              leftIcon={
-                <TabBarIcon name="ios-clipboard" />
-              }
-            />
-
-            <View style={{margin:10}}>
-            </View>
-          </View>
-
-          <View style={{ margin: 10 }}></View>
-
-          <View>
-            <Button
-              title="등록하기"
-              onPress={
-                () => {
-                  // send request to the web server
-                  const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
-
-                  // data validation check
-                  if (this.title == undefined) this.title="제목이 입력되지 않았습니다."
-                  if (this.memo == undefined) this.memo="메모가 입력되지 않았습니다."
-                  if (this.state.startTime == undefined) this.setState({startTime:"0000-00-00T00:00:00.000Z"})
-                  if (this.state.endTime == undefined) this.setState({endTime:"0000-00-00T00:00:00.000Z"})
-
-                  this.fetchPost(url, {
-                    id: this.state.interestCategoryId,
-                    name: global.googleUserName,
-                    email: global.googleUserEmail,
-                    startTime: this.state.startTime,
-                    endTime:this.state.endTime,
-                    title: this.title,
-                    memo: this.memo,
-                  })
-                  Alert.alert("봉사 신청이 등록 되었습니다!");
-                  this.props.navigation.navigate('Interest');
-                }
-              }
             />
           </View>
 
-        </ScrollView>
-      );
-    }
-    else {
-      return (
-        <View style={styles.container}>
-          <Text>Data is loading...</Text>
         </View>
-      );
-    }
+        <TouchableOpacity onPress={() => this.createTwoButtonAlert()}>
+          <Text style={styles.button}>
+            등록하기
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
   }
 
-
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -232,96 +307,71 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDD',
   },
   contentContainer: {
-    paddingTop: 0,
-    alignItems: 'center',
-    padding: 3,
+    paddingTop: 25,
+    padding: 5,
   },
-  roundedBackground: {
-    marginRight: 5,
-    marginLeft: 5,
-    marginTop: 5,
-    paddingTop: 1,
-    paddingBottom: 1,
-    alignSelf: 'stretch',
-
-    ...Platform.select({
-      ios: {
-        shadowColor: '#4d4d4d',
-        shadowOffset: { width: 8, height: 8, },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-      },
-      android: { elevation: 12, },
-    }),
-
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#fff'
+  box: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 30,
+    paddingBottom: 30,
+    backgroundColor: '#FFF',
+    marginBottom: 25,
+    marginLeft: 8,
+    marginRight: 8,
+    borderRadius: 25,
+    elevation: 2,
   },
-
+  list: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
   title: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#BBB',
     padding: 3,
-    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  category: {
+  text: {
     flex: 1,
-    backgroundColor: '#BBB',
-    padding: 3,
-    marginBottom: 10,
+    padding: 5,
+    paddingLeft: 10,
+    fontSize: 15,
+    textAlignVertical: 'center',
   },
-  postCategory: {
-    flex: 1,
-    alignSelf: 'flex-start'
-  },
-  postTitle: {
-    flex: 3,
-    alignSelf: 'flex-start',
-  },
-  content: {
-    flex: 3,
-    backgroundColor: '#BBB',
-    padding: 3,
-    marginBottom: 10,
-    alignSelf: 'stretch',
-  },
-  postContent: {
-    backgroundColor: '#999',
-    alignSelf: 'center',
-  },
-  account: {
-    flex: 1,
-    backgroundColor: '#BBB',
-    alignSelf: 'stretch',
-    marginBottom: 10,
-  },
-  accountMessage: {
-    flex: 1,
-    alignSelf: 'center',
-    backgroundColor: '#999',
-  },
-  form: {
-    flex: 1,
-    alignSelf: 'stretch',
-    marginBottom: 10,
-  },
-  formCategory: {
+  time: {
     flex: 1,
     flexDirection: 'row',
-    alignSelf: 'center',
-    backgroundColor: '#999'
+    marginBottom: 5,
   },
-  formTitle: {
+  timeList: {
+    padding: 5,
+  },
+  timeText: {
     flex: 1,
-    alignSelf: 'stretch',
-    backgroundColor: '#777'
+    paddingLeft: 5,
+    paddingRight: 5,
+    fontSize: 15,
+    textAlignVertical: 'center',
+    borderRadius: 50,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
   },
-  formContent: {
-    flex: 3,
-    alignSelf: 'stretch',
-    backgroundColor: '#777'
+  date: {
+    flex: 1,
+    paddingLeft: 5,
+    fontSize: 15,
+    textAlign: 'left',
   },
+  button: {
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  }
 });
