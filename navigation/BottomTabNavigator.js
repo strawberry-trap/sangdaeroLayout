@@ -14,6 +14,7 @@ import MypageScreen from '../screens/Mypage/MypageScreen';
 import BoardStackScreen from '../screens/Board/BoardStackScreen';
 import ActivityStackScreen from '../screens/Activity/ActivityStackScreen';
 import NoticeStackScreen from '../screens/Notice/NoticeStackScreen';
+import MypageStackScreen from '../screens/Mypage/MyPageStackScreen';
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
@@ -64,7 +65,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
       <BottomTab.Screen
-        name="Activity1"
+        name="Notice"
         component={NoticeStackScreen}
         options={{
           title: '공지사항',
@@ -73,7 +74,7 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
       <BottomTab.Screen
         name="Mypage"
-        component={MypageScreen}
+        component={MypageStackScreen}
         options={{
           title: '내정보',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-person" />,

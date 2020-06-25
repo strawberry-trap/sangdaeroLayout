@@ -1,33 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem, Card } from 'react-native-elements';
-import { createStackNavigator } from '@react-navigation/stack';
+import { Badge, ListItem, Card, Button } from 'react-native-elements';
+import { createStackNavigator, HeaderBackground } from '@react-navigation/stack';
 import TabBarIcon from '../../components/TabBarIcon';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import NoticeListScreen from './NoticeListScreen';
-import NoticeDetailScreen from './NoticeDetailScreen';
+import MypageScreen from './MypageScreen';
+import ConfigScreen from './ConfigScreen';
 
-const NoticeStack = createStackNavigator();
+const MypageStack = createStackNavigator();
 
-export default function NoticeStackScreen({ navigation, route }){
+export default function MypageStackScreen({ navigation, route }){
     return(
-        <NoticeStack.Navigator initialRouteName='공지 목록'
+        <MypageStack.Navigator initialRouteName='내 정보'
             screenOptions={{
                 headerRight: () => (
                   <TouchableOpacity
-                  onPress={() => navigation.navigate('알림')}
-                  style={styles.rightIconContainer}>
-                      <Ionicons
-                        name='ios-notifications-outline'
-                        size={30} 
-                        style={{ marginBottom: -3 }}
-                        color={'#FFF'}
-                      />
-                  </TouchableOpacity>
+                    onPress={() => navigation.navigate('알림')}
+                    style={styles.rightIconContainer}>
+                        <Ionicons
+                          name='ios-notifications-outline'
+                          size={30} 
+                          style={{ marginBottom: -3 }}
+                          color={'#FFF'}
+                        />
+                    </TouchableOpacity>
                 ),
                 headerBackground: ()=>(
                   <LinearGradient
@@ -40,9 +40,10 @@ export default function NoticeStackScreen({ navigation, route }){
                 headerTintColor: '#FFF',
             }}
         >
-            <NoticeStack.Screen name='공지 목록' component={NoticeListScreen} />
-            <NoticeStack.Screen name='공지 내용' component={NoticeDetailScreen} />            
-        </NoticeStack.Navigator>
+            <MypageStack.Screen name='내 정보' component={MypageScreen} />
+            <MypageStack.Screen name='설정' component={ConfigScreen} />
+            
+        </MypageStack.Navigator>
     )
 }
 

@@ -19,23 +19,41 @@ export default class ActivityDetailScreen extends React.Component {
       pictureSendingUrl:"",
     };
 
+    console.log(this.state.data);
+
+    this.volunteerList = "";
+    this.userList = ""
+
     // check if user is related to this activity. Default is not-related.
     // 1) check if volunteer
     for (var i = 0; i < this.state.data.activityVolunteers.length; i++) {
+      if (i == 0) {
+        this.volunteerList = this.state.data.activityVolunteers[i].user.name+"";
+      } else {
+        this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.name;
+      }
+
       if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
         this.setState({ isUserRelated: 1 });
         console.log("current user is volunteer");
-        break;
       }
     }
     // 2) check if benefiting-user
     for (var i = 0; i < this.state.data.activityUsers.length; i++) {
+      if (i == 0) {
+        this.userList = this.state.data.activityUsers[i].user.name+"";
+      } else {
+        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.name+"";
+      }
+
       if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
         this.setState({ isUserRelated: 2 });
         console.log("current user is benefiting-user");
-        break;
       }
     }
+
+    console.log(this.volunteerList);
+    console.log(this.state.isUserRelated);
 
     this.status = [
       '매칭 전',
@@ -174,54 +192,41 @@ export default class ActivityDetailScreen extends React.Component {
       [
         {
           text: "취소",
-          onPress: () => console.log("Cancel Pressed"),
+          onPress: () => console.log("취소 되었습니다"),
           style: "cancel"
         },
         {
           text: "갤러리",
-          onPress: () => Alert.alert("지원되었습니다")
+          onPress: () => Alert.alert("전송 되었습니다")
         },
         {
           text: "카메라",
-          onPress: () => Alert.alert("지원되었습니다")
+          onPress: () => Alert.alert("전송 되었습니다")
         }
       ],
       { cancelable: false }
     );
 
-  submit = () => { // for some examples, they don't use async
-
-
-    // console.warn(collection); // for debugging
-
-    // HTTP post here
-    var url = 'http://saevom06.cafe24.com/activitydata/getActivities';
+  fetchPost(url, data) {
+    console.log(url);
+    console.log(data);
     try {
       fetch(url, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-      }).then(
-        (res) => res.json())
-        .then((resJson) => {
-          console.log(resJson);
-        })
-    } catch (e) {
-      console.warn('fetch failed');
-      console.warn(e);
+        //credentials: 'include',
 
+        body: JSON.stringify(data),
+      }).then((res) => {
+        Alert.alert("신청 되었습니다");
+        this.setState({ dialogVisible: false });
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
     }
-    // fetch(url, {
-    //     method: 'POST', // or 'PUT'
-    //     body: JSON.stringify(collection),
-    //     headers: new Headers({
-    //         'Content-Type': 'application/json'
-    //     })
-    // }).then(result => result.json())
-    //     .catch(error => console.error('Error: ', error))
-    //     .then(response => console.log('Success', response));
   }
 
   getImage(props) {
@@ -286,11 +291,11 @@ export default class ActivityDetailScreen extends React.Component {
             <View style={styles.dataList}>
               <View style={styles.data}>
                 <Text style={styles.header}>봉사자</Text>
-                <Text style={styles.content}>윤하늘</Text>
+                <Text style={styles.content}>{this.volunteerList}</Text>
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>이용자</Text>
-                <Text style={styles.content}>김준서</Text>
+                <Text style={styles.content}>{this.userList}</Text>
               </View>
             </View>
           </View>
@@ -309,11 +314,11 @@ export default class ActivityDetailScreen extends React.Component {
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>장소</Text>
-                <Text style={styles.content}>경북 포항시 북구 흥해읍 한동로 558</Text>
+                <Text style={styles.content}>{this.state.data.place}</Text>
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>세부내용</Text>
-                <Text style={styles.content}>어르신에게 말벗 해드리기</Text>
+                <Text style={styles.content}>{this.state.data.content}</Text>
               </View>
             </View>
           </View>
@@ -321,45 +326,54 @@ export default class ActivityDetailScreen extends React.Component {
 
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: 'rgb(1, 192, 99)' }}>사진을 업로드해 주세요.</Dialog.Title>
-          <View style={{ margin: 30 }}></View>
+          {!image &&
+            <Dialog.Title style={styles.photoHeader}>사진을 업로드해 주세요.</Dialog.Title>
+          }
+          {image &&
+            <Dialog.Title style={styles.photoHeader}>아래 이미지를 전송하시겠습니까?</Dialog.Title>
+          }
+          {image &&
+            <Image source={{ uri: image }} style={styles.photo} />
+          }
+          
+          {!image &&
+            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
+              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
+            </View>
+          }
+          {image &&
+            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button label="전송하기" color='#000' 
+                onPress={() => {
+                  this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
+                    Alert.alert('전송 완료!', '확인을 눌러 카테고리 선택 화면으로 돌아갑니다.', [{
+                      text: '확인',
+                      onPress: () => { 
+                        this.setState({dialogVisible:false});
+                        this.props.navigation.navigate('활동 목록'); }
+                    }]);
+                  });
 
-          {image && <Text style={{ fontSize: 15 }}>
-            아래 이미지를 전송하시겠습니까?
-          </Text>}
-          {image && <View style={{ margin: 10 }}></View>}
-          {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-          {image && <View style={[{ width: "50%", margin: 20, backgroundColor: "white" }]}>
-            <Button
-              buttonStyle={{ backgroundColor: 'orange', height: 40 }}
-              titleStyle={{ fontSize: 23 }}
-
-              onPress={() => {
-                this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
-                  Alert.alert('전송 완료!', '확인을 눌러 카테고리 선택 화면으로 돌아갑니다.', [{
-                    text: '확인',
-                    onPress: () => { 
-                      this.setState({dialogVisible:false});
-                      this.props.navigation.navigate('활동 목록'); }
-                  }]);
-                });
- 
-              }}
-
-              title="전송하기"
-              raised
-            >
-            </Button>
-
-          </View>}
-
-          <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='rgb(1, 192, 99)' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
-          <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='rgb(1, 192, 99)' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
-          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+                }}/>
+            </View>
+          }
+          
         </Dialog.Container>
 
 
-        {this.state.isUserRelated == 0 && <TouchableOpacity onPress={() => console.log("add")}>
+        {this.state.isUserRelated == 0 &&
+        <TouchableOpacity
+          onPress={() => 
+            this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
+              id: this.state.data.id, // id of the activity that user chose
+              name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+              email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+              type: 1,
+            })}
+          >
           <Text style={styles.button}>
             봉사자 지원
           </Text>
@@ -383,51 +397,15 @@ export default class ActivityDetailScreen extends React.Component {
               종료 사진 전송
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => Alert.alert('취소되었습니다')}>
+            <Text style={styles.cancleButton}>
+              취소하기
+            </Text>
+          </TouchableOpacity>
         </View>}
       </ScrollView>
     )
-  }
-}
-
-/*
-        <ButtonGroup
-          buttons={['봉사자 지원', '이용자 지원', '목록']}
-          containerStyle={{backgroundColor: 'rgb(155, 249, 153)', marginTop:30}}
-          textStyle={{color: 'black'}}
-          onPress={()=>this.submit()}
-        />
-        <ButtonGroup
-          buttons={['시작 사진 전송', '종료 사진 전송']}
-          containerStyle={{backgroundColor: 'rgb(155, 249, 153)', marginTop:30}}
-          textStyle={{color: 'black'}}
-          onPress={()=>Alert.alert(
-            "전송하시겠습니까?",
-            "사진 부분",
-            [
-              {
-                text: "취소",
-                style: "cancel"
-              }, 
-              {
-                text: "전송",
-                onPress: () => Alert.alert("전송되었습니다"),
-              }
-            ]
-            )}
-        />
-*/
-
-function ButtonList(type) {
-  switch (type) {
-    case 'unRegister':
-      console.log('UnRegister');
-      break;
-    case 'user':
-      console.log('User');
-      break;
-    case 'volunteer':
-      console.log('Volunteer');
-      break;
   }
 }
 
@@ -513,12 +491,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  photoHeader: {
+    color:'#000',
+    marginBottom: 30,
+  },
+  photo: {
+    width:200,
+    height:200,
+    alignSelf:'center',
+    resizeMode:'center',
+  },
   startButton: {
     flex: 1,
+    width:100,
     textAlign: 'center',
     marginLeft: 0,
     marginRight: 10,
-    fontSize: 22,
+    fontSize: 14,
     color: '#FFF',
     backgroundColor: 'rgb(1, 192, 99)',
     borderRadius: 50,
@@ -526,12 +515,23 @@ const styles = StyleSheet.create({
   },
   endButton: {
     flex: 1,
+    width:100,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  },
+  cancleButton: {
+    flex: 1,
+    width:100,
     textAlign: 'center',
     marginLeft: 10,
     marginRight: 0,
-    fontSize: 22,
+    fontSize: 14,
     color: '#FFF',
-    backgroundColor: 'rgb(29,140,121)',
+    backgroundColor: '#777',
     borderRadius: 50,
     padding: 8,
   }

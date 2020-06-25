@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView, ImageBackground, Alert } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView, ImageBackground } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem } from 'react-native-elements'
 
@@ -10,10 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Dialog from "react-native-dialog";
 
-export default class MypageScreen extends React.Component {
+export default class ConfigScreen extends React.Component {
   state = {
-    allUserActivities:[],
-    userInfo:[],
+    allActivities: [],
     showList: false,
 
     // for dialog
@@ -43,32 +42,8 @@ export default class MypageScreen extends React.Component {
     ];
     
     try {
-      var name = global.googleUserName;
-      var email = global.googleUserEmail;
       // get first five activites from server
-      let url = "http://saevom06.cafe24.com/userdata/getUser?name="+name+"&email="+email
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-      }).then((response) => response.json())
-        .then((responseInJson) => {
-          console.log("then");
-          console.log(responseInJson);
-          this.setState({ userInfo: responseInJson }); // assign data to state variable
-          this.setState({ showList: true });
-        })
-    } catch (e) {
-      console.log(e);
-    }
-
-    try {
-      var name = global.googleUserName;
-      var email = global.googleUserEmail;
-      // get first five activites from server
-      let url = "http://saevom06.cafe24.com/activitydata/getTop5ActivitiesForUser?name="+name+"&email="+email
+      let url = "http://saevom06.cafe24.com/activitydata/getTop5Activities"
       fetch(url, {
         method: 'GET',
         headers: {
@@ -98,7 +73,7 @@ export default class MypageScreen extends React.Component {
           }
           console.log(responseInJson[0]);
           console.log(responseInJson.length);
-          this.setState({ allUserActivities: responseInJson }); // assign data to state variable
+          this.setState({ allActivities: responseInJson }); // assign data to state variable
           this.setState({ showList: true });
         })
     } catch (e) {
@@ -143,9 +118,6 @@ export default class MypageScreen extends React.Component {
   }
 
   render() {
-
-    console.disableYellowBox = true;
-
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
@@ -184,88 +156,49 @@ export default class MypageScreen extends React.Component {
 
         
         </Dialog.Container>
-        <ImageBackground
-          source={require('../../assets/images/home_back.png')}
-          style={styles.background}
-        >
-          <View style={styles.topSpace}>
-            <Text style={styles.topText}>{global.googleUserName}님,</Text>
-            <Text style={styles.topText}>좋은 하루 되세요.</Text>
-          </View>
-        </ImageBackground>
-        
+
         <View style={styles.box}>
-          <View style={styles.title}>
-            <Text style={styles.titleText}>닉네임</Text>
-          </View>
           <View style={styles.listBox}>
             <View style={styles.listFirst}>
-              <Text style={styles.item}>{this.state.userInfo.nickname}</Text>
+              <Text style={styles.item}>위치정보 승인</Text>
               <Ionicons
-                name={'ios-build'}
-                size={30}
-                style={{ marginTop: 7}}
-                color={'rgb(220,220,220)'}
-              />
+                name='ios-checkmark-circle'
+                size={30} 
+                style={{ marginTop: 7 }}
+                color={'#000'}
+                />
+            </View>
+            <View style={styles.sub}>
+              <Text style={styles.subText}>위치정보 공유 동의 설명</Text>
+            </View>
+          </View>
+          <View style={styles.listBox}>
+            <View style={styles.list}>
+              <Text style={styles.item}>전화번호 공유 승인</Text>
+              <Ionicons
+                name='ios-checkmark-circle'
+                size={30} 
+                style={{ marginTop: 7 }}
+                color={'#000'}
+                />
+            </View>
+            <View style={styles.sub}>
+              <Text style={styles.subText}>번화번호 공유 동의 설명</Text>
+            </View>
+          </View>
+          <View style={styles.listBox}>
+            <View style={styles.list}>
+              <Text style={styles.item}>알림</Text>
+              <Ionicons
+                name='ios-checkmark-circle-outline'
+                size={30} 
+                style={{ marginTop: 7 }}
+                color={'#000'}
+                />
             </View>
           </View>
         </View>
         
-        <View style={styles.box}>
-            <View style={styles.title}>
-              <Text style={styles.titleText}>나의 활동</Text>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen : '관심사 목록', intial : false})}>
-                <Text style={styles.titleButton}>전체보기</Text>
-              </TouchableOpacity>
-            </View>
-
-            <SafeAreaView style={styles.listBox}>
-              <FlatList
-                data={this.state.allUserActivities}
-                renderItem={
-                  ({ item }) => (
-                    <View style={styles.list}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          // this.props.navigation.navigate('ActivityListScreen', {data: item}); // code for sending selected data when navigating
-                          this.setState({userSelectedActivity:item});
-                          this.setState({userSelectedInterestCategory:item.interestCategory});
-                          this.setState({ dialogVisible: true });
-                        }}
-                      >
-                          <Text style={styles.item}>{item.title}</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )
-                }
-                keyExtractor={(item) => item.id.toString()}
-              >
-              </FlatList>
-          </SafeAreaView>
-        </View>
-        <View style={styles.box}>
-          <View style={styles.title}>
-            <Text style={styles.titleText}>계정관리</Text>
-          </View>
-          <View style={styles.listBox}>
-            <TouchableOpacity
-              style={styles.listFirst}
-              onPress={() => this.props.navigation.navigate('설정')}
-              >
-              <Text style={styles.item}>설정</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.listBox}>
-            <View style={styles.list}>
-              <Text style={styles.item}>로그아웃</Text>
-            </View>
-          </View>
-          <View style={styles.listBox}>
-            <View style={styles.list}>
-              <Text style={styles.item}>회원탈퇴</Text>
-            </View>
-          </View>
-        </View>
       </ScrollView>
     )
   }
@@ -298,23 +231,6 @@ const styles = StyleSheet.create({
     backgroundColor:'rgb(220,220,220)',
     marginBottom:0,
   },
-  title: {
-    padding: 10,
-    paddingLeft:25,
-    flexDirection: 'row',
-  },
-  titleText: {
-    flex: 1,
-    alignSelf: 'flex-start',
-    fontSize:15,
-    fontWeight:'bold',
-    color:'#888',
-  },
-  titleButton: {
-    alignSelf: 'flex-end',
-    justifyContent:'center',
-    color:'rgb(140,140,140)'
-  },
   listBox: {
     backgroundColor:'#FFF',
     paddingRight:25,
@@ -322,14 +238,14 @@ const styles = StyleSheet.create({
   },
   listFirst: {
     flex:1,
-    paddingTop: 5,
-    paddingBottom: 8,
+    paddingTop: 15,
+    paddingBottom: 15,
     flexDirection:'row',
   },
   list: {
     flex:1,
-    paddingTop: 5,
-    paddingBottom: 8,
+    paddingTop: 15,
+    paddingBottom: 15,
     flexDirection:'row',
     borderTopWidth:0.5,
     borderColor:'rgb(220,220,220)',
@@ -339,5 +255,15 @@ const styles = StyleSheet.create({
     fontSize:20,
     paddingTop:8,
     paddingBottom:8,
-  }
+  },
+  sub: {
+    paddingBottom: 20,
+  },
+  subText: {
+    flex: 1,
+    alignSelf: 'flex-start',
+    fontSize:15,
+    fontWeight:'bold',
+    color:'#888',
+  },
 });

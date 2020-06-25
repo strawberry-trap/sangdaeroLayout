@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView, ImageBackground } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView, ImageBackground, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem } from 'react-native-elements'
 
@@ -14,12 +14,14 @@ export default class HomeScreen extends React.Component {
 
   state = {
     allActivities: [],
+    allUserActivities:[],
     showList: false,
 
     // for dialog
     dialogVisible: false, 
     isDatePickerVisible: false, // date picker in dialog
     finalConfirmDialog: false,
+    postType:1,
 
     // additional data to send to the web server
     userSelectedActivity: {},
@@ -31,7 +33,7 @@ export default class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.userMemo='';
+    this.userType=1;
 
     this.status = [
       '매칭 전',
@@ -72,9 +74,48 @@ export default class HomeScreen extends React.Component {
               responseInJson[i].endTime = this.parseDate(responseInJson[i].endTime);
             }
           }
+          this.setState({ allActivities: responseInJson }); // assign data to state variable
+          this.setState({ showList: true });
+        })
+    } catch (e) {
+      console.log(e);
+    }
+
+    try {
+      var name = global.googleUserName;
+      var email = global.googleUserEmail;
+      // get first five activites from server
+      let url = "http://saevom06.cafe24.com/activitydata/getTop5ActivitiesForUser?name="+name+"&email="+email
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+          console.log("then");
+          for (var i = 0; i < responseInJson.length; i++) {
+            if (responseInJson[i].deadline.charAt(4) != '년') {
+              if (responseInJson[i].deadline == null) {
+                if (responseInJson[i].startTime == null) {
+                  responseInJson[i].deadline = '없음';
+                } else {
+                  responseInJson[i].deadline = responseInJson[i].startTime;
+                }
+              }
+          
+              if (responseInJson[i].deadline != '없음') {
+                responseInJson[i].deadline = this.parseDate(responseInJson[i].deadline);
+              }
+          
+              responseInJson[i].startTime = this.parseDate(responseInJson[i].startTime);
+              responseInJson[i].endTime = this.parseDate(responseInJson[i].endTime);
+            }
+          }
           console.log(responseInJson[0]);
           console.log(responseInJson.length);
-          this.setState({ allActivities: responseInJson }); // assign data to state variable
+          this.setState({ allUserActivities: responseInJson }); // assign data to state variable
           this.setState({ showList: true });
         })
     } catch (e) {
@@ -82,20 +123,11 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  showDatePicker = () => {
-    this.setState({ isDatePickerVisible: true });
-  };
- 
-  hideDatePicker = () => {
-    this.setState({ isDatePickerVisible: false });
-  };
-
-  handleConfirm = (date) => {
-    this.setState({ userSelectedDateTime: date});
-    this.hideDatePicker();
-  };
 
   fetchPost(url, data) {
+    console.log(url);
+    console.log(data);
+    
     try {
       fetch(url, {
         method: 'POST',
@@ -106,10 +138,14 @@ export default class HomeScreen extends React.Component {
         //credentials: 'include',
 
         body: JSON.stringify(data),
-      }).then((res) => { });
+      }).then((res) => {
+        Alert.alert("신청 되었습니다");
+        this.setState({ dialogVisible: false });
+      });
     } catch (e) {
       console.warn('fetch failed', e, url);
     }
+    
   }
 
   parseDate(date) {
@@ -173,17 +209,18 @@ export default class HomeScreen extends React.Component {
                 세부 내용 : {this.state.userSelectedActivity.content}
               </Dialog.Description>
 
-              <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
-                () => {
-                  this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
-                    id: this.state.userSelectedActivity.id, // id of the activity that user chose
-                    name: 'HyunWoo',//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
-                    email: '21400045@handong.edu',// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
-                    memo: this.userMemo,
-                  });
-                  this.setState({ dialogVisible: false });
-                }
-              } />
+              {this.state.postType == 1 &&
+                <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
+                  () => {
+                    this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
+                      id: this.state.userSelectedActivity.id, // id of the activity that user chose
+                      name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+                      email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+                      type: this.userType,
+                    });
+                  }
+                } />
+              }
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
             </Dialog.Container>
               <View style={styles.topSpace}>
@@ -207,6 +244,7 @@ export default class HomeScreen extends React.Component {
                           <TouchableOpacity
                             onPress={() => {
                               // this.props.navigation.navigate('ActivityListScreen', {data: item}); // code for sending selected data when navigating
+                              this.setState({postType: 1});
                               this.setState({userSelectedActivity:item});
                               this.setState({userSelectedInterestCategory:item.interestCategory});
                               this.setState({ dialogVisible: true });
@@ -232,13 +270,14 @@ export default class HomeScreen extends React.Component {
 
                 <SafeAreaView style={styles.listBox}>
                   <FlatList
-                    data={this.state.allActivities}
+                    data={this.state.allUserActivities}
                     renderItem={
                       ({ item }) => (
                         <View style={styles.list}>
                           <TouchableOpacity
                             onPress={() => {
                               // this.props.navigation.navigate('ActivityListScreen', {data: item}); // code for sending selected data when navigating
+                              this.setState({postType: 2});
                               this.setState({userSelectedActivity:item});
                               this.setState({userSelectedInterestCategory:item.interestCategory});
                               this.setState({ dialogVisible: true });

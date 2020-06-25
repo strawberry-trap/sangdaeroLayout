@@ -40,44 +40,6 @@ export default class NoticeListScreen extends React.Component {
             })
     }
 
-    getImage(props) {
-        var path;
-
-        switch (props) {
-            case 0:
-                path = require('../../assets/images/status_0.png');
-                break;
-            case 1:
-                path = require('../../assets/images/status_1.png');
-                break;
-            case 2:
-                path = require('../../assets/images/status_2.png');
-                break;
-            case 3:
-                path = require('../../assets/images/status_3.png');
-                break;
-            case 4:
-                path = require('../../assets/images/status_4.png');
-                break;
-            default:
-                path = require('../../assets/images/status_5.png');
-                break;
-        }
-
-        return (
-            <View style={styles.imageGroup}>
-                <Image
-                    source={path}
-                    style={styles.statusButton}
-                />
-                <Image
-                    source={require('../../assets/images/right_arrow.png')}
-                    style={styles.arrow}
-                />
-            </View>
-        )
-    }
-
     createListItem(l, i) {
         if (i == 0) {
             return (
@@ -85,7 +47,6 @@ export default class NoticeListScreen extends React.Component {
                     key={i}
                     title={l.title}
                     titleStyle={styles.title}
-                    rightElement={this.getImage(l.status)}
                     onPress={() => this.props.navigation.navigate('공지 내용', { data: this.state.data[i] })}
                     containerStyle={styles.listFirst}
                 />
@@ -96,7 +57,6 @@ export default class NoticeListScreen extends React.Component {
                     key={i}
                     title={l.title}
                     titleStyle={styles.title}
-                    rightElement={this.getImage(l.status)}
                     onPress={() => this.props.navigation.navigate('공지 내용', { data: this.state.data[i] })}
                     containerStyle={styles.list}
                 />

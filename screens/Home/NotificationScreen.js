@@ -19,7 +19,13 @@ export default class NotificationScreen extends React.Component {
   }
   
   componentDidMount() {
-    fetch('http://saevom06.cafe24.com/interestdata/getAll', {
+    var name = global.googleUserName+"";
+    var email = global.googleUserEmail+"";
+
+    console.log(name);
+    console.log(email);
+
+    fetch('http://saevom06.cafe24.com/notificationdata/getNotificationsForUser?name='+name+'&email='+email, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -29,16 +35,17 @@ export default class NotificationScreen extends React.Component {
     })
     .then((response) => response.json())
     .then((responseInJson) => {
+      
+      console.log(responseInJson);
+      console.log(responseInJson[0].message);
       this.setState({data:responseInJson});
-      console.log(this.state.data);
     })
     .catch((e) => console.log(e))
     .finally(() => {
       this.setState({isLoading:false});
     })
+    
   }
-
-  
 
   render() {
     const { data, isLoading } = this.state;
@@ -49,7 +56,8 @@ export default class NotificationScreen extends React.Component {
           { isLoading ? <View/> : (
             data.map((l, i) => (
               <ListItem
-                title={l.name}
+                key={i}
+                title={l.message}
                 leftElement={
                   <Ionicons
                     name='ios-notifications-outline'
