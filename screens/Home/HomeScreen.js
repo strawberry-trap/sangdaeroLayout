@@ -96,6 +96,7 @@ export default class HomeScreen extends React.Component {
   render() {
 
     console.disableYellowBox = true;
+
     return (
       <View style={styles.container}>
         <ImageBackground source={require('../../assets/images/home_back_test.png')} style={styles.background}>
