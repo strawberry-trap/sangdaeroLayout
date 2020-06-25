@@ -8,17 +8,22 @@ import { Picker } from '@react-native-community/picker';
 import TabBarIcon from '../../components/TabBarIcon';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+let title = "";
+let memo = "";
+
 export default class RequestScreen extends React.Component {
 
   state = {
-    index:1,
+    index: 1,
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
-    isStartTime:false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
+    isStartTime: false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
     startTime: null, // data to send to the web server
     endTime: null, // data to send to the web server
-    test:null,
-    interestCategoryId : 0,
+    startTimeDataForServer: null,
+    endTimeDataForServer: null,
+    test: null,
+    interestCategoryId: 0,
   }
 
   constructor(props) {
@@ -28,23 +33,22 @@ export default class RequestScreen extends React.Component {
 
     this.state = {
       test: props.route.params.test,
-      //interestCategoryId: props.route.params.interestType,
+      categoryId: props.route.params.categoryId,
+      categoryName: props.route.params.categoryName,
+
       startTime: this.parseDate(date),
       endTime: this.parseDate(date),
     }
-    console.log(this.state.test);
-    
   }
 
   parseDate(newDate) {
-    console.log(newDate);
 
     var year = this.addZero(newDate.getFullYear());
     var month = this.addZero(newDate.getMonth() + 1);
     var date = this.addZero(newDate.getDate());
     var day = newDate.getDay();
-    
-    switch(day) {
+
+    switch (day) {
       case 0:
         day = "일";
         break;
@@ -80,7 +84,22 @@ export default class RequestScreen extends React.Component {
     hour = this.addZero(hour);
     var minute = this.addZero(newDate.getMinutes());
 
-    return year+"년 "+month+"월 "+date+"일("+day+")"+ampm+" "+hour+"시 "+minute+"분";
+    return year + "년 " + month + "월 " + date + "일(" + day + ")" + ampm + " " + hour + "시 " + minute + "분";
+  }
+
+  parseDateForServer(newDate){
+    
+    var year = this.addZero(newDate.getFullYear());
+    var month = this.addZero(newDate.getMonth() + 1);
+    var date = this.addZero(newDate.getDate());
+    var day = newDate.getDay();
+    var hour = newDate.getHours();
+    hour = this.addZero(hour);
+    var minute = this.addZero(newDate.getMinutes());
+
+    // YYYY-MM-DD HH:MM:00 (seconds are fixed to '00')
+    var startTimeForServer = year+"-"+month+"-"+date+" "+hour+":"+minute+":00";
+    return startTimeForServer;
   }
 
   addZero(num) {
@@ -91,21 +110,61 @@ export default class RequestScreen extends React.Component {
     }
   }
 
-  createTwoButtonAlert = () =>
-  Alert.alert(
-    "한동대학교 청소",
-    "요청하기",
-    [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel"
-      },
-      { text: "OK", onPress: () => Alert.alert("요청되었습니다") }
-    ],
-    { cancelable: false }
-  );
+  async sendRequestToServer() {
 
+    // send request to the web server
+    const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
+
+    let data = {
+      id: this.state.categoryId,
+      name: global.googleUserName,
+      email: global.googleUserEmail,
+      startTime: this.state.startTime,
+      endTime: this.state.endTime,
+      title: this.title,
+      memo: this.memo,
+    }
+
+    // data validation check
+    if (this.title == undefined) this.title = "제목이 입력되지 않았습니다."
+    if (this.memo == undefined) this.memo = "메모가 입력되지 않았습니다."
+    if (this.state.startTimeDataForServer == undefined) { data['startTime']='0000-00-00 00:00:00'; }
+    if (this.state.endTimeDataForServer == undefined) { data['endTime']='0000-00-00 00:00:00';} 
+
+    return await fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then(()=>{
+        Alert.alert("등록 완료","새로운 봉사활동 요청이 등록 되었습니다!");
+      });
+  }
+
+  createTwoButtonAlert = () => {
+    Alert.alert(
+      "새로운 봉사활동을 요청합니다.",
+      "정말 요청하시겠습니까?",
+      [
+        {
+          text: "확인", onPress: () => {
+            const result = this.sendRequestToServer();
+            if (result == 1){
+              Alert.alert("새로운 봉사활동 요청이 등록되었습니다!");
+            }
+          }
+        },
+        {
+          text: "취소",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+      ],
+      { cancelable: false }
+    );
+  }
   state = {
     index: '1',
   };
@@ -119,7 +178,7 @@ export default class RequestScreen extends React.Component {
           'Content-Type': 'application/json'
         },
         //credentials: 'include',
-  
+
         body: JSON.stringify(data),
       });
       console.log(url);
@@ -138,21 +197,19 @@ export default class RequestScreen extends React.Component {
   };
 
   handleConfirm = (date) => {
-    if (this.state.isStartTime == true){
-      this.setState({ startTime: this.parseDate(date)});
+    if (this.state.isStartTime == true) {
+      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
-        this.setState({endTime: this.state.startTime});
+        this.setState({ endTime: this.state.startTime, endTimeDataForServer:this.state.startTimeDataForServer });
       }
     } else {
-      this.setState({endTime: this.parseDate(date)});
+      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
-        this.setState({startTime: this.state.endTime});
+        this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
       }
     }
-
-
     this.hideDatePicker();
   };
 
@@ -168,7 +225,7 @@ export default class RequestScreen extends React.Component {
             onCancel={this.hideDatePicker}
           />
         </View>
-        
+
         <View style={styles.box}>
           <View style={styles.list}>
             <View>
@@ -177,21 +234,22 @@ export default class RequestScreen extends React.Component {
             <Input
               name='title'
               placeholder='제목을 입력하세요'
+              onChangeText={(input) => { this.title = input; }}
             />
           </View>
           <View style={styles.list}>
             <Text style={styles.title}>카테고리</Text>
-            
+
             <Text style={styles.text} name='category'>
-              {global.googleUserName}
+              {this.state.categoryName}
             </Text>
           </View>
           <View style={styles.list}>
             <Text style={styles.title}>활동시간</Text>
             <View style={styles.time}>
-              <TouchableOpacity 
-                onPress={()=>{this.setState({ isStartTime:true ,isDatePickerVisible: true })}
-              }>
+              <TouchableOpacity
+                onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
+                }>
                 <Text style={styles.timeText}>시작시간 선택</Text>
               </TouchableOpacity>
               <View style={styles.timeList}>
@@ -200,9 +258,9 @@ export default class RequestScreen extends React.Component {
               </View>
             </View>
             <View style={styles.time}>
-              <TouchableOpacity 
-                onPress={()=>{this.setState({ isStartTime:true ,isDatePickerVisible: true })}
-              }>
+              <TouchableOpacity
+                onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
+                }>
                 <Text style={styles.timeText}>종료시간 선택</Text>
               </TouchableOpacity>
               <View style={styles.timeList}>
@@ -217,8 +275,20 @@ export default class RequestScreen extends React.Component {
               {global.googleUserName}
             </Text>
           </View>
+
+          <View style={styles.list}>
+            <View>
+              <Text style={styles.title}>메모</Text>
+            </View>
+            <Input
+              name='memo'
+              placeholder='메모를 입력하세요'
+              onChangeText={(input) => { this.memo = input; }}
+            />
+          </View>
+
         </View>
-        <TouchableOpacity onPress={()=>this.createTwoButtonAlert()}>
+        <TouchableOpacity onPress={() => this.createTwoButtonAlert()}>
           <Text style={styles.button}>
             등록하기
           </Text>
@@ -226,7 +296,7 @@ export default class RequestScreen extends React.Component {
       </ScrollView>
     );
   }
-  
+
 }
 
 
@@ -240,67 +310,67 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   box: {
-    flex:1,
-    padding:20,
-    paddingTop:30,
-    paddingBottom:30,
-    backgroundColor:'#FFF',
-    marginBottom:25,
-    marginLeft:8,
-    marginRight:8,
-    borderRadius:25,
-    elevation:2,
+    flex: 1,
+    padding: 20,
+    paddingTop: 30,
+    paddingBottom: 30,
+    backgroundColor: '#FFF',
+    marginBottom: 25,
+    marginLeft: 8,
+    marginRight: 8,
+    borderRadius: 25,
+    elevation: 2,
   },
   list: {
-    marginTop:10,
-    marginBottom:10,
+    marginTop: 10,
+    marginBottom: 10,
   },
-  title:{
+  title: {
     flex: 1,
     flexDirection: 'row',
     padding: 3,
-    fontSize:20,
-    fontWeight:'bold',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   text: {
-    flex:1,
-    padding:5,
-    paddingLeft:10,
-    fontSize:15,
-    textAlignVertical:'center',
+    flex: 1,
+    padding: 5,
+    paddingLeft: 10,
+    fontSize: 15,
+    textAlignVertical: 'center',
   },
   time: {
-    flex:1,
-    flexDirection:'row',
-    marginBottom:5,
+    flex: 1,
+    flexDirection: 'row',
+    marginBottom: 5,
   },
   timeList: {
-    padding:5,
+    padding: 5,
   },
-  timeText:{
-    flex:1,
-    paddingLeft:5,
-    paddingRight:5,
-    fontSize:15,
-    textAlignVertical:'center',
-    borderRadius:50,
-    color:'#FFF',
-    backgroundColor:'rgb(29,140,121)',
+  timeText: {
+    flex: 1,
+    paddingLeft: 5,
+    paddingRight: 5,
+    fontSize: 15,
+    textAlignVertical: 'center',
+    borderRadius: 50,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
   },
   date: {
-    flex:1,
+    flex: 1,
     paddingLeft: 5,
-    fontSize:15,
-    textAlign:'left',
+    fontSize: 15,
+    textAlign: 'left',
   },
   button: {
-    textAlign:'center',
-    marginLeft:35,
-    marginRight:35,
-    fontSize:22,
-    color:'#FFF',
-    backgroundColor:'rgb(29,140,121)',
-    borderRadius:50,
-    padding:8,
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(29,140,121)',
+    borderRadius: 50,
+    padding: 8,
   }
 });
