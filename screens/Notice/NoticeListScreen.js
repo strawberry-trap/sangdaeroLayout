@@ -78,6 +78,7 @@ export default class NoticeListScreen extends React.Component {
                             ))
                         )}
                     </View>
+
                 </View>
 
             </ScrollView>
