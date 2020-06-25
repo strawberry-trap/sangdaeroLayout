@@ -8,7 +8,7 @@ import { Badge, Button, ButtonGroup, ListItem } from 'react-native-elements';
 let buttonList = [];
 let interestCategory = [];
 
-export default class ActivityScreen extends React.Component {
+export default class NotificationScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -16,28 +16,6 @@ export default class ActivityScreen extends React.Component {
       data: [],
       isLoading: true,
     }
-    this.bottomButtons = ['Logout', 'Home', 'Json Data', 'Button Ex'];
-
-    this.fixList =[
-      {
-        name:'물건 나눔',
-        subtitle:'물건 나눔',
-        badgeValue:'2',
-        badgeStatus:'success'
-      },
-      {
-        name:'요청하기',
-        subtitle:'요청하기',
-        badgeValue:'4',
-        badgeStatus:'success'
-      },
-      {
-        name:'내 활동',
-        subtitle:'내 활동',
-        badgeValue:'4',
-        badgeStatus:'success'
-      },
-    ]
   }
   
   componentDidMount() {
@@ -71,10 +49,14 @@ export default class ActivityScreen extends React.Component {
           { isLoading ? <View/> : (
             data.map((l, i) => (
               <ListItem
-                key={i+2}
                 title={l.name}
-                chevron={{size:30}}
-                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id})}
+                leftElement={
+                  <Ionicons
+                    name='ios-notifications-outline'
+                    size={27} 
+                    style={{ marginBottom: -3 }}
+                    color={'rgb(1, 192, 99)'}
+                  />}
                 containerStyle={styles.item}
                 titleStyle={styles.text}
               />
@@ -90,19 +72,16 @@ export default class ActivityScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#rgb(220,220,220)',
+    backgroundColor: '#FFF',
   },
   contentContainer: {
-    paddingTop: 15,
+    paddingTop: 0,
   },
   item: {
     flex:1,
-    padding:18,
     backgroundColor:'#FFF',
-    margin:8,
-    borderRadius:10,
-    height:90,
-    elevation:2,
+    borderBottomWidth:0.5,
+    borderColor:'rgb(220,220,220)',
   },
   listBox: {
     padding: 3,
@@ -118,9 +97,8 @@ const styles = StyleSheet.create({
     borderColor:'rgb(220,220,220)',
   },
   text: {
-    fontSize:25,
-    fontWeight:'bold',
-    paddingLeft:20,
-    color:'rgb(29,140,121)',
+    fontSize:17,
+    paddingLeft:8,
+    color:'#000',
   }
 });

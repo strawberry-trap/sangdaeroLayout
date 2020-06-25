@@ -27,6 +27,59 @@ export default class HomeScreen extends React.Component {
     userSelectedInterestCategory: {},
     serverUrl: '',
     type: 0,
+  };
+
+  constructor(props) {
+    super(props);
+    this.userMemo='';
+
+    this.status = [
+      '매칭 전',
+      '매칭 중',
+      '매칭 완료',
+      '활동 진행중',
+      '활동 종료',
+      '활동 취소'
+    ];
+    
+    try {
+      // get first five activites from server
+      let url = "http://saevom06.cafe24.com/activitydata/getTop5Activities"
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+          console.log("then");
+          for (var i = 0; i < responseInJson.length; i++) {
+            if (responseInJson[i].deadline.charAt(4) != '년') {
+              if (responseInJson[i].deadline == null) {
+                if (responseInJson[i].startTime == null) {
+                  responseInJson[i].deadline = '없음';
+                } else {
+                  responseInJson[i].deadline = responseInJson[i].startTime;
+                }
+              }
+          
+              if (responseInJson[i].deadline != '없음') {
+                responseInJson[i].deadline = this.parseDate(responseInJson[i].deadline);
+              }
+          
+              responseInJson[i].startTime = this.parseDate(responseInJson[i].startTime);
+              responseInJson[i].endTime = this.parseDate(responseInJson[i].endTime);
+            }
+          }
+          console.log(responseInJson[0]);
+          console.log(responseInJson.length);
+          this.setState({ allActivities: responseInJson }); // assign data to state variable
+          this.setState({ showList: true });
+        })
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   showDatePicker = () => {
@@ -59,43 +112,31 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  constructor(props) {
-    super(props);
-    this.userMemo='';
+  parseDate(date) {
+    console.log(date);
+    var splitDash = date.split('-');
+      
+    var year = splitDash[0] + '년 ';
+    var month = splitDash[1] + '월 ';
 
-    this.status = [
-      '매칭 전',
-      '매칭 중',
-      '매칭 완료',
-      '활동 진행중',
-      '활동 종료',
-      '활동 취소'
-    ];
-    
-    try {
-      // get first five activites from server
-      let url = "http://saevom06.cafe24.com/activitydata/getTop5Activities"
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-      }).then((response) => response.json())
-        .then((responseInJson) => {
-          console.log(responseInJson);
-          this.setState({ allActivities: responseInJson }); // assign data to state variable
-          this.setState({ showList: true });
-        })
-    } catch (e) {
-      console.log(e);
-    }
+    var splitT = splitDash[2].split('T');
+
+    var day = splitT[0] + '일 ';
+
+    var splitColon = splitT[1].split(':');
+    var hour = splitColon[0] + '시 ';
+    var minute = splitColon[1] + '분';
+
+    return year + month + day + hour + minute;
   }
+
+  
 
 
   render() {
 
     console.disableYellowBox = true;
+
     return (
       <View style={styles.container}>
         <ImageBackground source={require('../../assets/images/home_back_test.png')} style={styles.background}>
@@ -109,31 +150,35 @@ export default class HomeScreen extends React.Component {
               </Dialog.Description>
 
               <Dialog.Description>
-                {this.state.userSelectedInterestCategory.name}
-              </Dialog.Description>
-
-              <Dialog.Description>
                 마감 기한 : {this.state.userSelectedActivity.deadline}
               </Dialog.Description>
 
-              <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='rgb(1, 192, 99)' onPress={
+              <Dialog.Description>
+                관심사 : {this.state.userSelectedInterestCategory.name}
+              </Dialog.Description>
+
+              <Dialog.Description>
+                시작시간 : {this.state.userSelectedActivity.startTime}
+              </Dialog.Description>
+
+              <Dialog.Description>
+                종료시간 : {this.state.userSelectedActivity.endTime}
+              </Dialog.Description>
+
+              <Dialog.Description>
+                장소 : {this.state.userSelectedActivity.place}
+              </Dialog.Description>
+
+              <Dialog.Description>
+                세부 내용 : {this.state.userSelectedActivity.content}
+              </Dialog.Description>
+
+              <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
                 () => {
                   this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
                     id: this.state.userSelectedActivity.id, // id of the activity that user chose
                     name: 'HyunWoo',//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
                     email: '21400045@handong.edu',// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
-                    memo: this.userMemo,
-                  });
-                  this.setState({ dialogVisible: false });
-                }
-              } />
-
-              <Dialog.Button label="이용자 지원" title="이용자 지원" color='rgb(1, 192, 99)' onPress={
-                () => {
-                  this.fetchPost('http://saevom06.cafe24.com/requestdata/newRegister', { //  ** NEED REST CONTROLLER URL **
-                    id: this.state.userSelectedActivity.id,
-                    name: this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
-                    email: this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
                     memo: this.userMemo,
                   });
                   this.setState({ dialogVisible: false });
@@ -147,7 +192,7 @@ export default class HomeScreen extends React.Component {
               </View>
               <View style={styles.box}>
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>최근 활동 목록</Text>
+                  <Text style={styles.titleText}>최근 등록된 활동</Text>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen : '관심사 목록', intial : false})}>
                     <Text style={styles.titleButton}>전체보기</Text>
                   </TouchableOpacity>
@@ -179,7 +224,7 @@ export default class HomeScreen extends React.Component {
             </View>
             <View style={styles.box}>
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>최근 활동 목록</Text>
+                  <Text style={styles.titleText}>나의 활동</Text>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen : '관심사 목록', intial : false})}>
                     <Text style={styles.titleButton}>전체보기</Text>
                   </TouchableOpacity>

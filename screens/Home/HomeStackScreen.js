@@ -1,31 +1,34 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem, Card } from 'react-native-elements';
+import { Badge, ListItem, Card, Button } from 'react-native-elements';
 import { createStackNavigator, HeaderBackground } from '@react-navigation/stack';
 import TabBarIcon from '../../components/TabBarIcon';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import HomeScreen from './HomeScreen';
+import NotificationScreen from './NotificationScreen';
 
 
 const HomeStack = createStackNavigator();
 
-export default function HomeStackScreen(){
+export default function HomeStackScreen({ navigation, route }){
     return(
         <HomeStack.Navigator
             screenOptions={{
                 headerRight: () => (
-                    <View style={styles.rightIconContainer}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('알림')}
+                    style={styles.rightIconContainer}>
                         <Ionicons
                           name='ios-notifications-outline'
-                          size={30}
+                          size={30} 
                           style={{ marginBottom: -3 }}
                           color={'#FFF'}
                         />
-                    </View>
+                    </TouchableOpacity>
                 ),
                 headerLeft: () => (
                   <Image
@@ -47,6 +50,7 @@ export default function HomeStackScreen(){
             }}
         >
             <HomeStack.Screen name='Home' component={HomeScreen} />
+            <HomeStack.Screen name='알림' component={NotificationScreen} />
             
         </HomeStack.Navigator>
     )
