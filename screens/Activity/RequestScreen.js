@@ -115,11 +115,7 @@ export default class RequestScreen extends React.Component {
     // send request to the web server
     const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
 
-    // data validation check
-    if (this.title == undefined) this.title = "제목이 입력되지 않았습니다."
-    if (this.memo == undefined) this.memo = "메모가 입력되지 않았습니다."
-
-    const data = {
+    let data = {
       id: this.state.categoryId,
       name: global.googleUserName,
       email: global.googleUserEmail,
@@ -128,6 +124,12 @@ export default class RequestScreen extends React.Component {
       title: this.title,
       memo: this.memo,
     }
+
+    // data validation check
+    if (this.title == undefined) this.title = "제목이 입력되지 않았습니다."
+    if (this.memo == undefined) this.memo = "메모가 입력되지 않았습니다."
+    if (this.state.startTimeDataForServer == undefined) { data['startTime']='0000-00-00 00:00:00'; }
+    if (this.state.endTimeDataForServer == undefined) { data['endTime']='0000-00-00 00:00:00';} 
 
     return await fetch(url, {
         method: 'POST',
@@ -148,9 +150,6 @@ export default class RequestScreen extends React.Component {
       [
         {
           text: "확인", onPress: () => {
-            console.log('서버로 보내진 시작시간 : ', this.state.startTimeDataForServer);
-            console.log('서버로 보내진 종료 시간 : ', this.state.endTimeDataForServer);
-            console.log('서버로 보내진 사용자 이름 : ', global.googleUserName);
             const result = this.sendRequestToServer();
             if (result == 1){
               Alert.alert("새로운 봉사활동 요청이 등록되었습니다!");
