@@ -1,16 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
+import { StyleSheet,Image, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { Badge, Button, ListItem, Input } from 'react-native-elements';
 import { Picker } from '@react-native-community/picker';
 import TabBarIcon from '../../components/TabBarIcon';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import * as ImagePicker from 'expo-image-picker'; // for image access
+import Dialog from "react-native-dialog";
 
 let title="";
 let memo="";
-export default class RequestScreen extends React.Component {
+let formData = new FormData();
+
+export default class ShareProductScreen extends React.Component {
 
   state = {
     index: 1,
@@ -25,7 +29,11 @@ export default class RequestScreen extends React.Component {
     endTimeDataForServer: null,
     test: null,
     interestCategoryId: 0,
-    
+
+    // camera
+    image: null, // check if image is selected or not
+    isImageConfirmed: false,
+    dialogVisible: false, // dialog for image picking
   }
 
   constructor(props) {
@@ -35,8 +43,8 @@ export default class RequestScreen extends React.Component {
 
     this.state = {
       test: props.route.params.test,
-      categoryId: props.route.params.categoryId,
-      categoryName: props.route.params.categoryName,
+      categoryId: props.route.params.id,
+      categoryName: props.route.params.name,
 
       startTime: this.parseDate(date),
       endTime: this.parseDate(date),
@@ -112,61 +120,130 @@ export default class RequestScreen extends React.Component {
     }
   }
 
-  generateDataToSend(){
+  // image picker
+  async takeAndUploadPhotoAsync(url) {
+    // Display the camera to the user and wait for them to take a photo or to cancel
+    // the action
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
 
-    let data = {
-      id: this.state.categoryId,
-      name: global.googleUserName,
-      email: global.googleUserEmail,
-      startTime: this.state.startTimeDataForServer,
-      endTime: this.state.endTimeDataForServer,
-      title: this.title,
-      memo: this.memo,
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    } else {
+      console.log('image selecting error!');
+      return;
     }
+
+    // ImagePicker saves the taken photo to disk and returns a local URI to it
+    let localUri = result.uri;
+    let filename = localUri.split('/').pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    // Upload the image using the fetch and FormData APIs
+    // Assume "photo" is the name of the form field the server expects
+    // formData.append('image', { uri: localUri, name: filename, type });
+
+    formData.append('image', { uri: localUri, name: filename, type });
+    formData.append('name', global.googleUserName);
+    formData.append('email', global.googleUserEmail);
+    formData.append('id', this.state.categoryId);
+  }
+
+  async pickImageFromGallery(url) {
+    // Display the camera to the user and wait for them to take a photo or to cancel
+    // the action
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      // aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    } else {
+      console.log('image selecting error!');
+      return;
+    }
+    console.log(result);
+
+    // ImagePicker saves the taken photo to disk and returns a local URI to it
+    let localUri = result.uri;
+    let filename = localUri.split('/').pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    // Upload the image using the fetch and FormData APIs
+    // Assume "photo" is the name of the form field the server expects
+    // formData.append('image', { uri: localUri, name: filename, type });
+
+    formData.append('image', { uri: localUri, name: filename, type });
+    formData.append('name', global.googleUserName);
+    formData.append('email', global.googleUserEmail);
+    formData.append('id', this.state.categoryId);
+
+  }
+
+  async sendPictureToServer(url){
 
     // data validation check
     if (this.title == undefined) {
-      data["title"] = "제목이 입력되지 않았습니다.";
-    }
+        this.title = "제목이 입력되지 않았습니다.";
+        }
     if (this.memo == undefined) {
-      data["memo"] = "메모가 입력되지 않았습니다.";
-    }
-    if (this.state.startTimeDataForServer == undefined) { data['startTime']='0000-00-00 00:00:00'; }
-    if (this.state.endTimeDataForServer == undefined) { data['endTime']='0000-00-00 00:00:00';}
+        this.memo = "메모가 입력되지 않았습니다.";
+        }
+    let startTemp = "";
+    let endTemp="";
+    if (this.state.startTimeDataForServer == undefined) { startTemp='0000-00-00 00:00:00'; }
+    else startTemp = this.state.startTimeDataForServer;
+    if (this.state.endTimeDataForServer == undefined) { endTemp='0000-00-00 00:00:00';}
+    else endTemp = this.state.endTimeDataForServer;
+      
+    // 유저가 사진을 고른 시점에서 id, image, name, email은 이미 formData에 추가된 상태임
+    formData.append('startTime', startTemp);
+    formData.append('endTime', endTemp);
+    formData.append('title', this.title);
+    formData.append('memo', this.memo);
 
-    return data;
-  }
-
-  async sendRequestToServer(data) {
-
-    // send request to the web server
-    const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
+    console.log(formData);
 
     return await fetch(url, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      }).then(()=>{
-        Alert.alert("등록 완료","새로운 봉사활동 요청이 등록 되었습니다!");
-      });   
+      method: 'POST',
+      body: formData,
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    }).then(() => { console.log('success', url);});
   }
 
   createTwoButtonAlert = () => {
     Alert.alert(
-      "새로운 봉사활동을 요청합니다.",
-      "정말 요청하시겠습니까?",
+      "물건 나눔을 등록합니다.",
+      "정말 등록하시겠습니까?",
       [
         {
           text: "확인", onPress: () => {
-            let data = this.generateDataToSend();
+
             console.log('@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ 서버로 보내지는 데이터 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ');
-            console.log(data);
-            const result = this.sendRequestToServer(data);
-            if (result == 1){
-              Alert.alert("새로운 봉사활동 요청이 등록되었습니다!");
+            console.log(formData);
+            const url ="http://saevom06.cafe24.com/requestdata/newProduct";
+
+            this.sendPictureToServer(url);
+            const result = this.state.isImageConfirmed;
+            if (result == true){
+              Alert.alert("물건 나눔이 등록되었습니다!");
+              this.setState({dialogVisible:false});
+            } else {
+                Alert.alert("사진이 등록되지 않았습니다.");
+                this.setState({dialogVisible:false});
             }
           }
         },
@@ -228,6 +305,8 @@ export default class RequestScreen extends React.Component {
   };
 
   render() {
+
+    let { image } = this.state;
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
@@ -239,6 +318,38 @@ export default class RequestScreen extends React.Component {
             onCancel={this.hideDatePicker}
           />
         </View>
+
+
+        <Dialog.Container visible={this.state.dialogVisible}>
+          {!image &&
+            <Dialog.Title style={styles.photoHeader}>사진을 등록해 주세요.</Dialog.Title>
+          }
+          {image &&
+            <Dialog.Title style={styles.photoHeader}>선택한 이미지를 전송하시겠습니까?</Dialog.Title>
+          }
+          {image &&
+            <Image source={{ uri: image }} style={styles.photo} />
+          }
+          
+          {!image &&
+            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
+              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
+            </View>
+          }
+          {image &&
+            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ isImageConfirmed:false, dialogVisible: false }); }} />
+              <Dialog.Button label="확인" color='#000' 
+                onPress={()=>{
+                    this.setState({isImageConfirmed:true});
+                    this.setState({dialogVisible:false});
+                }}/>
+            </View>
+          }
+          
+        </Dialog.Container>
 
         <View style={styles.box}>
           <View style={styles.list}>
@@ -300,8 +411,17 @@ export default class RequestScreen extends React.Component {
               onChangeText={(input) => { this.memo = input; }}
             />
           </View>
-          
 
+          <View style={styles.list}>
+            <TouchableOpacity onPress={() => {
+            this.setState({ dialogVisible: true });
+          }}>
+            <Text style={styles.startButton}>
+              물건 나눔 사진 선택
+            </Text>
+          </TouchableOpacity>
+          </View>
+            
         </View>
         <TouchableOpacity onPress={() => this.createTwoButtonAlert()}>
           <Text style={styles.button}>

@@ -25,121 +25,16 @@ export default class NoticeDetailScreen extends React.Component {
             </View>
             <View style={styles.dataList}>
               <View style={styles.data}>
-                <Text style={styles.header}>마감 기한</Text>
-                <Text style={styles.content}>{this.state.data.deadline}</Text>
+                <Text style={styles.header}>작성자</Text>
+                <Text style={styles.content}>{this.state.data.writer}</Text>
               </View>
               <View style={styles.data}>
-                <Text style={styles.header}>관심사</Text>
-                <Text style={styles.content}>{this.state.data.interestCategory.name}</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.line} />
-          <View style={styles.list}>
-            <View style={styles.titleList}>
-              <Text style={styles.title}>담당인원</Text>
-            </View>
-            <View style={styles.dataList}>
-              <View style={styles.data}>
-                <Text style={styles.header}>봉사자</Text>
-                <Text style={styles.content}>윤하늘</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.header}>이용자</Text>
-                <Text style={styles.content}>김준서</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.line} />
-          <View style={styles.list}>
-            <View style={styles.titleList}>
-              <Text style={styles.title}>활동내용</Text>
-            </View>
-            <View style={styles.dataList}>
-              <View style={styles.data}>
-                <Text style={styles.header}>활동기간</Text>
-                <View style={styles.date}>
-                  <Text style={styles.time}>{this.state.data.startTime} ~</Text>
-                  <Text style={styles.time}>{this.state.data.endTime}</Text>
-                </View>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.header}>장소</Text>
-                <Text style={styles.content}>경북 포항시 북구 흥해읍 한동로 558</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.header}>세부내용</Text>
-                <Text style={styles.content}>어르신에게 말벗 해드리기</Text>
+                <Text style={styles.header}>내용</Text>
+                <Text style={styles.content}>{this.state.data.memo}</Text>
               </View>
             </View>
           </View>
         </View>
-
-
-        <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: 'rgb(1, 192, 99)' }}>사진을 업로드해 주세요.</Dialog.Title>
-          <View style={{ margin: 30 }}></View>
-
-          {image && <Text style={{ fontSize: 15 }}>
-            아래 이미지를 전송하시겠습니까?
-          </Text>}
-          {image && <View style={{ margin: 10 }}></View>}
-          {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-          {image && <View style={[{ width: "50%", margin: 20, backgroundColor: "white" }]}>
-            <Button
-              buttonStyle={{ backgroundColor: 'orange', height: 40 }}
-              titleStyle={{ fontSize: 23 }}
-
-              onPress={() => {
-                this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
-                  Alert.alert('전송 완료!', '확인을 눌러 카테고리 선택 화면으로 돌아갑니다.', [{
-                    text: '확인',
-                    onPress: () => { 
-                      this.setState({dialogVisible:false});
-                      this.props.navigation.navigate('활동 목록'); }
-                  }]);
-                });
- 
-              }}
-
-              title="전송하기"
-              raised
-            >
-            </Button>
-
-          </View>}
-
-          <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='rgb(1, 192, 99)' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
-          <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='rgb(1, 192, 99)' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
-          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
-        </Dialog.Container>
-
-
-        {this.state.isUserRelated == 0 && <TouchableOpacity onPress={() => console.log("add")}>
-          <Text style={styles.button}>
-            봉사자 지원
-          </Text>
-        </TouchableOpacity>}
-
-        {(this.state.isUserRelated == 0 || this.state.isUserRelated == 0) && <View style={styles.photoButtons}>
-          <TouchableOpacity onPress={() => {
-            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadStartImg"});
-            this.setState({ dialogVisible: true });
-          }}>
-            <Text style={styles.startButton}>
-              시작 사진 전송
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => {
-            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadEndImg"});
-            this.setState({ dialogVisible: true });
-          }}>
-            <Text style={styles.endButton}>
-              종료 사진 전송
-            </Text>
-          </TouchableOpacity>
-        </View>}
       </ScrollView>
     )
   }
