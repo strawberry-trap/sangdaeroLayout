@@ -120,8 +120,7 @@ export default class ActivityListScreen extends React.Component {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <TouchableOpacity onPress={() => {
-            if (this.state.categoryId == 3) this.props.navigation.navigate('물건나눔', {test:'test',categoryName:this.state.name, categoryId:this.state.id})
-            else this.props.navigation.navigate('요청하기', {test:'test',categoryName:this.state.name, categoryId:this.state.id})
+            this.props.navigation.navigate('요청하기', {test:'test',categoryName:this.state.name, categoryId:this.state.id})
           }}>
           <Text style={styles.button}>
             새로운 활동 추가하기 +
