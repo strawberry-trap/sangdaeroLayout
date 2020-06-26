@@ -12,6 +12,7 @@ import ActivityScreen from './ActivityScreen';
 import ActivityListScreen from './ActivityListScreen';
 import ActivityDetailScreen from './ActivityDetailScreen';
 import RequestScreen from './RequestScreen';
+import ShareProductScreen from './ShareProductScreen';
 
 const ActivityStack = createStackNavigator();
 
@@ -46,6 +47,7 @@ export default function ActivityStackScreen({ navigation, route }){
             <ActivityStack.Screen name='활동 목록' component={ActivityListScreen} />
             <ActivityStack.Screen name='활동 내용' component={ActivityDetailScreen} />
             <ActivityStack.Screen name='요청하기' component={RequestScreen} />
+            <ActivityStack.Screen name='물건나눔' component={ShareProductScreen}/>
             
         </ActivityStack.Navigator>
     )

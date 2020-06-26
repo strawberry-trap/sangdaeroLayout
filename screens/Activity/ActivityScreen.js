@@ -60,8 +60,6 @@ export default class ActivityScreen extends React.Component {
     })
   }
 
-  
-
   render() {
     const { data, isLoading } = this.state;
 
@@ -74,7 +72,13 @@ export default class ActivityScreen extends React.Component {
                 key={i+2}
                 title={l.name}
                 chevron={{size:30}}
-                onPress={() => this.props.navigation.navigate('활동 목록', {id:l.id, name:l.name})}
+                onPress={
+                  () => {
+                    if (l.id==3){
+                      this.props.navigation.navigate('물건나눔', {id:l.id, name:l.name});
+                    }
+                    else this.props.navigation.navigate('활동 목록', {id:l.id, name:l.name});
+                }}
                 containerStyle={styles.item}
                 titleStyle={styles.text}
               />

@@ -60,6 +60,7 @@ export default class NoticeListScreen extends React.Component {
                     onPress={() => this.props.navigation.navigate('공지 내용', { data: this.state.data[i] })}
                     containerStyle={styles.list}
                 />
+
             )
         }
     }
@@ -78,7 +79,6 @@ export default class NoticeListScreen extends React.Component {
                             ))
                         )}
                     </View>
-
                 </View>
 
             </ScrollView>

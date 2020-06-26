@@ -52,9 +52,6 @@ export default class ActivityDetailScreen extends React.Component {
       }
     }
 
-    console.log(this.volunteerList);
-    console.log(this.state.isUserRelated);
-
     this.status = [
       '매칭 전',
       '매칭 중',
@@ -349,11 +346,10 @@ export default class ActivityDetailScreen extends React.Component {
               <Dialog.Button label="전송하기" color='#000' 
                 onPress={() => {
                   this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
-                    Alert.alert('전송 완료!', '확인을 눌러 카테고리 선택 화면으로 돌아갑니다.', [{
+                    Alert.alert('전송 완료!', '사진이 전송되었습니다.', [{
                       text: '확인',
                       onPress: () => { 
-                        this.setState({dialogVisible:false});
-                        this.props.navigation.navigate('활동 목록'); }
+                        this.setState({dialogVisible:false}); }
                     }]);
                   });
 
