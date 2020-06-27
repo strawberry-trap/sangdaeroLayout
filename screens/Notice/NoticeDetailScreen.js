@@ -28,8 +28,12 @@ export default class NoticeDetailScreen extends React.Component {
                 <Text style={styles.header}>작성자</Text>
                 <Text style={styles.content}>{this.state.data.writer}</Text>
               </View>
+            </View>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.list}>
+            <View style={styles.dataList}>
               <View style={styles.data}>
-                <Text style={styles.header}>내용</Text>
                 <Text style={styles.content}>{this.state.data.memo}</Text>
               </View>
             </View>

@@ -1,36 +1,24 @@
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem } from 'react-native-elements'
-
-import { MonoText } from '../../components/StyledText';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { ListItem } from 'react-native-elements'
 
 export default class ActivityListScreen extends React.Component {
   constructor(props) {
     super(props);
+    console.log('Activity List Screen')
 
     this.state = {
       id: props.route.params.id,
       name: props.route.params.name,
       data: [],
-      isLoading: true,
+      isLoading: false,
     }
 
-    this.status = [
-      '매칭 전',
-      '매칭 중',
-      '매칭 완료',
-      '활동 진행중',
-      '활동 완료',
-      '취소된 활동'
-    ];
-
+    this.getData();
   }
   
-  componentDidMount() {
+  getData() {
     fetch('http://saevom06.cafe24.com/activitydata/getActivities?id='+ this.state.id, {
       method: 'GET',
       headers: {
@@ -41,8 +29,8 @@ export default class ActivityListScreen extends React.Component {
     })
     .then((response) => response.json())
     .then((responseInJson) => {
+      console.log('Get activity list');
       this.setState({data:responseInJson});
-      console.log(this.state.data);
     })
     .catch((e) => console.log(e))
     .finally(() => {
@@ -53,6 +41,7 @@ export default class ActivityListScreen extends React.Component {
   getImage(props) {
     var path;
 
+    // Allocating path as dynamic will cause error
     switch(props) {
       case 0:
         path = require('../../assets/images/status_0.png');
@@ -140,10 +129,6 @@ export default class ActivityListScreen extends React.Component {
   }
 }
 
-ActivityListScreen.navigationOptions = {
-  header: null,
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -201,12 +186,6 @@ const styles = StyleSheet.create({
   title: {
     margin:5,
     fontSize:16,
-  },
-  subTitle: {
-    margin:0,
-    padding:0,
-    fontSize:12,
-    backgroundColor:'#777'
   },
   imageGroup:{
     flexDirection:'row',

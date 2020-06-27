@@ -13,6 +13,7 @@ import Dialog from "react-native-dialog";
 let title="";
 let memo="";
 let formData = new FormData();
+const url="http://saevom06.cafe24.com/requestdata/newProduct";
 
 export default class ShareProductScreen extends React.Component {
 
@@ -124,6 +125,7 @@ export default class ShareProductScreen extends React.Component {
   async takeAndUploadPhotoAsync(url) {
     // Display the camera to the user and wait for them to take a photo or to cancel
     // the action
+    console.log("camera");
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
@@ -135,6 +137,8 @@ export default class ShareProductScreen extends React.Component {
       console.log('image selecting error!');
       return;
     }
+
+    console.log(this.state.image);
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     let localUri = result.uri;
@@ -239,7 +243,7 @@ export default class ShareProductScreen extends React.Component {
             this.sendPictureToServer(url);
             const result = this.state.isImageConfirmed;
             if (result == true){
-              Alert.alert("물건 나눔이 등록되었습니다!");
+              Alert.alert("물건 나눔이 등록되었습니다!, 관제사가 확인 후 등록하겠습니다.");
               this.setState({dialogVisible:false});
             } else {
                 Alert.alert("사진이 등록되지 않았습니다.");
@@ -334,8 +338,8 @@ export default class ShareProductScreen extends React.Component {
           {!image &&
             <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
-              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
-              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
+              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(url)} />
+              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(url)} />
             </View>
           }
           {image &&
@@ -416,10 +420,13 @@ export default class ShareProductScreen extends React.Component {
             <TouchableOpacity onPress={() => {
             this.setState({ dialogVisible: true });
           }}>
-            <Text style={styles.startButton}>
+            <Text style={styles.selectButton}>
               물건 나눔 사진 선택
             </Text>
           </TouchableOpacity>
+          {image &&
+            <Image source={{ uri: image }} style={styles.photo} />
+          }
           </View>
             
         </View>
@@ -498,6 +505,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'left',
   },
+  selectButton: {
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: 'rgb(29,140,121)',
+    backgroundColor: '#FFF',
+    borderRadius: 50,
+    borderColor:'rgb(29,140,121)',
+    borderRadius:1,
+    padding: 8,
+  },
   button: {
     textAlign: 'center',
     marginLeft: 35,
@@ -507,5 +526,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(29,140,121)',
     borderRadius: 50,
     padding: 8,
-  }
+  },
+  photoButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  photoHeader: {
+    color:'#000',
+    marginBottom: 30,
+  },
+  photo: {
+    width:200,
+    height:200,
+    alignSelf:'center',
+    resizeMode:'center',
+  },
 });
