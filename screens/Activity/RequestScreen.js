@@ -1,15 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem, Input } from 'react-native-elements';
-import { Picker } from '@react-native-community/picker';
-import TabBarIcon from '../../components/TabBarIcon';
+import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Input } from 'react-native-elements';
+
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-let title="";
-let memo="";
 export default class RequestScreen extends React.Component {
 
   state = {
@@ -114,6 +109,8 @@ export default class RequestScreen extends React.Component {
 
   generateDataToSend(){
 
+    // this data is a protocol between mobile app and web server, http://saevom06.cafe24.com/requestdata/newRegister
+    // if you forget to send any of these, server will return whitelabel(error) page.
     let data = {
       id: this.state.categoryId,
       name: global.googleUserName,
@@ -137,11 +134,10 @@ export default class RequestScreen extends React.Component {
     return data;
   }
 
+  // this method will post request creating a new 'volunteer' activity request.
   async sendRequestToServer(data) {
 
-    // send request to the web server
     const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
-
     return await fetch(url, {
         method: 'POST',
         headers: {
@@ -154,6 +150,7 @@ export default class RequestScreen extends React.Component {
       });   
   }
 
+  // function contains 1) generate
   createTwoButtonAlert = () => {
     Alert.alert(
       "새로운 봉사활동을 요청합니다.",
@@ -161,13 +158,8 @@ export default class RequestScreen extends React.Component {
       [
         {
           text: "확인", onPress: () => {
-            let data = this.generateDataToSend();
-            console.log('@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ 서버로 보내지는 데이터 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ');
-            console.log(data);
-            const result = this.sendRequestToServer(data);
-            if (result == 1){
-              Alert.alert("새로운 봉사활동 요청이 등록되었습니다!");
-            }
+            let data = this.generateDataToSend(); // generate data
+            this.sendRequestToServer(data);
           }
         },
         {
@@ -179,28 +171,6 @@ export default class RequestScreen extends React.Component {
       { cancelable: false }
     );
   }
-  state = {
-    index: '1',
-  };
-
-  fetchPost(url, data) {
-    try {
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        //credentials: 'include',
-  
-        body: JSON.stringify(data),
-      });
-      console.log(url);
-      console.warn('fetch successful', url);
-    } catch (e) {
-      console.warn('fetch failed', e, url);
-    }
-  };
 
   showDatePicker = () => {
     this.setState({ isDatePickerVisible: true });

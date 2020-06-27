@@ -1,17 +1,12 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet,Image, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem, Input } from 'react-native-elements';
-import { Picker } from '@react-native-community/picker';
-import TabBarIcon from '../../components/TabBarIcon';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Input } from 'react-native-elements';
+
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker'; // for image access
 import Dialog from "react-native-dialog";
 
-let title="";
-let memo="";
 let formData = new FormData();
 
 export default class ShareProductScreen extends React.Component {
@@ -319,13 +314,14 @@ export default class ShareProductScreen extends React.Component {
           />
         </View>
 
-
         <Dialog.Container visible={this.state.dialogVisible}>
           {!image &&
-            <Dialog.Title style={styles.photoHeader}>사진을 등록해 주세요.</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}>
+              <Text>사진을 등록해 주세요.</Text>
+              </Dialog.Title>
           }
           {image &&
-            <Dialog.Title style={styles.photoHeader}>선택한 이미지를 전송하시겠습니까?</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}><Text>선택한 이미지를 전송하시겠습니까?</Text></Dialog.Title>
           }
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />
@@ -431,9 +427,7 @@ export default class ShareProductScreen extends React.Component {
       </ScrollView>
     );
   }
-  
 }
-
 
 const styles = StyleSheet.create({
   container: {

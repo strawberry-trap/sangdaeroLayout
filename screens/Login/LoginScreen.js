@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
-import * as firebase from 'firebase';
-import * as Expo from "expo";
 import * as Google from 'expo-google-app-auth';
-import { Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/Feather';
-// import * as Google from 'expo-google-sign-in'; // You may use this when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
+
+// You may use below line when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
+// import * as Google from 'expo-google-sign-in';
 
 export default class LoginScreen extends Component {
+
+  constructor(props){
+    super(props);
+    console.log("[ LoginScreen.js ]");
+  }
 
   _isMounted = false;
 
@@ -18,86 +21,6 @@ export default class LoginScreen extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-  }
-
-  // check if google user & firebase user are the same
-  isUserEqual = (googleUser, firebaseUser) => {
-    if (firebaseUser) {
-      var providerData = firebaseUser.providerData;
-      for (var i = 0; i < providerData.length; i++) {
-        if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
-          providerData[i].uid === googleUser.getBasicProfile().getId()) {
-          // We don't need to reauth the Firebase connection.
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  //copied from official document,
-  //https://firebase.google.com/docs/auth/web/google-signin?authuser=0
-
-  onSignIn = (googleUser) => {
-    // console.log('Google Auth Response', googleUser.profile);
-
-    // first check if user is signed in to the "firebase authentication system".
-    var unsubscribe = firebase.auth()
-      .onAuthStateChanged(function (firebaseUser) {
-        unsubscribe();
-
-        // check if the verified(firebase-authenticated) user is the same user that is trying to log in now
-        if (!this.isUserEqual(googleUser, firebaseUser)) {
-
-          // build Firebase credential with the Google ID token.
-          var credential = firebase.auth.GoogleAuthProvider.credential(
-
-            // googleUser.getAuthResponse().id_token
-            // instead of useing above line, seperately pass the token.
-            googleUser.idToken,
-            googleUser.accessToken
-          );
-
-          // Sign in the user to firebase auth system with credential from the Google user.
-          firebase.auth().signInWithCredential(credential)
-
-            // ****** async added. MUST CHECK IF IT WORKS WITHOUT ERROR. ******
-            .then(async function (result) {
-
-              // console.log(result.additionalUserInfo.profile);
-              // do post request to the SpringBoot server.
-              try {
-                var url = 'http://saevom06.cafe24.com/test/post';
-                console.log(url);
-                //var dummyObject = {'name': 'dummy name'}
-                var data = await fetch(url,
-                  {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-type': 'application/json',
-                    },
-                    body: JSON.stringify(result.additionalUserInfo.profile),
-                  }
-                )
-              } catch (e) {
-                console.log('http request from application failed : ', e);
-              }
-            })
-            .catch(function (error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // The email of the user's account used.
-              var email = error.email;
-              // The firebase.auth.AuthCredential type that was used.
-              var credential = error.credential;
-              // ...
-            });
-        } else {
-          console.log('User already signed-in Firebase.');
-        }
-      }.bind(this));
   }
 
   signInWithGoogleAsync = async () => {
@@ -115,7 +38,6 @@ export default class LoginScreen extends Component {
 
           this.setState({loggedIn: true });
         }
-        this.onSignIn(result); // call onSignIn method here.
         return result.accessToken;
       } else {
         return { cancelled: true };
@@ -124,16 +46,10 @@ export default class LoginScreen extends Component {
     catch (e) {
       return { error: true };
     }
-
-    
   }
 
   componentWillUnmount() {
     this._isMounted = false;
-  }
-
-  handleOnPress =() => {
-    console.log('onPress');
   }
 
   render() {
@@ -153,34 +69,11 @@ export default class LoginScreen extends Component {
           </TouchableOpacity>
         </ImageBackground>
         }
-
         {this.state.loggedIn && this.props.navigation.navigate('Main')}
-        
-        
       </View>
     );
   }
 }
-
-/*
-<View>
-            {this.state.loggedIn && // when Google user is logged in, this component appears
-            <View>
-                <Text
-                style={{color : 'rgb(1, 192, 99)', letterSpacing:1 ,fontSize:30, marginBottom:30, textAlign:'center'}}
-                >{global.googleUserName} 환영합니다</Text>
-                <Text
-                style={{color : 'rgb(1, 192, 99)', letterSpacing:2 ,fontSize:20, marginBottom:30, textAlign:'center'}}
-                >{global.googleUserEmail}</Text>
-                <Button 
-                  title="시작하기"
-                  onPress={() => this.props.navigation.navigate('Main')}
-                  />
-
-            </View>
-          }
-        </View>
-*/
 
 const styles = StyleSheet.create({
   container: {

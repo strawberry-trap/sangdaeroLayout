@@ -11,6 +11,8 @@ export default class ActivityDetailScreen extends React.Component {
   constructor(props) {
     super(props);
 
+    console.log("[ ActivityDetailScreen.js ]");
+
     this.state = {
       data: props.route.params.data,
       isUserRelated: 0, // for three cases: volunteer = 1, benefiting-user = 2, not related = 0
@@ -18,8 +20,6 @@ export default class ActivityDetailScreen extends React.Component {
       dialogVisible: false, // dialog for image picking
       pictureSendingUrl:"",
     };
-
-    console.log(this.state.data);
 
     this.volunteerList = "";
     this.userList = ""
@@ -80,19 +80,17 @@ export default class ActivityDetailScreen extends React.Component {
 
   };
 
-  // image picker
   async takeAndUploadPhotoAsync(url) {
-    // Display the camera to the user and wait for them to take a photo or to cancel
-    // the action
+
+    // open the camera screen on mobile phone
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
+      allowsEditing: true, // if disabled, "cut picture" function is disabled
+      aspect: [4, 3], // rectangle size
     });
 
     if (!result.cancelled) {
       this.setState({ image: result.uri });
     } else {
-      console.log('image selecting error!');
       return;
     }
 
@@ -154,6 +152,7 @@ export default class ActivityDetailScreen extends React.Component {
     this.setState({pictureSendingUrl:url});
   }
 
+  // sending 'image' to server needs different body format from previous 'fetchPost', which is 'content-type': 'multipart/form-data'
   async sendPictureToServer(url){
     return await fetch(url, {
       method: 'POST',
@@ -182,31 +181,9 @@ export default class ActivityDetailScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
-  createTwoButtonAlert = () =>
-    Alert.alert(
-      "시작 사진 전송",
-      "",
-      [
-        {
-          text: "취소",
-          onPress: () => console.log("취소 되었습니다"),
-          style: "cancel"
-        },
-        {
-          text: "갤러리",
-          onPress: () => Alert.alert("전송 되었습니다")
-        },
-        {
-          text: "카메라",
-          onPress: () => Alert.alert("전송 되었습니다")
-        }
-      ],
-      { cancelable: false }
-    );
-
+  // send POST request to server url
   fetchPost(url, data) {
-    console.log(url);
-    console.log(data);
+
     try {
       fetch(url, {
         method: 'POST',
@@ -214,8 +191,6 @@ export default class ActivityDetailScreen extends React.Component {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-        //credentials: 'include',
-
         body: JSON.stringify(data),
       }).then((res) => {
         Alert.alert("신청 되었습니다");
@@ -324,10 +299,10 @@ export default class ActivityDetailScreen extends React.Component {
 
         <Dialog.Container visible={this.state.dialogVisible}>
           {!image &&
-            <Dialog.Title style={styles.photoHeader}>사진을 업로드해 주세요.</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}><Text>사진을 업로드해 주세요.</Text></Dialog.Title>
           }
           {image &&
-            <Dialog.Title style={styles.photoHeader}>아래 이미지를 전송하시겠습니까?</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}><Text>아래 이미지를 전송하시겠습니까?</Text></Dialog.Title>
           }
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />

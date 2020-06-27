@@ -150,34 +150,48 @@ export default class MypageScreen extends React.Component {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
+          <Dialog.Title style={{ color: '#000' }} children='required'><Text>{this.state.userSelectedActivity.title}</Text></Dialog.Title>
 
           <Dialog.Description>
+          <Text>
             {this.status[this.state.userSelectedActivity.status]}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             마감 기한 : {this.state.userSelectedActivity.deadline}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             관심사 : {this.state.userSelectedInterestCategory.name}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             시작시간 : {this.state.userSelectedActivity.startTime}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             종료시간 : {this.state.userSelectedActivity.endTime}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             장소 : {this.state.userSelectedActivity.place}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Description>
+          <Text>
             세부 내용 : {this.state.userSelectedActivity.content}
+            </Text>
           </Dialog.Description>
 
           <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />

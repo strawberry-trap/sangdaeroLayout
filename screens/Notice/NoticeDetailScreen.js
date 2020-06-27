@@ -1,9 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity, Image } from 'react-native';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ButtonGroup } from 'react-native-elements'
-import * as ImagePicker from 'expo-image-picker'; // for image access
-import Dialog from "react-native-dialog";
+import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default class NoticeDetailScreen extends React.Component {
 
