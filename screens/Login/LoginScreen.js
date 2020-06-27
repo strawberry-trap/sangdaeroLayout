@@ -16,7 +16,28 @@ export default class LoginScreen extends Component {
 
   state = {
     userName: '', userEmail: '', userId: '',
-    loggedIn: false
+    loggedIn: false,
+    isExistingUser: false,
+  }
+
+  // checks if currently logged in user is existing or not
+  checkIfExistingUser(userName, userEmail){
+
+    const url = 'http://saevom06.cafe24.com/'; // *** Restcontroller URL is needed
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ // send this data to server to authenticate user
+        "userName" : userName,
+        "userEmail" : userEmail,
+      }),
+    }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
+      response == true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:false})
+    });
+
   }
 
   componentDidMount() {
@@ -35,8 +56,10 @@ export default class LoginScreen extends Component {
         if (this._isMounted) {
           global.googleUserName = result.user.name;
           global.googleUserEmail = result.user.email;
+          this.setState({loggedIn: true }); // now user is logged in.
 
-          this.setState({loggedIn: true });
+          // check if existing user or not
+          this.checkIfExistingUser(result.user.name, result.user.email);
         }
         return result.accessToken;
       } else {
@@ -69,7 +92,8 @@ export default class LoginScreen extends Component {
           </TouchableOpacity>
         </ImageBackground>
         }
-        {this.state.loggedIn && this.props.navigation.navigate('Main')}
+        {(this.state.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
+        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
       </View>
     );
   }

@@ -8,10 +8,12 @@ import * as ImagePicker from 'expo-image-picker'; // for image access
 import Dialog from "react-native-dialog";
 
 let formData = new FormData();
+const url="http://saevom06.cafe24.com/requestdata/newProduct";
 
 export default class ShareProductScreen extends React.Component {
 
   state = {
+
     index: 1,
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
@@ -22,13 +24,13 @@ export default class ShareProductScreen extends React.Component {
     endTime: null,
     startTimeDataForServer: null,
     endTimeDataForServer: null,
-    test: null,
+    test: null, // just for test, not used
     interestCategoryId: 0,
 
-    // camera
+    // camera related variables
     image: null, // check if image is selected or not
-    isImageConfirmed: false,
-    dialogVisible: false, // dialog for image picking
+    isImageConfirmed: false, // if user clicks 'ok' when selecting an image, this variable becomes 'true'
+    dialogVisible: false, // showing dialog or not
   }
 
   constructor(props) {
@@ -119,6 +121,7 @@ export default class ShareProductScreen extends React.Component {
   async takeAndUploadPhotoAsync(url) {
     // Display the camera to the user and wait for them to take a photo or to cancel
     // the action
+    console.log("camera");
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
@@ -130,6 +133,8 @@ export default class ShareProductScreen extends React.Component {
       console.log('image selecting error!');
       return;
     }
+
+    console.log(this.state.image);
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     let localUri = result.uri;
@@ -165,7 +170,6 @@ export default class ShareProductScreen extends React.Component {
       console.log('image selecting error!');
       return;
     }
-    console.log(result);
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     let localUri = result.uri;
@@ -189,6 +193,7 @@ export default class ShareProductScreen extends React.Component {
   async sendPictureToServer(url){
 
     // data validation check
+    // ** divied user-input data and server-sending data. This logic is explained in line 167 of [RequestScreen.js]
     if (this.title == undefined) {
         this.title = "제목이 입력되지 않았습니다.";
         }
@@ -197,18 +202,18 @@ export default class ShareProductScreen extends React.Component {
         }
     let startTemp = "";
     let endTemp="";
+
     if (this.state.startTimeDataForServer == undefined) { startTemp='0000-00-00 00:00:00'; }
     else startTemp = this.state.startTimeDataForServer;
     if (this.state.endTimeDataForServer == undefined) { endTemp='0000-00-00 00:00:00';}
     else endTemp = this.state.endTimeDataForServer;
       
-    // 유저가 사진을 고른 시점에서 id, image, name, email은 이미 formData에 추가된 상태임
+    // at the point when the user picked an image, "id, image, name, email" are already appended to formData
+    // hence, just add below values
     formData.append('startTime', startTemp);
     formData.append('endTime', endTemp);
     formData.append('title', this.title);
     formData.append('memo', this.memo);
-
-    console.log(formData);
 
     return await fetch(url, {
       method: 'POST',
@@ -220,6 +225,7 @@ export default class ShareProductScreen extends React.Component {
   }
 
   createTwoButtonAlert = () => {
+
     Alert.alert(
       "물건 나눔을 등록합니다.",
       "정말 등록하시겠습니까?",
@@ -227,17 +233,16 @@ export default class ShareProductScreen extends React.Component {
         {
           text: "확인", onPress: () => {
 
-            console.log('@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ 서버로 보내지는 데이터 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ');
-            console.log(formData);
             const url ="http://saevom06.cafe24.com/requestdata/newProduct";
 
             this.sendPictureToServer(url);
             const result = this.state.isImageConfirmed;
+
             if (result == true){
-              Alert.alert("물건 나눔이 등록되었습니다!");
+              Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
               this.setState({dialogVisible:false});
             } else {
-                Alert.alert("사진이 등록되지 않았습니다.");
+                Alert.alert("사진이 등록되지 않았습니다.\n물건 나눔 사진 선택을 눌러주세요.");
                 this.setState({dialogVisible:false});
             }
           }
@@ -302,6 +307,7 @@ export default class ShareProductScreen extends React.Component {
   render() {
 
     let { image } = this.state;
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
@@ -330,8 +336,8 @@ export default class ShareProductScreen extends React.Component {
           {!image &&
             <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
-              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
-              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
+              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(url)} />
+              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(url)} />
             </View>
           }
           {image &&
@@ -412,10 +418,13 @@ export default class ShareProductScreen extends React.Component {
             <TouchableOpacity onPress={() => {
             this.setState({ dialogVisible: true });
           }}>
-            <Text style={styles.startButton}>
+            <Text style={styles.selectButton}>
               물건 나눔 사진 선택
             </Text>
           </TouchableOpacity>
+          {image &&
+            <Image source={{ uri: image }} style={styles.photo} />
+          }
           </View>
             
         </View>
@@ -492,6 +501,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'left',
   },
+  selectButton: {
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: 'rgb(29,140,121)',
+    backgroundColor: '#FFF',
+    borderRadius: 50,
+    borderColor:'rgb(29,140,121)',
+    borderRadius:1,
+    padding: 8,
+  },
   button: {
     textAlign: 'center',
     marginLeft: 35,
@@ -501,5 +522,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(29,140,121)',
     borderRadius: 50,
     padding: 8,
-  }
+  },
+  photoButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  photoHeader: {
+    color:'#000',
+    marginBottom: 30,
+  },
+  photo: {
+    width:200,
+    height:200,
+    alignSelf:'center',
+    resizeMode:'center',
+  },
 });

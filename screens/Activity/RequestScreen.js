@@ -2,9 +2,10 @@ import * as React from 'react';
 import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
-
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+let title = "";
+let memo = "";
 export default class RequestScreen extends React.Component {
 
   state = {
@@ -12,19 +13,19 @@ export default class RequestScreen extends React.Component {
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
     isStartTime: false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
-    
+
     // data to send to the web server
-    startTime: null, 
+    startTime: null,
     endTime: null,
     startTimeDataForServer: null,
     endTimeDataForServer: null,
     test: null,
     interestCategoryId: 0,
-    
   }
 
   constructor(props) {
     super(props);
+    console.log('Request Screen');
 
     var date = new Date();
 
@@ -38,8 +39,32 @@ export default class RequestScreen extends React.Component {
     }
   }
 
-  parseDate(newDate) {
+  handleConfirm = (date) => {
+    if (this.state.isStartTime == true) {
+      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
 
+      if (this.state.startTime > this.state.endTime) {
+        this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
+      }
+    } else {
+      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
+
+      if (this.state.startTime > this.state.endTime) {
+        this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
+      }
+    }
+    this.hideDatePicker();
+  };
+
+  showDatePicker = () => {
+    this.setState({ isDatePickerVisible: true });
+  };
+
+  hideDatePicker = () => {
+    this.setState({ isDatePickerVisible: false });
+  };
+
+  parseDate(newDate) {
     var year = this.addZero(newDate.getFullYear());
     var month = this.addZero(newDate.getMonth() + 1);
     var date = this.addZero(newDate.getDate());
@@ -81,21 +106,20 @@ export default class RequestScreen extends React.Component {
     hour = this.addZero(hour);
     var minute = this.addZero(newDate.getMinutes());
 
-    return year + "년 " + month + "월 " + date + "일(" + day + ")" + ampm + " " + hour + "시 " + minute + "분";
+    return year + "/" + month + "/" + date + "(" + day + ") " + ampm + " " + hour + ":" + minute;
   }
 
-  parseDateForServer(newDate){
-    
+  parseDateForServer(newDate) {
+
     var year = this.addZero(newDate.getFullYear());
     var month = this.addZero(newDate.getMonth() + 1);
     var date = this.addZero(newDate.getDate());
-    var day = newDate.getDay();
     var hour = newDate.getHours();
     hour = this.addZero(hour);
     var minute = this.addZero(newDate.getMinutes());
 
     // YYYY-MM-DD HH:MM:00 (seconds are fixed to '00')
-    var startTimeForServer = year+"-"+month+"-"+date+" "+hour+":"+minute+":00";
+    var startTimeForServer = year + "-" + month + "-" + date + " " + hour + ":" + minute + ":00";
     return startTimeForServer;
   }
 
@@ -107,59 +131,15 @@ export default class RequestScreen extends React.Component {
     }
   }
 
-  generateDataToSend(){
-
-    // this data is a protocol between mobile app and web server, http://saevom06.cafe24.com/requestdata/newRegister
-    // if you forget to send any of these, server will return whitelabel(error) page.
-    let data = {
-      id: this.state.categoryId,
-      name: global.googleUserName,
-      email: global.googleUserEmail,
-      startTime: this.state.startTimeDataForServer,
-      endTime: this.state.endTimeDataForServer,
-      title: this.title,
-      memo: this.memo,
-    }
-
-    // data validation check
-    if (this.title == undefined) {
-      data["title"] = "제목이 입력되지 않았습니다.";
-    }
-    if (this.memo == undefined) {
-      data["memo"] = "메모가 입력되지 않았습니다.";
-    }
-    if (this.state.startTimeDataForServer == undefined) { data['startTime']='0000-00-00 00:00:00'; }
-    if (this.state.endTimeDataForServer == undefined) { data['endTime']='0000-00-00 00:00:00';}
-
-    return data;
-  }
-
-  // this method will post request creating a new 'volunteer' activity request.
-  async sendRequestToServer(data) {
-
-    const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
-    return await fetch(url, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      }).then(()=>{
-        Alert.alert("등록 완료","새로운 봉사활동 요청이 등록 되었습니다!");
-      });   
-  }
-
-  // function contains 1) generate
   createTwoButtonAlert = () => {
     Alert.alert(
-      "새로운 봉사활동을 요청합니다.",
-      "정말 요청하시겠습니까?",
+      "새로운 봉사활동을 요청합니다",
+      "요청하시겠습니까?",
       [
         {
-          text: "확인", onPress: () => {
+          text: "신청", onPress: () => {
             let data = this.generateDataToSend(); // generate data
-            this.sendRequestToServer(data);
+            this.sendRequestToServer(data); // send the generated data to server.
           }
         },
         {
@@ -172,30 +152,54 @@ export default class RequestScreen extends React.Component {
     );
   }
 
-  showDatePicker = () => {
-    this.setState({ isDatePickerVisible: true });
-  };
+  generateDataToSend() {
 
-  hideDatePicker = () => {
-    this.setState({ isDatePickerVisible: false });
-  };
-
-  handleConfirm = (date) => {
-    if (this.state.isStartTime == true) {
-      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
-
-      if (this.state.startTime > this.state.endTime) {
-        this.setState({ endTime: this.state.startTime, endTimeDataForServer:this.state.startTimeDataForServer });
-      }
-    } else {
-      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
-
-      if (this.state.startTime > this.state.endTime) {
-        this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
-      }
+    let data = {
+      id: this.state.categoryId,
+      name: global.googleUserName,
+      email: global.googleUserEmail,
+      startTime: this.state.startTimeDataForServer,
+      endTime: this.state.endTimeDataForServer,
+      title: this.title,
+      memo: this.memo,
     }
-    this.hideDatePicker();
-  };
+
+    // data validation check
+    /*
+      I divided the variable for user-input and server-sending data.
+      This is due to the setState() issue. When only using this.state variables, the updated variables
+      are not updated when sending to the server. Hence, I divided two types of variable that works just the same.
+      "data" is the actual data to send to the server, and this.state's 'startTimeDataForServer' and 'endTimeDataForServer'
+      are the data that changes when user chooses each time. So when checking null in user input, I first check this.state's variables
+      then assign default values to "data", that is to be sent to the server.
+    */
+    if (this.title == undefined) {
+      data["title"] = "제목이 입력되지 않았습니다.";
+    }
+    if (this.memo == undefined) {
+      data["memo"] = "메모가 입력되지 않았습니다.";
+    }
+    if (this.state.startTimeDataForServer == undefined) { data['startTime'] = '0000-00-00 00:00:00'; }
+    if (this.state.endTimeDataForServer == undefined) { data['endTime'] = '0000-00-00 00:00:00'; }
+
+    return data;
+  }
+
+  // this method will post request creating a new 'volunteer' activity request.
+  async sendRequestToServer(data) {
+
+    const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
+    return await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    }).then(() => {
+      Alert.alert("등록 완료", "새로운 봉사활동 요청이 등록 되었습니다!");
+    });
+  }
 
   render() {
     return (
@@ -209,7 +213,6 @@ export default class RequestScreen extends React.Component {
             onCancel={this.hideDatePicker}
           />
         </View>
-
         <View style={styles.box}>
           <View style={styles.list}>
             <View>
@@ -231,26 +234,20 @@ export default class RequestScreen extends React.Component {
           <View style={styles.list}>
             <Text style={styles.title}>활동시간</Text>
             <View style={styles.time}>
+              <Text style={styles.text}>시작시간</Text>
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.timeText}>시작시간 선택</Text>
+                <Text style={styles.date}>{this.state.startTime}</Text>
               </TouchableOpacity>
-              <View style={styles.timeList}>
-                <Text style={styles.date}>{this.state.startTime.substring(0, 16)}</Text>
-                <Text style={styles.date}>{this.state.startTime.substring(16, 26)}</Text>
-              </View>
             </View>
             <View style={styles.time}>
+              <Text style={styles.text}>종료시간</Text>
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.timeText}>종료시간 선택</Text>
+                <Text style={styles.date}>{this.state.endTime}</Text>
               </TouchableOpacity>
-              <View style={styles.timeList}>
-                <Text style={styles.date}>{this.state.endTime.substring(0, 16)}</Text>
-                <Text style={styles.date}>{this.state.endTime.substring(16, 26)}</Text>
-              </View>
             </View>
           </View>
           <View style={styles.list}>
@@ -259,7 +256,6 @@ export default class RequestScreen extends React.Component {
               {global.googleUserName}
             </Text>
           </View>
-
           <View style={styles.list}>
             <View>
               <Text style={styles.title}>메모</Text>
@@ -270,18 +266,16 @@ export default class RequestScreen extends React.Component {
               onChangeText={(input) => { this.memo = input; }}
             />
           </View>
-          
-
         </View>
         <TouchableOpacity onPress={() => this.createTwoButtonAlert()}>
           <Text style={styles.button}>
-            등록하기
+            요청하기
           </Text>
         </TouchableOpacity>
       </ScrollView>
     );
   }
-  
+
 }
 
 
@@ -332,21 +326,12 @@ const styles = StyleSheet.create({
   timeList: {
     padding: 5,
   },
-  timeText: {
-    flex: 1,
-    paddingLeft: 5,
-    paddingRight: 5,
-    fontSize: 15,
-    textAlignVertical: 'center',
-    borderRadius: 50,
-    color: '#FFF',
-    backgroundColor: 'rgb(29,140,121)',
-  },
   date: {
     flex: 1,
-    paddingLeft: 5,
+    padding: 5,
+    paddingRight: 10,
     fontSize: 15,
-    textAlign: 'left',
+    textAlignVertical: 'center',
   },
   button: {
     textAlign: 'center',
