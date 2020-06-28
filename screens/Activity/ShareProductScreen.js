@@ -1,23 +1,19 @@
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { StyleSheet,Image, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import { Badge, Button, ListItem, Input } from 'react-native-elements';
-import { Picker } from '@react-native-community/picker';
-import TabBarIcon from '../../components/TabBarIcon';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Input } from 'react-native-elements';
+
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker'; // for image access
 import Dialog from "react-native-dialog";
 
-let title="";
-let memo="";
 let formData = new FormData();
 const url="http://saevom06.cafe24.com/requestdata/newProduct";
 
 export default class ShareProductScreen extends React.Component {
 
   state = {
+
     index: 1,
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
@@ -28,13 +24,13 @@ export default class ShareProductScreen extends React.Component {
     endTime: null,
     startTimeDataForServer: null,
     endTimeDataForServer: null,
-    test: null,
+    test: null, // just for test, not used
     interestCategoryId: 0,
 
-    // camera
+    // camera related variables
     image: null, // check if image is selected or not
-    isImageConfirmed: false,
-    dialogVisible: false, // dialog for image picking
+    isImageConfirmed: false, // if user clicks 'ok' when selecting an image, this variable becomes 'true'
+    dialogVisible: false, // showing dialog or not
   }
 
   constructor(props) {
@@ -174,7 +170,6 @@ export default class ShareProductScreen extends React.Component {
       console.log('image selecting error!');
       return;
     }
-    console.log(result);
 
     // ImagePicker saves the taken photo to disk and returns a local URI to it
     let localUri = result.uri;
@@ -198,6 +193,7 @@ export default class ShareProductScreen extends React.Component {
   async sendPictureToServer(url){
 
     // data validation check
+    // ** divied user-input data and server-sending data. This logic is explained in line 167 of [RequestScreen.js]
     if (this.title == undefined) {
         this.title = "제목이 입력되지 않았습니다.";
         }
@@ -206,18 +202,18 @@ export default class ShareProductScreen extends React.Component {
         }
     let startTemp = "";
     let endTemp="";
+
     if (this.state.startTimeDataForServer == undefined) { startTemp='0000-00-00 00:00:00'; }
     else startTemp = this.state.startTimeDataForServer;
     if (this.state.endTimeDataForServer == undefined) { endTemp='0000-00-00 00:00:00';}
     else endTemp = this.state.endTimeDataForServer;
       
-    // 유저가 사진을 고른 시점에서 id, image, name, email은 이미 formData에 추가된 상태임
+    // at the point when the user picked an image, "id, image, name, email" are already appended to formData
+    // hence, just add below values
     formData.append('startTime', startTemp);
     formData.append('endTime', endTemp);
     formData.append('title', this.title);
     formData.append('memo', this.memo);
-
-    console.log(formData);
 
     return await fetch(url, {
       method: 'POST',
@@ -229,6 +225,7 @@ export default class ShareProductScreen extends React.Component {
   }
 
   createTwoButtonAlert = () => {
+
     Alert.alert(
       "물건 나눔을 등록합니다.",
       "정말 등록하시겠습니까?",
@@ -236,17 +233,16 @@ export default class ShareProductScreen extends React.Component {
         {
           text: "확인", onPress: () => {
 
-            console.log('@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ 서버로 보내지는 데이터 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ');
-            console.log(formData);
             const url ="http://saevom06.cafe24.com/requestdata/newProduct";
 
             this.sendPictureToServer(url);
             const result = this.state.isImageConfirmed;
+
             if (result == true){
-              Alert.alert("물건 나눔이 등록되었습니다!, 관제사가 확인 후 등록하겠습니다.");
+              Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
               this.setState({dialogVisible:false});
             } else {
-                Alert.alert("사진이 등록되지 않았습니다.");
+                Alert.alert("사진이 등록되지 않았습니다.\n물건 나눔 사진 선택을 눌러주세요.");
                 this.setState({dialogVisible:false});
             }
           }
@@ -311,6 +307,7 @@ export default class ShareProductScreen extends React.Component {
   render() {
 
     let { image } = this.state;
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
@@ -323,13 +320,14 @@ export default class ShareProductScreen extends React.Component {
           />
         </View>
 
-
         <Dialog.Container visible={this.state.dialogVisible}>
           {!image &&
-            <Dialog.Title style={styles.photoHeader}>사진을 등록해 주세요.</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}>
+              <Text>사진을 등록해 주세요.</Text>
+              </Dialog.Title>
           }
           {image &&
-            <Dialog.Title style={styles.photoHeader}>선택한 이미지를 전송하시겠습니까?</Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}><Text>선택한 이미지를 전송하시겠습니까?</Text></Dialog.Title>
           }
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />
@@ -438,9 +436,7 @@ export default class ShareProductScreen extends React.Component {
       </ScrollView>
     );
   }
-  
 }
-
 
 const styles = StyleSheet.create({
   container: {

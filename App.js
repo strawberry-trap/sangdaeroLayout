@@ -9,6 +9,7 @@ import LinkingConfiguration from './navigation/LinkingConfiguration';
 
 import LoginScreen from './screens/Login/LoginScreen';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
+import AgreementScreen from './screens/Login/AgreementScreen';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,7 @@ export default class App extends React.Component {
             >
               <Stack.Screen name="Log" component={LoginScreen} />
               <Stack.Screen name="Main" component={BottomTabNavigator} />
+              <Stack.Screen name="Agreement" component={AgreementScreen}/>
             </Stack.Navigator>
           </NavigationContainer>
         </View>

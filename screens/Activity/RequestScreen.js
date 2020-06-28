@@ -7,6 +7,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 let title = "";
 let memo = "";
 export default class RequestScreen extends React.Component {
+
   state = {
     index: 1,
     isDataLoaded: false,
@@ -109,6 +110,7 @@ export default class RequestScreen extends React.Component {
   }
 
   parseDateForServer(newDate) {
+
     var year = this.addZero(newDate.getFullYear());
     var month = this.addZero(newDate.getMonth() + 1);
     var date = this.addZero(newDate.getDate());
@@ -136,12 +138,8 @@ export default class RequestScreen extends React.Component {
       [
         {
           text: "신청", onPress: () => {
-            let data = this.generateDataToSend();
-            console.log(data);
-            const result = this.sendRequestToServer(data);
-            if (result == 1) {
-              Alert.alert("새로운 봉사활동이 요청되었습니다!");
-            }
+            let data = this.generateDataToSend(); // generate data
+            this.sendRequestToServer(data); // send the generated data to server.
           }
         },
         {
@@ -155,6 +153,7 @@ export default class RequestScreen extends React.Component {
   }
 
   generateDataToSend() {
+
     let data = {
       id: this.state.categoryId,
       name: global.googleUserName,
@@ -166,6 +165,14 @@ export default class RequestScreen extends React.Component {
     }
 
     // data validation check
+    /*
+      I divided the variable for user-input and server-sending data.
+      This is due to the setState() issue. When only using this.state variables, the updated variables
+      are not updated when sending to the server. Hence, I divided two types of variable that works just the same.
+      "data" is the actual data to send to the server, and this.state's 'startTimeDataForServer' and 'endTimeDataForServer'
+      are the data that changes when user chooses each time. So when checking null in user input, I first check this.state's variables
+      then assign default values to "data", that is to be sent to the server.
+    */
     if (this.title == undefined) {
       data["title"] = "제목이 입력되지 않았습니다.";
     }
@@ -178,11 +185,10 @@ export default class RequestScreen extends React.Component {
     return data;
   }
 
+  // this method will post request creating a new 'volunteer' activity request.
   async sendRequestToServer(data) {
 
-    // send request to the web server
     const url = 'http://saevom06.cafe24.com/requestdata/newRegister';
-
     return await fetch(url, {
       method: 'POST',
       headers: {

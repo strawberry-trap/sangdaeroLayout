@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ListItem } from 'react-native-elements';
 
@@ -18,6 +18,7 @@ export default class ActivityScreen extends React.Component {
   }
 
   getData() {
+    
     fetch('http://saevom06.cafe24.com/interestdata/getAll', {
       method: 'GET',
       headers: {
@@ -32,9 +33,7 @@ export default class ActivityScreen extends React.Component {
         for (var i = 0; i < responseInJson.length; i++) {
           if (responseInJson[i].name == '물건나누기')
             this.setState({ donateId: responseInJson[i].id })
-          console.log(this.state.donateId);
         }
-        console.log(this.state.data);
       })
       .catch((e) => console.log(e))
       .finally(() => {
@@ -42,7 +41,7 @@ export default class ActivityScreen extends React.Component {
       })
   }
 
-  createListItem(l, i) {
+  createListItem(l, i) { // input l is not used?
     if (this.state.data[i].name != '물건나누기') {
       return (
         <ListItem
@@ -62,7 +61,7 @@ export default class ActivityScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View>
+        { (this.state.data.length) > 0 ? <View>
           <ListItem
             key={1}
             title={'물건나누기'}
@@ -79,7 +78,13 @@ export default class ActivityScreen extends React.Component {
             :
             (data.map((l, i) => (this.createListItem(l, i))))
           }
-        </View>
+        </View> : 
+        <View>
+          <View style={{margin:10}}></View>
+          <Text style={styles.noActivityList}>
+            등록된 관심사가 없습니다.
+          </Text>  
+        </View>}
       </ScrollView>
     )
   }
@@ -92,6 +97,10 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingTop: 15,
+  },
+  noActivityList:{
+    textAlign:"center",
+    fontSize:20,
   },
   itemFirst: {
     flex: 1,

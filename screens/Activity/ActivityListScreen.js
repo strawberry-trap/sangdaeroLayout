@@ -104,6 +104,7 @@ export default class ActivityListScreen extends React.Component {
   }
 
   render() {
+
     const { data, isLoading } = this.state;
 
     return (
@@ -116,13 +117,21 @@ export default class ActivityListScreen extends React.Component {
           </Text>
         </TouchableOpacity>
         <View style={styles.box}>
+          {this.state.data.length > 0 ?
           <View style={styles.listBox}>
             { isLoading ? <View/> : (
               data.map((l, i) => (
                 this.createListItem(l, i)
               ))
             )}
-          </View>
+          </View> : 
+          <View>
+            <View style={{margin:10}}></View>
+            <Text style={styles.noActivityList}>등록된 활동이 없습니다.</Text>
+            <View style={{margin:10}}></View>
+          </View>}
+
+
         </View>
       </ScrollView>
     );
@@ -136,6 +145,10 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingTop: 25,
+  },
+  noActivityList:{
+    textAlign:"center",
+    fontSize:20,
   },
   button: {
     textAlign:'center',
