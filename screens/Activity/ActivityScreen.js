@@ -18,7 +18,7 @@ export default class ActivityScreen extends React.Component {
   }
 
   getData() {
-    
+
     fetch('http://saevom06.cafe24.com/interestdata/getAll', {
       method: 'GET',
       headers: {
@@ -37,7 +37,8 @@ export default class ActivityScreen extends React.Component {
       })
       .catch((e) => console.log(e))
       .finally(() => {
-        this.setState({ isLoading: false });
+        if (this.state.data.length > 0)
+          this.setState({ isLoading: true });
       })
   }
 
@@ -61,7 +62,7 @@ export default class ActivityScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        { (this.state.data.length) > 0 ? <View>
+        <View>
           <ListItem
             key={1}
             title={'물건나누기'}
@@ -74,17 +75,16 @@ export default class ActivityScreen extends React.Component {
             titleStyle={styles.textFirst}
           />
           {isLoading ?
-            <View />
-            :
             (data.map((l, i) => (this.createListItem(l, i))))
+            :
+            <ListItem
+              key={0}
+              title='등록된 관심사가 없습니다'
+              containerStyle={styles.item}
+              titleStyle={styles.text}
+            />
           }
-        </View> : 
-        <View>
-          <View style={{margin:10}}></View>
-          <Text style={styles.noActivityList}>
-            등록된 관심사가 없습니다.
-          </Text>  
-        </View>}
+        </View>
       </ScrollView>
     )
   }
@@ -98,9 +98,9 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 15,
   },
-  noActivityList:{
-    textAlign:"center",
-    fontSize:20,
+  noActivityList: {
+    textAlign: "center",
+    fontSize: 20,
   },
   itemFirst: {
     flex: 1,

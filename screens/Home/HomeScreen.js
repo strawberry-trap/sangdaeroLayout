@@ -90,15 +90,16 @@ export default class HomeScreen extends React.Component {
             this.setState({ allUserActivities: responseInJson }); // assign data to state variable
           }
           if (type == 'Activity') {
-            this.setState({loadActivities:true})
+            if (this.state.allActivities.length > 0)
+              this.setState({loadActivities:true})
           } else {
-            this.setState({loadUserActivities:true})
+            if (this.state.allUserActivities.length > 0)
+              this.setState({loadUserActivities:true})
           }
         })
     } catch (e) {
       console.log(e);
-    }
-    
+    } 
   }
 
   fetchPost(url, data) {
@@ -250,6 +251,7 @@ export default class HomeScreen extends React.Component {
               <Text style={styles.topText}>환영합니다</Text>
               <Text style={styles.topText}>{global.googleUserName}님</Text>
             </View>
+
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>최근 등록된 활동</Text>
@@ -264,7 +266,12 @@ export default class HomeScreen extends React.Component {
                     this.createListItem(l, i)
                   ))
                   :
-                  <View/>
+                  <ListItem
+                    key={0}
+                    title='등록된 활동이 없습니다'
+                    titleStyle={styles.text}
+                    containerStyle={styles.listFirst}
+                  />
                 }
               </View>
             </View>
@@ -282,7 +289,12 @@ export default class HomeScreen extends React.Component {
                     this.createListItem(l, i)
                   ))
                   :
-                  <View/>
+                  <ListItem
+                    key={0}
+                    title='등록된 활동이 없습니다'
+                    titleStyle={styles.text}
+                    containerStyle={styles.listFirst}
+                  />
                 }
               </View>
             </View>

@@ -34,7 +34,8 @@ export default class ActivityListScreen extends React.Component {
     })
     .catch((e) => console.log(e))
     .finally(() => {
-      this.setState({isLoading:false});
+      if (this.state.data.length > 0)
+        this.setState({isLoading:true});
     })
   }
 
@@ -117,20 +118,18 @@ export default class ActivityListScreen extends React.Component {
           </Text>
         </TouchableOpacity>
         <View style={styles.box}>
-          {this.state.data.length > 0 ?
           <View style={styles.listBox}>
-            { isLoading ? <View/> : (
-              data.map((l, i) => (
+            {isLoading ?
+              (data.map((l, i) => (
                 this.createListItem(l, i)
               ))
-            )}
-          </View> : 
-          <View>
-            <View style={{margin:10}}></View>
-            <Text style={styles.noActivityList}>등록된 활동이 없습니다.</Text>
-            <View style={{margin:10}}></View>
-          </View>}
-
+              ) :
+              <ListItem
+                key={0}
+                title='등록된 활동이 없습니다'
+                containerStyle={styles.listFirst}
+              />}
+          </View>
 
         </View>
       </ScrollView>
