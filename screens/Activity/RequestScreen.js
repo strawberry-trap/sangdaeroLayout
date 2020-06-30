@@ -34,20 +34,20 @@ export default class RequestScreen extends React.Component {
       categoryId: props.route.params.categoryId,
       categoryName: props.route.params.categoryName,
 
-      startTime: this.parseDate(date),
-      endTime: this.parseDate(date),
+      startTime: date,
+      endTime: date,
     }
   }
 
   handleConfirm = (date) => {
     if (this.state.isStartTime == true) {
-      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
+      this.setState({ startTime: date, startTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
       }
     } else {
-      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
+      this.setState({ endTime: date, endTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
@@ -207,6 +207,7 @@ export default class RequestScreen extends React.Component {
         <View>
           <DateTimePickerModal
             isVisible={this.state.isDatePickerVisible}
+            date={this.state.startTime}
             mode="datetime"
             display="spinner"
             onConfirm={this.handleConfirm}
@@ -238,7 +239,7 @@ export default class RequestScreen extends React.Component {
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.date}>{this.state.startTime}</Text>
+                <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.time}>
@@ -246,7 +247,7 @@ export default class RequestScreen extends React.Component {
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.date}>{this.state.endTime}</Text>
+                <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
               </TouchableOpacity>
             </View>
           </View>
