@@ -5,12 +5,13 @@ import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
 
 export default class HomeScreen extends React.Component {
-
   state = {
+    allNotices: [],
     allActivities: [],
     allUserActivities: [],
+    loadNotices: false,
     loadActivities: false,
-    loadUserActivities:false,
+    loadUserActivities: false,
 
     // for dialog
     dialogVisible: false,
@@ -20,8 +21,8 @@ export default class HomeScreen extends React.Component {
 
     // additional data to send to the web server
     userSelectedActivity: {},
-    userSelectedDateTime: null,
     userSelectedInterestCategory: {},
+    userSelectedNotice: {},
     serverUrl: '',
     type: 0,
   };
@@ -40,13 +41,28 @@ export default class HomeScreen extends React.Component {
       '활동 취소'
     ];
 
+    this.getData('Notice');
     this.getData('Activity');
     this.getData('User');
   }
 
+  componentDidUpdate() {
+    if (this.props.route.params?.set) {
+      if (this.props.route.params.set) {
+        console.log("Get new data");
+        this.props.route.params.set = false;
+        this.getData('Notice');
+        this.getData('Activity');
+        this.getData('User');
+      }
+    }
+  }
+
   getData(type) {
     let url;
-    if (type == 'Activity') {
+    if (type == 'Notice') {
+      url = "http://saevom06.cafe24.com/noticedata/getTop5Notices"
+    } else if (type == 'Activity') {
       url = "http://saevom06.cafe24.com/activitydata/getTop5Activities"
     } else {
       url = "http://saevom06.cafe24.com/activitydata/getTop5ActivitiesForUser?name=" + global.googleUserName + "&email=" + global.googleUserEmail;
@@ -61,45 +77,57 @@ export default class HomeScreen extends React.Component {
         },
       }).then((response) => response.json())
         .then((responseInJson) => {
-          if (type == 'Activity') {
-            console.log("Get activity data");  
+          if (type == 'Notice') {
+            console.log("Get notice data");
+          } else if (type == 'Activity') {
+            console.log("Get activity data");
           } else {
             console.log("Get user activity data");
           }
           for (var i = 0; i < responseInJson.length; i++) {
-            if (responseInJson[i].deadline.charAt(4) != '년') {
-              if (responseInJson[i].deadline == null) {
-                if (responseInJson[i].startTime == null) {
-                  responseInJson[i].deadline = '없음';
-                } else {
-                  responseInJson[i].deadline = responseInJson[i].startTime;
+            if (type == 'Notice') {
+              responseInJson[i].modDate = this.parseDate(responseInJson[i].modDate);
+              responseInJson[i].regDate = this.parseDate(responseInJson[i].regDate);
+            } else {
+              if (responseInJson[i].deadline.charAt(4) != '년') {
+                if (responseInJson[i].deadline == null) {
+                  if (responseInJson[i].startTime == null) {
+                    responseInJson[i].deadline = '없음';
+                  } else {
+                    responseInJson[i].deadline = responseInJson[i].startTime;
+                  }
                 }
-              }
 
-              if (responseInJson[i].deadline != '없음') {
-                responseInJson[i].deadline = this.parseDate(responseInJson[i].deadline);
-              }
+                if (responseInJson[i].deadline != '없음') {
+                  responseInJson[i].deadline = this.parseDate(responseInJson[i].deadline);
+                }
 
-              responseInJson[i].startTime = this.parseDate(responseInJson[i].startTime);
-              responseInJson[i].endTime = this.parseDate(responseInJson[i].endTime);
+                responseInJson[i].startTime = this.parseDate(responseInJson[i].startTime);
+                responseInJson[i].endTime = this.parseDate(responseInJson[i].endTime);
+              }
             }
           }
-          if (type == 'Activity') {
+          if (type == 'Notice') {
+            this.setState({ allNotices: responseInJson }); // assign data to state variable
+          } else if (type == 'Activity') {
             this.setState({ allActivities: responseInJson }); // assign data to state variable
           } else {
             this.setState({ allUserActivities: responseInJson }); // assign data to state variable
           }
-          if (type == 'Activity') {
+          if (type == 'Notice') {
+            if (this.state.allNotices.length > 0)
+              this.setState({ loadNotices: true })
+          } else if (type == 'Activity') {
             if (this.state.allActivities.length > 0)
-              this.setState({loadActivities:true})
+              this.setState({ loadActivities: true })
           } else {
             if (this.state.allUserActivities.length > 0)
-              this.setState({loadUserActivities:true})
+              this.setState({ loadUserActivities: true })
           }
         })
     } catch (e) {
       console.log(e);
-    } 
+    }
   }
 
   fetchPost(url, data) {
@@ -140,48 +168,85 @@ export default class HomeScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
-  createListItem(l, i) {
+  createListItem(l, i, type) {
     if (i == 0) {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.text}
-          containerStyle={styles.listFirst}
-          onPress={
-            () => {
-              this.setState({ postType: 2 });
-              this.setState({ userSelectedActivity: l });
-              this.setState({ userSelectedInterestCategory: l.interestCategory });
-              this.setState({ dialogVisible: true });
+      if (type == 0) {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.listFirst}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedNotice: l });
+                this.setState({ dialogVisible: true });
+              }
             }
-          }
-        />
-      )
+          />
+        )
+      } else {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.listFirst}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+              }
+            }
+          />
+        )
+      }
     } else {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.text}
-          containerStyle={styles.list}
-          onPress={
-            () => {
-              this.setState({ postType: 2 });
-              this.setState({ userSelectedActivity: l });
-              this.setState({ userSelectedInterestCategory: l.interestCategory });
-              this.setState({ dialogVisible: true });
+      if (type == 0) {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.list}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedNotice: l });
+                this.setState({ dialogVisible: true });
+              }
             }
-          }
-        />
-      )
+          />
+        )
+      } else {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.list}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+              }
+            }
+          />
+        )
+      }
+
     }
   }
 
   render() {
 
     console.disableYellowBox = true;
-    const { allActivities, allUserActivities, loadActivities, loadUserActivities } = this.state;
+    const { allNotices, allActivities, allUserActivities, loadNotices, loadActivities, loadUserActivities } = this.state;
 
     return (
       <View style={styles.container}>
@@ -189,50 +254,69 @@ export default class HomeScreen extends React.Component {
           <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
             <Dialog.Container visible={this.state.dialogVisible}>
+            {this.state.postType != 0 ?
               <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
+              :
+              <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
+            }
+              {this.state.postType != 0 ?
+                <View>
+                  <Dialog.Description>
+                    <Text>
+                      {this.status[this.state.userSelectedActivity.status]}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-              <Text>
-                {this.status[this.state.userSelectedActivity.status]}
-                </Text>
-              </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      마감 기한 : {this.state.userSelectedActivity.deadline}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-                <Text>
-                마감 기한 : {this.state.userSelectedActivity.deadline}
-                </Text>
-              </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      관심사 : {this.state.userSelectedInterestCategory.name}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-                <Text>
-                관심사 : {this.state.userSelectedInterestCategory.name}
-                </Text>
-              </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      시작시간 : {this.state.userSelectedActivity.startTime}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-                <Text>
-                시작시간 : {this.state.userSelectedActivity.startTime}
-                </Text>
-              </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      종료시간 : {this.state.userSelectedActivity.endTime}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-                <Text>
-                종료시간 : {this.state.userSelectedActivity.endTime}
-                </Text>
-              </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      장소 : {this.state.userSelectedActivity.place}
+                    </Text>
+                  </Dialog.Description>
 
-              <Dialog.Description>
-                <Text>
-                장소 : {this.state.userSelectedActivity.place}
-                </Text>
-              </Dialog.Description>
-
-              <Dialog.Description>
-                <Text>
-                세부 내용 : {this.state.userSelectedActivity.content}
-                </Text>
-              </Dialog.Description>
-
+                  <Dialog.Description>
+                    <Text>
+                      세부 내용 : {this.state.userSelectedActivity.content}
+                    </Text>
+                  </Dialog.Description>
+                </View>
+                :
+                <View>
+                  <Dialog.Description>
+                    <Text>
+                      등록일 : {this.state.userSelectedNotice.modDate}
+                    </Text>
+                  </Dialog.Description>
+                  <Dialog.Description>
+                    <Text>
+                      {this.state.userSelectedNotice.content}
+                    </Text>
+                  </Dialog.Description>
+                </View>
+              }
               {this.state.postType == 1 &&
                 <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
                   () => {
@@ -247,6 +331,7 @@ export default class HomeScreen extends React.Component {
               }
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
             </Dialog.Container>
+
             <View style={styles.topSpace}>
               <Text style={styles.topText}>환영합니다</Text>
               <Text style={styles.topText}>{global.googleUserName}님</Text>
@@ -254,16 +339,38 @@ export default class HomeScreen extends React.Component {
 
             <View style={styles.box}>
               <View style={styles.title}>
+                <Text style={styles.titleText}>공지사항</Text>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Notice', { screen: '공지 목록', params: { set: true } })}>
+                  <Text style={styles.titleButton}>전체보기</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.listBox}>
+                {loadNotices ?
+                  allNotices.map((l, i) => (
+                    this.createListItem(l, i, 0)
+                  ))
+                  :
+                  <ListItem
+                    key={0}
+                    title='등록된 공지사항이 없습니다'
+                    titleStyle={styles.text}
+                    containerStyle={styles.listFirst}
+                  />
+                }
+              </View>
+            </View>
+            <View style={styles.box}>
+              <View style={styles.title}>
                 <Text style={styles.titleText}>최근 등록된 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', intial: false })}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:1}})}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.listBox}>
-                { loadActivities ? 
+                {loadActivities ?
                   allActivities.map((l, i) => (
-                    this.createListItem(l, i)
+                    this.createListItem(l, i, 1)
                   ))
                   :
                   <ListItem
@@ -278,15 +385,15 @@ export default class HomeScreen extends React.Component {
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>나의 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', intial: false })}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:2}})}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.listBox}>
-                { loadUserActivities ? 
+                {loadUserActivities ?
                   allUserActivities.map((l, i) => (
-                    this.createListItem(l, i)
+                    this.createListItem(l, i, 2)
                   ))
                   :
                   <ListItem

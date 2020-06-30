@@ -13,9 +13,21 @@ export default class NoticeListScreen extends React.Component {
             data: [],
             isLoading: true,
         }
+        this.getData();
     }
 
-    componentDidMount() {
+    componentDidUpdate() {
+        if (this.props.route.params?.set) {
+
+            if (this.props.route.params.set) {
+                console.log("Get new data");
+                this.props.route.params.set = false;
+                this.getData();
+            }
+        }
+    }
+
+    getData() {
         fetch('http://saevom06.cafe24.com/noticedata/getNotices', {
             method: 'GET',
             headers: {
@@ -65,10 +77,10 @@ export default class NoticeListScreen extends React.Component {
 
         return (
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
- 
+
                 <View style={styles.box}>
                     <View style={styles.listBox}>
-                        { isLoading ? <View /> : (
+                        {isLoading ? <View /> : (
                             data.map((l, i) => (
                                 this.createListItem(l, i)
                             ))

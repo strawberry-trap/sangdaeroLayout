@@ -17,8 +17,21 @@ export default class ActivityScreen extends React.Component {
     this.getData();
   }
 
-  getData() {
+  componentDidUpdate(){
+    console.log("Update");
+    if (this.props.route.params?.listType) {
+      this.props.navigation.navigate('활동 목록', { listType: this.props.route.params.listType, id: null, name:null});
+    }
+    if (this.props.route.params?.set) {
+      if (this.props.route.params.set) {
+        console.log("Get new data");
+        this.props.route.params.set= false;
+        this.getData();
+      }
+    }
+  }
 
+  getData() {
     fetch('http://saevom06.cafe24.com/interestdata/getAll', {
       method: 'GET',
       headers: {
@@ -46,10 +59,10 @@ export default class ActivityScreen extends React.Component {
     if (this.state.data[i].name != '물건나누기') {
       return (
         <ListItem
-          key={i + 1}
+          key={i + 2}
           title={this.state.data[i].name}
           chevron={{ size: 30 }}
-          onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name })}
+          onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, listType: 0 })}
           containerStyle={styles.item}
           titleStyle={styles.text}
         />
@@ -59,6 +72,8 @@ export default class ActivityScreen extends React.Component {
 
   render() {
     const { data, isLoading } = this.state;
+
+    
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -71,6 +86,14 @@ export default class ActivityScreen extends React.Component {
               () => {
                 this.props.navigation.navigate('물건 나눔', { id: this.state.donateId, name: '물건나누기' });
               }}
+            containerStyle={styles.itemFirst}
+            titleStyle={styles.textFirst}
+          />
+          <ListItem
+            key={2}
+            title={'전체 활동'}
+            chevron={{ size: 30 }}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: null, name: null, listType: 1 })}
             containerStyle={styles.itemFirst}
             titleStyle={styles.textFirst}
           />

@@ -17,7 +17,7 @@ export default class LoginScreen extends Component {
   state = {
     userName: '', userEmail: '', userId: '',
     loggedIn: false,
-    isExistingUser: false,
+    isExistingUser: true,
   }
 
   // checks if currently logged in user is existing or not
@@ -35,7 +35,7 @@ export default class LoginScreen extends Component {
         "userEmail" : userEmail,
       }),
     }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
-      response == true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:false})
+      response == true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:true})
     });
 
   }
