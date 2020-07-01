@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as Google from 'expo-google-app-auth';
 
-// You may use below line when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
+// reference) https://reactnative.dev/docs/asyncstorage.html
+import { AsyncStorage } from '@react-native-community/async-storage';
+import { Base64 } from 'js-base64';
+
+// ** You may use below line when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
 // import * as Google from 'expo-google-sign-in';
 
 export default class LoginScreen extends Component {
@@ -19,6 +23,45 @@ export default class LoginScreen extends Component {
     loggedIn: false,
     isExistingUser: true,
   }
+
+  base64Encoding(string){
+    return Base64.encode(string);
+  }
+
+  async setSession(email, name){
+
+    let encryptedEmail = this.base64Encoding(email);
+    let encryptedName = this.base64Encoding(name);
+
+    try {
+      await AsyncStorage.multiSet([
+        ["email", encryptedEmail],
+        ["name", encryptedName],
+      ]);
+    } catch (e){ console.log(e) }
+  }
+
+  async getSession(){
+
+    AsyncStorage.multiGet(['email', 'name']).then((data) => {
+
+      let email = data[0][1];
+      let name = data[1][1];
+      let session = {"email":email, "name":name};
+  
+      return session;
+  });
+  }
+
+  deleteSession(){
+    
+    let keys = ['email', 'name'];
+
+    AsyncStorage.multiRemove(keys, (err) => {
+      console.log('Local storage session is removed.');
+  });
+  }
+
 
   // checks if currently logged in user is existing or not
   checkIfExistingUser(userName, userEmail){
@@ -93,7 +136,7 @@ export default class LoginScreen extends Component {
         </ImageBackground>
         }
         {(this.state.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
+        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Main')}
       </View>
     );
   }
