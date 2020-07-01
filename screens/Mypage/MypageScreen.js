@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, FlatList, SafeAreaView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, Input, TouchableOpacity, View, TextInput, ImageBackground, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
 
 export default class MypageScreen extends React.Component {
+
   state = {
     allUserActivities: [],
     userInfo: [],
@@ -20,6 +21,9 @@ export default class MypageScreen extends React.Component {
     userSelectedDateTime: null,
     userSelectedInterestCategory: {},
     serverUrl: '',
+
+    //nickname change
+    changedNickName : "",
   };
 
   constructor(props) {
@@ -146,6 +150,55 @@ export default class MypageScreen extends React.Component {
     }
   }
 
+  changeNickName = () => {
+
+    let nick = this.state.changedNickName;
+    if (nick == "") nick = this.state.userInfo.nickname;
+    
+    let data = {
+      'name' : global.googleUserName,
+      'email' : global.googleUserEmail,
+      'nickName' : nick,
+    }
+    console.log(data);
+
+    Alert.alert(
+      "닉네임을 변경 하시겠습니까?",
+      "",
+      [
+        {
+          text: "확인", onPress: () => {
+            const url = "http://saevom06.cafe24.com/userdata/modifyNickName";
+
+            // post request
+            try {
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+              }).then((res) => {
+                //console.log("fetch successful!", res);
+                Alert.alert("닉네임 변경이 완료 되었습니다.");
+              });
+            } catch (e) {
+              //console.warn('fetch failed', e, url);
+              Alert.alert("닉네임 변경이 실패했습니다.");
+            }
+          }
+        },
+        {
+          text: "취소",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
   render() {
 
     console.disableYellowBox = true;
@@ -158,44 +211,44 @@ export default class MypageScreen extends React.Component {
           <Dialog.Title style={{ color: '#000' }} children='required'><Text>{this.state.userSelectedActivity.title}</Text></Dialog.Title>
 
           <Dialog.Description>
-          <Text>
-            {this.status[this.state.userSelectedActivity.status]}
+            <Text>
+              {this.status[this.state.userSelectedActivity.status]}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            마감 기한 : {this.state.userSelectedActivity.deadline}
+            <Text>
+              마감 기한 : {this.state.userSelectedActivity.deadline}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            관심사 : {this.state.userSelectedInterestCategory.name}
+            <Text>
+              관심사 : {this.state.userSelectedInterestCategory.name}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            시작시간 : {this.state.userSelectedActivity.startTime}
+            <Text>
+              시작시간 : {this.state.userSelectedActivity.startTime}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            종료시간 : {this.state.userSelectedActivity.endTime}
+            <Text>
+              종료시간 : {this.state.userSelectedActivity.endTime}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            장소 : {this.state.userSelectedActivity.place}
+            <Text>
+              장소 : {this.state.userSelectedActivity.place}
             </Text>
           </Dialog.Description>
 
           <Dialog.Description>
-          <Text>
-            세부 내용 : {this.state.userSelectedActivity.content}
+            <Text>
+              세부 내용 : {this.state.userSelectedActivity.content}
             </Text>
           </Dialog.Description>
 
@@ -219,8 +272,15 @@ export default class MypageScreen extends React.Component {
           </View>
           <View style={styles.listBox}>
             <View style={styles.listFirst}>
-              <Text style={styles.item}>{this.state.userInfo.nickname}</Text>
+              <TextInput
+                style={styles.item}
+                defaultValue={this.state.userInfo.nickname}
+                onChangeText={(input) => { 
+                  this.setState({changedNickName: input});
+               }}
+              />
               <Ionicons
+                onPress={() => {this.changeNickName();}}
                 name={'ios-build'}
                 size={30}
                 style={{ marginTop: 7 }}
