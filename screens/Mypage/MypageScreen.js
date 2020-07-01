@@ -43,6 +43,17 @@ export default class MypageScreen extends React.Component {
     this.getData('Activity');
   }
 
+  componentDidUpdate(){
+    if (this.props.route.params?.set) {
+      if (this.props.route.params.set) {
+        console.log("Get new data");
+        this.props.route.params.set= false;
+        this.getData('User');
+        this.getData('Activity');
+      }
+    }
+  }
+
   getData(type) {
     let url;
     if (type == 'User') {

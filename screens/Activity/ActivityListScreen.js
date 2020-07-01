@@ -22,7 +22,17 @@ export default class ActivityListScreen extends React.Component {
   }
 
   getData() {
-    fetch('http://saevom06.cafe24.com/activitydata/getActivities?id=' + this.state.id, {
+
+    if (this.state.id == null) {
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name='+ global.googleUserName + '&email='+global.googleUserEmail;
+    } else {
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id='+ this.state.id;
+    }
+
+    console.log(url);
+
+    fetch(url, {
+
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -88,6 +98,7 @@ export default class ActivityListScreen extends React.Component {
     if (a.isUrgent > b.isUrgent) return 1;
     // else
     return 0;
+
   }
 
   getImage(props) {
@@ -200,6 +211,7 @@ export default class ActivityListScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {this.state.id != null &&
         <TouchableOpacity onPress={() => {
           this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
         }}>
@@ -207,6 +219,7 @@ export default class ActivityListScreen extends React.Component {
             새로운 활동 추가하기 +
           </Text>
         </TouchableOpacity>
+        }
         <View style={styles.box}>
           <View style={styles.listBox}>
             {isLoading ?

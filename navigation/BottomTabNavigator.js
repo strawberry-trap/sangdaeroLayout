@@ -8,6 +8,7 @@ import HomeStackScreen from '../screens/Home/HomeStackScreen'
 import ActivityStackScreen from '../screens/Activity/ActivityStackScreen';
 import NoticeStackScreen from '../screens/Notice/NoticeStackScreen';
 import MypageStackScreen from '../screens/Mypage/MyPageStackScreen';
+
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
 
@@ -18,15 +19,24 @@ export default function BottomTabNavigator({ navigation, route }) {
       tabBarOptions={{
         activeTintColor: 'rgb(1, 192, 99)',
         inactiveTintColor: 'gray',
-      }}
+      }
+    }
     >
       <BottomTab.Screen
         name="Home"
         component={HomeStackScreen}
+        initialParams={{ set: true }}
         options={{
           title: '홈',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-home" />,
         }}
+        // Go to root screen of stack and give parameter to refresh
+        listeners={({navigation}) => ({
+          tabPress: (event) => {
+            event.preventDefault();
+            navigation.navigate('Home', {screen: '홈', params: {set: true}})
+          }
+        })}
       />
       <BottomTab.Screen
         name="Activity"
@@ -35,6 +45,12 @@ export default function BottomTabNavigator({ navigation, route }) {
           title: '활동',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-filing" />,
         }}
+        listeners={({navigation}) => ({
+          tabPress: (event) => {
+            event.preventDefault();
+            navigation.navigate('Activity', {screen: '관심사 목록', params: {set: true, listType:0}})
+          }
+        })}
       />
       <BottomTab.Screen
         name="Notice"
@@ -43,6 +59,12 @@ export default function BottomTabNavigator({ navigation, route }) {
           title: '공지사항',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-megaphone" />,
         }}
+        listeners={({navigation}) => ({
+          tabPress: (event) => {
+            event.preventDefault();
+            navigation.navigate('Notice', {screen: '공지 목록', params: {set: true}})
+          }
+        })}
       />
       <BottomTab.Screen
         name="Mypage"
@@ -51,6 +73,12 @@ export default function BottomTabNavigator({ navigation, route }) {
           title: '내정보',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-person" />,
         }}
+        listeners={({navigation}) => ({
+          tabPress: (event) => {
+            event.preventDefault();
+            navigation.navigate('Mypage', {screen: '내 정보', params: {set: true}})
+          }
+        })}
       />
     </BottomTab.Navigator>
   );
