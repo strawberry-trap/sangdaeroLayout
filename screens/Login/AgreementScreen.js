@@ -81,7 +81,7 @@ export default class AgreementScreen extends Component {
                 <ScrollView style={styles.listFirst}>
                   <Text>1. 제공 받는 자 : 활동으로 연결된 이용자</Text>
                   <Text>2. 이용 목적 : 이용자와 봉사자 간의 소통</Text>
-                  <Text>3. 항목 : 이름, 전화번호</Text>
+                  <Text>3. 제공 항목 : 이름, 전화번호</Text>
                   <Text>4. 보유 기간 : 활동 종료 시까지 보유</Text>
                 </ScrollView>
                 {!this.state.checkedSecond ?

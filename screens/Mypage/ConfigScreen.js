@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -7,17 +7,10 @@ import Dialog from "react-native-dialog";
 
 export default class ConfigScreen extends React.Component {
   state = {
-    allActivities: [],
-    showList: false,
+    button: true,
 
     // for dialog
-    dialogVisible: false, 
-
-    // additional data to send to the web server
-    userSelectedActivity: {},
-    userSelectedDateTime: null, 
-    userSelectedInterestCategory: {},
-    serverUrl: '',
+    dialogVisible: false,
   };
 
   constructor(props) {
@@ -30,57 +23,68 @@ export default class ConfigScreen extends React.Component {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
+          <Dialog.Title style={{ color: '#000' }} children='required'>
+            개인정보 제공 동의
+          </Dialog.Title>
 
           <Dialog.Description>
-            {this.status[this.state.userSelectedActivity.status]}
+            1. 제공 받는 자 : 활동으로 연결된 이용자
           </Dialog.Description>
 
           <Dialog.Description>
-            마감 기한 : {this.state.userSelectedActivity.deadline}
+            2. 이용 목적 : 이용자와 봉사자 간의 소통
           </Dialog.Description>
 
           <Dialog.Description>
-            관심사 : {this.state.userSelectedInterestCategory.name}
+            3. 제공 항목 : 이름, 전화번호
           </Dialog.Description>
 
           <Dialog.Description>
-            시작시간 : {this.state.userSelectedActivity.startTime}
-          </Dialog.Description>
-
-          <Dialog.Description>
-            종료시간 : {this.state.userSelectedActivity.endTime}
-          </Dialog.Description>
-
-          <Dialog.Description>
-            장소 : {this.state.userSelectedActivity.place}
-          </Dialog.Description>
-
-          <Dialog.Description>
-            세부 내용 : {this.state.userSelectedActivity.content}
+            4. 보유 기간 : 활동 종료 시까지 보유
           </Dialog.Description>
 
           <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
 
-        
+
         </Dialog.Container>
 
         <View style={styles.box}>
-          
           <View style={styles.listBox}>
             <View style={styles.list}>
               <Text style={styles.item}>전화번호 공유 승인</Text>
-              <Ionicons
-                name='ios-checkmark-circle'
-                size={30} 
-                style={{ marginTop: 7 }}
-                color={'#000'}
-                />
+              {this.state.button ?
+                <TouchableOpacity
+                  onPress={() => this.setState({ button: false })}
+                >
+                  <Ionicons
+                    name='ios-checkmark-circle'
+                    size={30}
+                    style={{ marginTop: 7 }}
+                    color={'#000'}
+                  />
+                </TouchableOpacity>
+                :
+                <TouchableOpacity
+                  onPress={() => this.setState({ button: true })}
+                >
+                  <Ionicons
+                    name='ios-checkmark-circle-outline'
+                    size={30}
+                    style={{ marginTop: 7 }}
+                    color={'#000'}
+                  />
+                </TouchableOpacity>
+              }
             </View>
-            <View style={styles.sub}>
-              <Text style={styles.subText}>번화번호 공유 동의 약관</Text>
-            </View>
+            <TouchableOpacity
+              onPress={() => this.setState({ dialogVisible: true })}
+            >
+              <View style={styles.sub}>
+                <Text style={styles.subText}>개인정보 공유 동의 약관</Text>
+              </View>
+            </TouchableOpacity>
           </View>
+
         </View>
       </ScrollView>
     )
@@ -97,28 +101,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   box: {
-    flex:1,
-    backgroundColor:'rgb(220,220,220)',
-    marginBottom:0,
+    flex: 1,
+    backgroundColor: 'rgb(220,220,220)',
+    marginBottom: 0,
   },
   listBox: {
-    backgroundColor:'#FFF',
-    paddingRight:25,
-    paddingLeft:25,
+    backgroundColor: '#FFF',
+    paddingRight: 25,
+    paddingLeft: 25,
   },
   list: {
-    flex:1,
+    flex: 1,
     paddingTop: 15,
     paddingBottom: 15,
-    flexDirection:'row',
-    borderTopWidth:0.5,
-    borderColor:'rgb(220,220,220)',
+    flexDirection: 'row',
+    borderTopWidth: 0.5,
+    borderColor: 'rgb(220,220,220)',
   },
   item: {
-    flex:1,
-    fontSize:20,
-    paddingTop:8,
-    paddingBottom:8,
+    flex: 1,
+    fontSize: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   sub: {
     paddingBottom: 20,
@@ -126,8 +130,8 @@ const styles = StyleSheet.create({
   subText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize:15,
-    fontWeight:'bold',
-    color:'#888',
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#888',
   },
 });

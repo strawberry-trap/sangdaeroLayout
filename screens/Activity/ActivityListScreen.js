@@ -89,28 +89,79 @@ export default class ActivityListScreen extends React.Component {
 
   createListItem(l, i) {
     if (i == 0) {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.title}
-          rightElement={this.getImage(l.status)}
-          onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
-          containerStyle={styles.listFirst}
-        />
-      )
+      if (this.checkUser(l)) {
+        return (
+          <View style={styles.listFirst}>
+            <ListItem
+              key={i}
+              title={l.title}
+              titleStyle={styles.title}
+              rightElement={this.getImage(l.status)}
+              onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
+              containerStyle={styles.roundUserList}
+            />
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.listFirst}>
+            <ListItem
+              key={i}
+              title={l.title}
+              titleStyle={styles.title}
+              rightElement={this.getImage(l.status)}
+              onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
+              containerStyle={styles.roundList}
+            />
+          </View>
+        )
+      }
     } else {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.title}
-          rightElement={this.getImage(l.status)}
-          onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
-          containerStyle={styles.list}
-        />
-      )
+      if (this.checkUser(l)) {
+        return (
+          <View style={styles.list}>
+            <ListItem
+              key={i}
+              title={l.title}
+              titleStyle={styles.title}
+              rightElement={this.getImage(l.status)}
+              onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
+              containerStyle={styles.roundUserList}
+            />
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.list}>
+            <ListItem
+              key={i}
+              title={l.title}
+              titleStyle={styles.title}
+              rightElement={this.getImage(l.status)}
+              onPress={() => this.props.navigation.navigate('활동 내용', {data:this.state.data[i]})}
+              containerStyle={styles.roundList}
+            />
+          </View>
+        )
+      }
+      
     }
+  }
+
+  checkUser(l) {
+    var email = global.googleUserEmail;
+    for (var i = 0; i < l.activityVolunteers.length; i++) {
+      if (email == l.activityVolunteers[i].user.socialId) {
+        console.log('user')
+        return true;
+      }
+    }
+    for (var i = 0; i < l.activityUsers.length; i++) {
+      if (email == l.activityUsers[i].user.socialId) {
+        return true;
+      }
+    }
+    return false;
   }
 
   render() {
@@ -189,22 +240,33 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   listFirst: {
-    flex:1,
-    padding: 5,
-    paddingRight:10,
-    paddingBottom: 8,
-    marginTop: 3,
-    flexDirection:'row',
+    
   },
   list: {
+    borderTopWidth:0.5,
+    borderColor:'rgb(220,220,220)',
+  },
+  roundList: {
     flex:1,
     padding: 5,
     paddingRight:10,
-    paddingBottom: 8,
+    paddingLeft:10,
     marginTop: 3,
+    marginBottom:3,
     flexDirection:'row',
-    borderTopWidth:0.5,
-    borderColor:'rgb(220,220,220)',
+    backgroundColor:'#FFF',
+    borderRadius:50
+  },
+  roundUserList:{
+    flex:1,
+    padding: 5,
+    paddingRight:10,
+    paddingLeft:10,
+    marginTop: 3,
+    marginBottom:3,
+    flexDirection:'row',
+    backgroundColor:'rgb(223,244,243)',
+    borderRadius:50
   },
   title: {
     margin:5,

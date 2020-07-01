@@ -118,6 +118,7 @@ export default class HomeScreen extends React.Component {
             if (this.state.allNotices.length > 0)
               this.setState({ loadNotices: true })
           } else if (type == 'Activity') {
+            console.log(this.state.allActivities.length)
             if (this.state.allActivities.length > 0)
               this.setState({ loadActivities: true })
           } else {
@@ -359,6 +360,7 @@ export default class HomeScreen extends React.Component {
                 }
               </View>
             </View>
+
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>최근 등록된 활동</Text>
@@ -382,6 +384,7 @@ export default class HomeScreen extends React.Component {
                 }
               </View>
             </View>
+
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>나의 활동</Text>
