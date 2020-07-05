@@ -21,7 +21,7 @@ export default class LoginScreen extends Component {
   state = {
     userName: '', userEmail: '', userId: '',
     loggedIn: false,
-    isExistingUser: true,
+    isExistingUser: false,
   }
 
   base64Encoding(string){
@@ -78,7 +78,7 @@ export default class LoginScreen extends Component {
         "userEmail" : userEmail,
       }),
     }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
-      response == true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:true})
+      response === true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:true})
     });
 
   }
@@ -136,7 +136,7 @@ export default class LoginScreen extends Component {
         </ImageBackground>
         }
         {(this.state.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Main')}
+        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
       </View>
     );
   }

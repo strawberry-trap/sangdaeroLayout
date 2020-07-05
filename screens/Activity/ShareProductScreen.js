@@ -415,16 +415,17 @@ export default class ShareProductScreen extends React.Component {
           </View>
 
           <View style={styles.list}>
+            {image &&
+              <Image source={{ uri: image }} style={styles.photo} />
+            }
             <TouchableOpacity onPress={() => {
-            this.setState({ dialogVisible: true });
-          }}>
-            <Text style={styles.selectButton}>
-              물건 나눔 사진 선택
+              this.setState({ dialogVisible: true });
+            }}>
+              <Text style={styles.selectButton}>
+                물건 나눔 사진 선택
             </Text>
-          </TouchableOpacity>
-          {image &&
-            <Image source={{ uri: image }} style={styles.photo} />
-          }
+            </TouchableOpacity>
+
           </View>
             
         </View>

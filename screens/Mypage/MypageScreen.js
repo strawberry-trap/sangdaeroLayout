@@ -334,7 +334,11 @@ export default class MypageScreen extends React.Component {
           </View>
           <View style={styles.listBox}>
             <View style={styles.list}>
-              <Text style={styles.item}>로그아웃</Text>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Log')}
+              >
+                <Text style={styles.item}>로그아웃</Text>
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.listBox}>

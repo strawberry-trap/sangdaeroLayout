@@ -19,6 +19,7 @@ export default class AgreementScreen extends Component {
     numberFirst: "",
     numberSecond: "",
     numberThird: "",
+    nickname:"",
   }
 
   toggleCheckBox(state) {
@@ -42,7 +43,7 @@ export default class AgreementScreen extends Component {
             <View style={styles.box}>
               <View style={styles.listBox}>
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>개인정보 수집 및 이용 동의 (필수)</Text>
+                  <Text style={styles.titleText}>개인정보 수집 및 이용 동의</Text>
                 </View>
                 <ScrollView style={styles.listFirst}>
                   <Text>1. 목적 : 이용자 개인 식별, 이용자와의 원활한 의사소통</Text>
@@ -76,7 +77,7 @@ export default class AgreementScreen extends Component {
               <View style={styles.line} />
               <View style={styles.listBox}>
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>개인정보 제공 동의 (필수)</Text>
+                  <Text style={styles.titleText}>개인정보 제공 동의</Text>
                 </View>
                 <ScrollView style={styles.listFirst}>
                   <Text>1. 제공 받는 자 : 활동으로 연결된 이용자</Text>
@@ -136,7 +137,7 @@ export default class AgreementScreen extends Component {
               <View style={styles.line} />
               <View style={styles.listBox}>
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>전화번호 (필수)</Text>
+                  <Text style={styles.titleText}>전화번호</Text>
                 </View>
                 <View style={styles.phoneList}>
                   <TextInput
@@ -175,13 +176,14 @@ export default class AgreementScreen extends Component {
                   <TextInput
                     style={styles.nicknameText}
                     placeholder='별명을 적어주세요'
-                    maxLength={3}
+                    maxLength={10}
+                    onChangeText={(text) => this.setState({nickname:text})}
                   />
                 </View>
               </View>
               <View style={styles.line} />
 
-              {(this.state.numberFirst.length >= 3 && this.state.numberSecond.length >= 3 && this.state.numberThird.length >= 4) ?
+              {(this.state.numberFirst.length >= 3 && this.state.numberSecond.length >= 3 && this.state.numberThird.length >= 4 && this.state.nickname.length >= 3) ?
                 <TouchableOpacity
                   onPress={() => {
                     this.addUser();

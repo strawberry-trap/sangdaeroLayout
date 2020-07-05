@@ -28,9 +28,9 @@ export default class ActivityDetailScreen extends React.Component {
     // 1) check if volunteer
     for (var i = 0; i < this.state.data.activityVolunteers.length; i++) {
       if (i == 0) {
-        this.volunteerList = this.state.data.activityVolunteers[i].user.name+"";
+        this.volunteerList = this.state.data.activityVolunteers[i].user.nickname+"";
       } else {
-        this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.name;
+        this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.nickname;
       }
 
       if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
@@ -41,9 +41,9 @@ export default class ActivityDetailScreen extends React.Component {
     // 2) check if benefiting-user
     for (var i = 0; i < this.state.data.activityUsers.length; i++) {
       if (i == 0) {
-        this.userList = this.state.data.activityUsers[i].user.name+"";
+        this.userList = this.state.data.activityUsers[i].user.nickname+"";
       } else {
-        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.name+"";
+        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.nickname+"";
       }
 
       if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
@@ -167,16 +167,16 @@ export default class ActivityDetailScreen extends React.Component {
     console.log(date);
     var splitDash = date.split('-');
 
-    var year = splitDash[0] + '년 ';
-    var month = splitDash[1] + '월 ';
+    var year = splitDash[0] + '/';
+    var month = splitDash[1] + '/';
 
     var splitT = splitDash[2].split('T');
 
-    var day = splitT[0] + '일 ';
+    var day = splitT[0] + ' ';
 
     var splitColon = splitT[1].split(':');
-    var hour = splitColon[0] + '시 ';
-    var minute = splitColon[1] + '분';
+    var hour = splitColon[0] + ':';
+    var minute = splitColon[1];
 
     return year + month + day + hour + minute;
   }
@@ -317,7 +317,7 @@ export default class ActivityDetailScreen extends React.Component {
           }
           {image &&
             <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false, image: null }); }} />
               <Dialog.Button label="전송하기" color='#000' 
                 onPress={() => {
                   this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{

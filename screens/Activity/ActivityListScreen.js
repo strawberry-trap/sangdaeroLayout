@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ListItem } from 'react-native-elements'
 import Icon from 'react-native-ionicons'
+import { Ionicons } from '@expo/vector-icons';
 
 export default class ActivityListScreen extends React.Component {
 
@@ -45,6 +46,7 @@ export default class ActivityListScreen extends React.Component {
         console.log('Get activity list');
         this.setState({ data: responseInJson });
         this.sortDataByUrgentDateTime(responseInJson, 12); // sort data regarding 'deadline'
+        console.log(this.state.data);
       })
       .catch((e) => console.log(e))
       .finally(() => {
@@ -101,7 +103,7 @@ export default class ActivityListScreen extends React.Component {
 
   }
 
-  getImage(props) {
+  getImage(props, urgent) {
     var path;
 
     // Allocating path as dynamic will cause error
@@ -126,22 +128,38 @@ export default class ActivityListScreen extends React.Component {
         break;
     }
 
-    return (
-      <View style={styles.imageGroup}>
-        <Image
-          source={path}
-          style={styles.statusButton}
-        />
-        <Image
-          source={require('../../assets/images/right_arrow.png')}
-          style={styles.arrow}
-        />
-      </View>
-    )
+    if (urgent) {
+      return (
+        <View style={styles.imageGroup}>
+          <Ionicons name="ios-flash" size={24} color="black" />
+          <Image
+            source={path}
+            style={styles.statusButton}
+          />
+          <Image
+            source={require('../../assets/images/right_arrow.png')}
+            style={styles.arrow}
+          />
+        </View>
+      )
+    } else {
+      return (
+        <View style={styles.imageGroup}>
+          <Image
+            source={path}
+            style={styles.statusButton}
+          />
+          <Image
+            source={require('../../assets/images/right_arrow.png')}
+            style={styles.arrow}
+          />
+        </View>
+      )
+    }
+    
   }
 
   createListItem(l, i) {
-    var urgentTitle = l.title;
     if (l.isUrgent == 1) {
       // Urgent : true
       if (i == 0) {
@@ -154,7 +172,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -168,7 +186,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -185,7 +203,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -199,7 +217,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -219,7 +237,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -233,7 +251,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -250,7 +268,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -264,7 +282,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status)}
+                rightElement={this.getImage(l.status, l.isUrgent)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -308,6 +326,12 @@ export default class ActivityListScreen extends React.Component {
         </TouchableOpacity>
         }
         <View style={styles.box}>
+          <View style={styles.title}>
+            <Text style={styles.titleText}>{this.state.name}</Text>
+            <TouchableOpacity onPress={() => console.log('click')}>
+              <Ionicons name="ios-star-outline" size={12} color="black" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.listBox}>
             {isLoading ?
               (urgentCheckedData.map((l, i) => (
@@ -367,6 +391,23 @@ const styles = StyleSheet.create({
     marginRight: 11,
     borderRadius: 15,
     elevation: 5,
+  },
+  title: {
+    padding: 3,
+    flexDirection: 'row',
+    marginBottom: 15,
+  },
+  titleText: {
+    flex: 1,
+    alignSelf: 'flex-start',
+    fontSize: 19,
+    fontWeight: 'bold',
+    color: 'rgb(29,140,121)',
+  },
+  titleButton: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    color: 'rgb(140,140,140)'
   },
   listBox: {
     padding: 3,

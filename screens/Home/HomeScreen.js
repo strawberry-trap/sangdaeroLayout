@@ -262,23 +262,27 @@ export default class HomeScreen extends React.Component {
             }
               {this.state.postType != 0 ?
                 <View>
+                  <View style={{flexDirection:'row'}}>
+                  
+                  <View>
+
+                  
+                  <Dialog.Description>
+                    <Text>
+                      {this.state.userSelectedInterestCategory.name}
+                    </Text>
+                  </Dialog.Description>
+                  </View>
+                  <View>
                   <Dialog.Description>
                     <Text>
                       {this.status[this.state.userSelectedActivity.status]}
                     </Text>
                   </Dialog.Description>
+                  </View>
+                  </View>
 
-                  <Dialog.Description>
-                    <Text>
-                      마감 기한 : {this.state.userSelectedActivity.deadline}
-                    </Text>
-                  </Dialog.Description>
-
-                  <Dialog.Description>
-                    <Text>
-                      관심사 : {this.state.userSelectedInterestCategory.name}
-                    </Text>
-                  </Dialog.Description>
+                  
 
                   <Dialog.Description>
                     <Text>
@@ -294,13 +298,13 @@ export default class HomeScreen extends React.Component {
 
                   <Dialog.Description>
                     <Text>
-                      장소 : {this.state.userSelectedActivity.place}
+                      {this.state.userSelectedActivity.place}
                     </Text>
                   </Dialog.Description>
 
                   <Dialog.Description>
                     <Text>
-                      세부 내용 : {this.state.userSelectedActivity.content}
+                      {this.state.userSelectedActivity.content}
                     </Text>
                   </Dialog.Description>
                 </View>

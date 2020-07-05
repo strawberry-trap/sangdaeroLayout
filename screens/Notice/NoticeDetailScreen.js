@@ -31,7 +31,7 @@ export default class NoticeDetailScreen extends React.Component {
           <View style={styles.list}>
             <View style={styles.dataList}>
               <View style={styles.data}>
-                <Text style={styles.content}>{this.state.data.memo}</Text>
+                <Text style={styles.content}>{this.state.data.content}</Text>
               </View>
             </View>
           </View>
