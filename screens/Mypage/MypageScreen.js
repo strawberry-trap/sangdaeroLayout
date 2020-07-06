@@ -210,6 +210,51 @@ export default class MypageScreen extends React.Component {
     );
   }
 
+  unregister = () => {
+    
+    let data = {
+      'name' : global.googleUserName,
+      'email' : global.googleUserEmail,
+    }
+
+    Alert.alert(
+      "정말 탈퇴하시겠습니까?",
+      "탈퇴 시 번복이 불가능하니, 한번 더 생각해 주세요.",
+      [
+        {
+          text: "확인", onPress: () => {
+            const url = "http://saevom06.cafe24.com/userdata/unregisterUser"; // *** restcontroller implementation is needed
+
+            // post request
+            try {
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+              }).then((res) => {
+                //console.log("fetch successful!", res);
+                Alert.alert("회원 탈퇴 되었습니다.");
+              });
+            } catch (e) {
+              //console.warn('fetch failed', e, url);
+              Alert.alert("회원 탈퇴가 되지 않았습니다.");
+            }
+          }
+        },
+        {
+          text: "취소",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+      ],
+      { cancelable: false }
+    );
+
+  }
+
   render() {
 
     console.disableYellowBox = true;
@@ -335,7 +380,10 @@ export default class MypageScreen extends React.Component {
           <View style={styles.listBox}>
             <View style={styles.list}>
               <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('Log')}
+                onPress={() => {
+                  global.loggedIn = false; // this variable will be set to be 'false' at the constructor of LoginScreen anyway.
+                  this.props.navigation.navigate('Log');
+                }}
               >
                 <Text style={styles.item}>로그아웃</Text>
               </TouchableOpacity>
