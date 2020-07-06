@@ -46,7 +46,6 @@ export default class ActivityListScreen extends React.Component {
         console.log('Get activity list');
         this.setState({ data: responseInJson });
         this.sortDataByUrgentDateTime(responseInJson, 12); // sort data regarding 'deadline'
-        console.log(this.state.data);
       })
       .catch((e) => console.log(e))
       .finally(() => {
@@ -160,6 +159,8 @@ export default class ActivityListScreen extends React.Component {
   }
 
   createListItem(l, i) {
+    this.editStatus(l);
+
     if (l.isUrgent == 1) {
       // Urgent : true
       if (i == 0) {
@@ -308,6 +309,61 @@ export default class ActivityListScreen extends React.Component {
       }
     }
     return false;
+  }
+
+  editStatus(l) {
+    var date = new Date();
+    var givenDate = this.parseDate(l.deadline);
+    var year = date.getFullYear();
+      var month = this.addZero(date.getMonth()+1);
+      var day = this.addZero(date.getDate());
+      var hour = this.addZero(date.getHours());
+      var minute = this.addZero(date.getMinutes());
+      var nowDate = year+'/'+month+'/'+day+' '+hour+':'+minute;
+    console.log('Edit')
+    console.log(l.status);
+    console.log(givenDate);
+    console.log(nowDate);
+    if (l.status == 1 && l.deadline < date) {
+      console.log('Type 1');
+      l.status == 2
+    }
+    if (l.status == 2 && l.startTime < date) {
+      console.log('Type 2');
+      l.status == 3
+    }
+  }
+
+  parseDate(date) {
+    console.log(date);
+      var splitDash = date.split('-');
+
+      var year = splitDash[0] * 100000000;
+      
+      var month = splitDash[1] * 1000000;
+    
+  
+      var splitT = splitDash[2];
+  
+      var day = splitT[0] * 10000;
+      ;
+  
+      var splitColon = splitT[1].split(':');
+      var hour = splitColon[0] * 100;
+      var minute = splitColon[1];
+      console.log(minute);
+      console.log(year + month + day + hour + minute);
+  
+      return year + month + day + hour + minute;
+  }
+
+  addZero(num) {
+    if (num < 10) {
+      return '0'+num;
+    } else {
+      return num+"";
+    }
+
   }
 
   render() {

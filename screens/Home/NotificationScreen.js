@@ -17,6 +17,16 @@ export default class NotificationScreen extends React.Component {
     this.getNotification();
   }
 
+  componentDidUpdate() {
+    if (this.props.route.params?.set) {
+      if (this.props.route.params.set) {
+        console.log("Get new data");
+        this.props.route.params.set = false;
+        this.getNotification();
+      }
+    }
+  }
+
   getNotification() {
     var name = global.googleUserName + "";
     var email = global.googleUserEmail + "";
@@ -35,14 +45,12 @@ export default class NotificationScreen extends React.Component {
       })
       .catch((e) => console.log(e))
       .finally(() => {
-        console.log(this.state.data.length);
         if (this.state.data.length > 0) {
           this.setState({ isLoading: true });
         } else {
           this.setState({ isLoading: false });
         }
       })
-
   }
 
   render() {

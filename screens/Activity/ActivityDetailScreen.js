@@ -61,7 +61,7 @@ export default class ActivityDetailScreen extends React.Component {
       '취소된 활동'
     ];
 
-    if (this.state.data.deadline.charAt(4) != '년') {
+    if (this.state.data.deadline.charAt(4) != '/') {
       if (this.state.data.deadline == null) {
         if (this.state.data.startTime == null) {
           this.state.data.deadline = '없음';

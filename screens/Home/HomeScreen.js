@@ -12,12 +12,14 @@ export default class HomeScreen extends React.Component {
     loadNotices: false,
     loadActivities: false,
     loadUserActivities: false,
+    activityUser: [],
 
     // for dialog
     dialogVisible: false,
     isDatePickerVisible: false, // date picker in dialog
     finalConfirmDialog: false,
     postType: 1,
+    register: false,
 
     // additional data to send to the web server
     userSelectedActivity: {},
@@ -89,7 +91,7 @@ export default class HomeScreen extends React.Component {
               responseInJson[i].modDate = this.parseDate(responseInJson[i].modDate);
               responseInJson[i].regDate = this.parseDate(responseInJson[i].regDate);
             } else {
-              if (responseInJson[i].deadline.charAt(4) != '년') {
+              if (responseInJson[i].deadline.charAt(4) != '/') {
                 if (responseInJson[i].deadline == null) {
                   if (responseInJson[i].startTime == null) {
                     responseInJson[i].deadline = '없음';
@@ -170,6 +172,11 @@ export default class HomeScreen extends React.Component {
   }
 
   createListItem(l, i, type) {
+    var related = true;
+    if (type == 1) {
+      console.log(l);
+      //related = this.checkUser(l);
+    }
     if (i == 0) {
       if (type == 0) {
         return (
@@ -183,6 +190,25 @@ export default class HomeScreen extends React.Component {
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
                 this.setState({ dialogVisible: true });
+                this.setState({ related: false });
+              }
+            }
+          />
+        )
+      } else if (type == 1 && related == true) {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.listFirst}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+                this.setState({ related: true });
               }
             }
           />
@@ -200,6 +226,7 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
+                this.setState({ related: false });
               }
             }
           />
@@ -218,6 +245,25 @@ export default class HomeScreen extends React.Component {
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
                 this.setState({ dialogVisible: true });
+                this.setState({ related: false });
+              }
+            }
+          />
+        )
+      } else if (type == 1 && related == true) {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.text}
+            containerStyle={styles.list}
+            onPress={
+              () => {
+                this.setState({ postType: type });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+                this.setState({ related: true });
               }
             }
           />
@@ -235,13 +281,28 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
+                this.setState({ related: false });
               }
             }
           />
         )
       }
-
     }
+  }
+
+  checkUser(l) {
+
+    for (var i = 0; i < l.activityVolunteers.length; i++) {
+      if (l.activityVolunteers[i].user.socialId == global.googleUserEmail) {
+        return true;
+      }
+    }
+    for (var i = 0; i < l.activityUsers.length; i++) {
+      if (l.activityUsers[i].user.socialId == global.googleUserEmail) {
+        return true;
+      }
+    }
+    return false;
   }
 
   render() {
@@ -255,44 +316,21 @@ export default class HomeScreen extends React.Component {
           <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
             <Dialog.Container visible={this.state.dialogVisible}>
-            {this.state.postType != 0 ?
-              <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
-              :
-              <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
-            }
+              {this.state.postType != 0 ?
+                <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title} ({this.status[this.state.userSelectedActivity.status]})</Dialog.Title>
+                :
+                <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
+              }
               {this.state.postType != 0 ?
                 <View>
-                  <View style={{flexDirection:'row'}}>
-                  
-                  <View>
-
-                  
                   <Dialog.Description>
                     <Text>
                       {this.state.userSelectedInterestCategory.name}
                     </Text>
                   </Dialog.Description>
-                  </View>
-                  <View>
                   <Dialog.Description>
                     <Text>
-                      {this.status[this.state.userSelectedActivity.status]}
-                    </Text>
-                  </Dialog.Description>
-                  </View>
-                  </View>
-
-                  
-
-                  <Dialog.Description>
-                    <Text>
-                      시작시간 : {this.state.userSelectedActivity.startTime}
-                    </Text>
-                  </Dialog.Description>
-
-                  <Dialog.Description>
-                    <Text>
-                      종료시간 : {this.state.userSelectedActivity.endTime}
+                      {this.state.userSelectedActivity.startTime} ~ {this.state.userSelectedActivity.endTime}
                     </Text>
                   </Dialog.Description>
 
@@ -322,7 +360,7 @@ export default class HomeScreen extends React.Component {
                   </Dialog.Description>
                 </View>
               }
-              {this.state.postType == 1 &&
+              {this.state.related == true &&
                 <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
                   () => {
                     this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
@@ -368,7 +406,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>최근 등록된 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:1}})}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 1 } })}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>
@@ -392,7 +430,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>나의 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:2}})}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2 } })}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>

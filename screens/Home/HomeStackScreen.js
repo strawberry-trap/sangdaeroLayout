@@ -16,7 +16,7 @@ export default function HomeStackScreen({ navigation, route }) {
       screenOptions={{
         headerRight: () => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('알림')}
+            onPress={() => navigation.navigate('알림', {params : {set:true}})}
             style={styles.rightIconContainer}>
             <Ionicons
               name='ios-notifications-outline'

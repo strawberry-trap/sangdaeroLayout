@@ -79,7 +79,7 @@ export default class MypageScreen extends React.Component {
           } else {
             console.log("Get activity data");
             for (var i = 0; i < responseInJson.length; i++) {
-              if (responseInJson[i].deadline.charAt(4) != '년') {
+              if (responseInJson[i].deadline.charAt(4) != '/') {
                 if (responseInJson[i].deadline == null) {
                   if (responseInJson[i].startTime == null) {
                     responseInJson[i].deadline = '없음';
