@@ -12,6 +12,8 @@ export default class NotificationScreen extends React.Component {
     this.state = {
       data: [],
       isLoading: false,
+
+      dialogVisible: false,
     }
 
     this.getNotification();

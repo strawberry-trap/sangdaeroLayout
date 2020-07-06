@@ -34,8 +34,9 @@ export default class ActivityDetailScreen extends React.Component {
       }
 
       if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
-        this.setState({ isUserRelated: 1 });
+        this.state.isUserRelated = 1;
         console.log("current user is volunteer");
+        console.log(this.state.isUserRelated);
       }
     }
     // 2) check if benefiting-user
@@ -47,7 +48,7 @@ export default class ActivityDetailScreen extends React.Component {
       }
 
       if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
-        this.setState({ isUserRelated: 2 });
+        this.state.isUserRelated = 2;
         console.log("current user is benefiting-user");
       }
     }
@@ -503,12 +504,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   cancleButton: {
-    flex: 1,
-    width:100,
+    flex:1,
     textAlign: 'center',
-    marginLeft: 10,
-    marginRight: 0,
-    fontSize: 14,
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
     color: '#FFF',
     backgroundColor: '#777',
     borderRadius: 50,

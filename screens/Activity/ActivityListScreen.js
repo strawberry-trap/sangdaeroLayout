@@ -14,17 +14,19 @@ export default class ActivityListScreen extends React.Component {
     this.state = {
       id: props.route.params.id,
       name: props.route.params.name,
+      interest : false,
       data: [],
       urgentCheckedData: [],
       isLoading: false,
     }
 
+console.log(this.state.name)
+
     this.getData();
   }
 
   getData() {
-
-    if (this.state.id == null) {
+    if (this.state.id == -1) {
       var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name='+ global.googleUserName + '&email='+global.googleUserEmail;
     } else {
       var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id='+ this.state.id;
@@ -54,6 +56,34 @@ export default class ActivityListScreen extends React.Component {
       })
   }
 
+  // need restcontroller
+  interestPost(type) {
+    console.log('change interest');
+    if (type==0) {
+      var url = 'http://saevom06.cafe24.com/userdata/addInterest';
+    } else {
+      var url = 'http://saevom06.cafe24.com/userdata/removeInterest';
+    }
+    console.log(url);
+    var data = {
+      'name': global.googleUserName,
+      'email': global.googleUserEmail,
+      'id': this.state.id,
+    }
+    console.log(data);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        async: false,
+      },
+      body : data
+    }).then((res) => {
+    });
+
+  }
+
   // sort data by deadline, that the deadline is within 12 hours from current time
   // input 'data' should be a json list of "activities", and 'deadlineHourDifference' is like "if the deadline time is within 12 hours from now".
   sortDataByUrgentDateTime(data, deadlineHourDifference) {
@@ -79,7 +109,7 @@ export default class ActivityListScreen extends React.Component {
       // difference between 'deadline' and '12 hours from right now' in hours
       var diff = (deadline - endTime) / (60 * 60 * 1000); // divide by milliseconds, since it is expressed as hours
 
-      if (diff <= 12 && diff >= 0) {
+      if (diff <= 12 && diff >= 0 && allActivities[i].status == 1) {
         allActivities[i]['isUrgent'] = 1;
         urgent.push(allActivities[i]);
       } else {
@@ -91,7 +121,7 @@ export default class ActivityListScreen extends React.Component {
     for (var i = 0; i < urgent.length; i++) total.push(urgent[i]);
     for (var i = 0; i < notUrgent.length; i++) total.push(notUrgent[i]);
 
-    this.setState({ urgentCheckedData: total });
+    this.setState({ data: total });
   }
 
   compareAttribute(a, b) {
@@ -130,7 +160,7 @@ export default class ActivityListScreen extends React.Component {
     if (urgent) {
       return (
         <View style={styles.imageGroup}>
-          <Ionicons name="ios-flash" size={24} color="black" />
+          <Ionicons name="ios-alert" size={20} color="rgb(29,140,121)" />
           <Image
             source={path}
             style={styles.statusButton}
@@ -159,14 +189,14 @@ export default class ActivityListScreen extends React.Component {
   }
 
   createListItem(l, i) {
-    this.editStatus(l);
+    l.status = this.editStatus(l.status, l.deadline, l.startTime, l.endTime);
 
     if (l.isUrgent == 1) {
       // Urgent : true
       if (i == 0) {
         // Urgent : true, First : true
-        if (this.checkUser(l)) {
-          // Urgent : true, First : true, UserInclude : true
+        if (this.checkUser(l) && this.state.id != -1) {
+          // Urgent : true, First : true, UserInclude : true, id != -1
           return (
             <View style={styles.listFirst}>
               <ListItem
@@ -196,8 +226,8 @@ export default class ActivityListScreen extends React.Component {
         }
       } else {
         // Urgent : true, First : false
-        if (this.checkUser(l)) {
-          // Urgent : true, First : false, UserInclude : true
+        if (this.checkUser(l) && this.state.id != -1) {
+          // Urgent : true, First : false, UserInclude : true, id != -1
           return (
             <View style={styles.list}>
               <ListItem
@@ -230,8 +260,8 @@ export default class ActivityListScreen extends React.Component {
       // Urgent : false
       if (i == 0) {
         // Urgent : false, First : true
-        if (this.checkUser(l)) {
-          // Urgent : false, First : true, UserInclude : true
+        if (this.checkUser(l) && this.state.id != -1) {
+          // Urgent : false, First : true, UserInclude : true, id != -1
           return (
             <View style={styles.listFirst}>
               <ListItem
@@ -261,8 +291,8 @@ export default class ActivityListScreen extends React.Component {
         }
       } else {
         // Urgent : false, First : false
-        if (this.checkUser(l)) {
-          // Urgent : false, First : false, UserInclude : true
+        if (this.checkUser(l) && this.state.id != -1) {
+          // Urgent : false, First : false, UserInclude : true, id != -1
           return (
             <View style={styles.list}>
               <ListItem
@@ -299,7 +329,6 @@ export default class ActivityListScreen extends React.Component {
     var email = global.googleUserEmail;
     for (var i = 0; i < l.activityVolunteers.length; i++) {
       if (email == l.activityVolunteers[i].user.socialId) {
-        console.log('user')
         return true;
       }
     }
@@ -311,50 +340,42 @@ export default class ActivityListScreen extends React.Component {
     return false;
   }
 
-  editStatus(l) {
+  editStatus(status, deadline, startTime, endTime) {
+    var newStatus = status;
     var date = new Date();
-    var givenDate = this.parseDate(l.deadline);
-    var year = date.getFullYear();
-      var month = this.addZero(date.getMonth()+1);
-      var day = this.addZero(date.getDate());
-      var hour = this.addZero(date.getHours());
-      var minute = this.addZero(date.getMinutes());
-      var nowDate = year+'/'+month+'/'+day+' '+hour+':'+minute;
-    console.log('Edit')
-    console.log(l.status);
-    console.log(givenDate);
-    console.log(nowDate);
-    if (l.status == 1 && l.deadline < date) {
-      console.log('Type 1');
-      l.status == 2
+    var givenDeadline = this.parseDate(deadline);
+    var givenStartTime = this.parseDate(startTime);
+    var givenEndTime = this.parseDate(endTime);
+
+    var year = date.getFullYear() * 100000000;
+    var month = this.addZero(date.getMonth() + 1) * 1000000;
+    var day = this.addZero(date.getDate()) * 10000;
+    var hour = this.addZero(date.getHours()) * 100;
+    var minute = this.addZero(date.getMinutes()) * 1;
+    var nowDate = year + month + day + hour + minute;
+    if (newStatus == 1 && givenDeadline < nowDate) {
+      newStatus = 2
     }
-    if (l.status == 2 && l.startTime < date) {
-      console.log('Type 2');
-      l.status == 3
+    if (newStatus == 2 && givenStartTime < nowDate) {
+      newStatus = 3
     }
+    if (newStatus == 3 && givenEndTime < nowDate) {
+      newStatus = 4
+    }
+    return newStatus;
   }
 
   parseDate(date) {
-    console.log(date);
-      var splitDash = date.split('-');
+    var splitDash = date.split('-');
+    var year = splitDash[0] * 100000000;
+    var month = splitDash[1] * 1000000;
+    var splitT = splitDash[2].split('T');
+    var day = splitT[0] * 10000;
+    var splitColon = splitT[1].split(':');
+    var hour = splitColon[0] * 100;
+    var minute = splitColon[1]*1;
 
-      var year = splitDash[0] * 100000000;
-      
-      var month = splitDash[1] * 1000000;
-    
-  
-      var splitT = splitDash[2];
-  
-      var day = splitT[0] * 10000;
-      ;
-  
-      var splitColon = splitT[1].split(':');
-      var hour = splitColon[0] * 100;
-      var minute = splitColon[1];
-      console.log(minute);
-      console.log(year + month + day + hour + minute);
-  
-      return year + month + day + hour + minute;
+    return year + month + day + hour + minute;
   }
 
   addZero(num) {
@@ -372,7 +393,7 @@ export default class ActivityListScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {this.state.id != null &&
+        {(this.state.id != -1 && this.state.id != 0)&&
         <TouchableOpacity onPress={() => {
           this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
         }}>
@@ -382,15 +403,34 @@ export default class ActivityListScreen extends React.Component {
         </TouchableOpacity>
         }
         <View style={styles.box}>
-          <View style={styles.title}>
-            <Text style={styles.titleText}>{this.state.name}</Text>
-            <TouchableOpacity onPress={() => console.log('click')}>
-              <Ionicons name="ios-star-outline" size={12} color="black" />
-            </TouchableOpacity>
+          <View style={styles.name}>
+            <Text style={styles.nameText}>{this.state.name}</Text>
+            {(this.state.id != -1 && this.state.id != 0) && this.state.interest ?
+
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({ interest: false })
+                  this.interestPost(1)
+                }}
+                style={styles.nameButton}
+              >
+                <Ionicons name="ios-star" size={24} color="black" />
+              </TouchableOpacity>
+              :
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({ interest: true })
+                  this.interestPost(0)
+                }}
+                style={styles.nameButton}
+              >
+                <Ionicons name="ios-star-outline" size={24} color="black" />
+              </TouchableOpacity>
+            }
           </View>
           <View style={styles.listBox}>
             {isLoading ?
-              (urgentCheckedData.map((l, i) => (
+              (data.map((l, i) => (
                 this.createListItem(l, i)
               ))
               ) :
@@ -448,22 +488,21 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 5,
   },
-  title: {
-    padding: 3,
+  name: {
+    padding: 15,
     flexDirection: 'row',
     marginBottom: 15,
   },
-  titleText: {
+  nameText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 19,
+    fontSize: 25,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
   },
-  titleButton: {
-    alignSelf: 'flex-end',
-    justifyContent: 'center',
-    color: 'rgb(140,140,140)'
+  nameButton: {
+    color: 'rgb(140,140,140)',
+    paddingRight: 5
   },
   listBox: {
     padding: 3,
@@ -508,6 +547,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 20,
     resizeMode: 'contain',
+    marginLeft: 10,
   },
   arrow: {
     width: 12,

@@ -406,7 +406,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>최근 등록된 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 1 } })}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 1, id:0, name:'전체 목록' } })}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>
@@ -430,7 +430,7 @@ export default class HomeScreen extends React.Component {
             <View style={styles.box}>
               <View style={styles.title}>
                 <Text style={styles.titleText}>나의 활동</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2 } })}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2, id: -1, name:'나의 활동' } })}>
                   <Text style={styles.titleButton}>전체보기</Text>
                 </TouchableOpacity>
               </View>

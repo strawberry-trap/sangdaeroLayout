@@ -20,7 +20,7 @@ export default class ActivityScreen extends React.Component {
   componentDidUpdate(){
     console.log("Update");
     if (this.props.route.params?.listType) {
-      this.props.navigation.navigate('활동 목록', { listType: this.props.route.params.listType, id: null, name:null});
+      this.props.navigation.navigate('활동 목록', { listType: this.props.route.params.listType, id: this.props.route.params.id, name:this.props.route.params.name});
     }
     if (this.props.route.params?.set) {
       if (this.props.route.params.set) {
@@ -93,7 +93,7 @@ export default class ActivityScreen extends React.Component {
             key={2}
             title={'전체 활동'}
             chevron={{ size: 30 }}
-            onPress={() => this.props.navigation.navigate('활동 목록', { id: null, name: null, listType: 1 })}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: 0, name: '전체 활동', listType: 1 })}
             containerStyle={styles.itemFirst}
             titleStyle={styles.textFirst}
           />

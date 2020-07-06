@@ -382,7 +382,7 @@ export default class MypageScreen extends React.Component {
               <TouchableOpacity
                 onPress={() => {
                   global.loggedIn = false; // this variable will be set to be 'false' at the constructor of LoginScreen anyway.
-                  this.props.navigation.navigate('Log');
+                  this.props.navigation.navigate('Log', {params: {reset: true}});
                 }}
               >
                 <Text style={styles.item}>로그아웃</Text>

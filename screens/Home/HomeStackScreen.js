@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as React from 'react';
-import { StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, Image, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import Dialog from "react-native-dialog";
 
 import HomeScreen from './HomeScreen';
 import NotificationScreen from './NotificationScreen';
@@ -11,6 +12,8 @@ import NotificationScreen from './NotificationScreen';
 const HomeStack = createStackNavigator();
 
 export default function HomeStackScreen({ navigation, route }) {
+
+  var dialogVisible = false;
   return (
     <HomeStack.Navigator
       screenOptions={{
