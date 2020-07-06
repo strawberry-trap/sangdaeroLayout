@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from
 import * as Google from 'expo-google-app-auth';
 
 // reference) https://reactnative.dev/docs/asyncstorage.html
-import { AsyncStorage } from '@react-native-community/async-storage';
-import { Base64 } from 'js-base64';
+// import { AsyncStorage } from '@react-native-community/async-storage';
+// import { Base64 } from 'js-base64';
 
 // ** You may use below line when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
 // import * as Google from 'expo-google-sign-in';
@@ -14,53 +14,54 @@ export default class LoginScreen extends Component {
   constructor(props){
     super(props);
     console.log("[ LoginScreen.js ]");
+
+    global.loggedIn = false;
   }
 
   _isMounted = false;
 
   state = {
     userName: '', userEmail: '', userId: '',
-    loggedIn: false,
     isExistingUser: false,
   }
 
-  base64Encoding(string){
-    return Base64.encode(string);
-  }
+  // base64Encoding(string){
+  //   return Base64.encode(string);
+  // }
 
-  async setSession(email, name){
+  // async setSession(email, name){
 
-    let encryptedEmail = this.base64Encoding(email);
-    let encryptedName = this.base64Encoding(name);
+  //   let encryptedEmail = this.base64Encoding(email);
+  //   let encryptedName = this.base64Encoding(name);
 
-    try {
-      await AsyncStorage.multiSet([
-        ["email", encryptedEmail],
-        ["name", encryptedName],
-      ]);
-    } catch (e){ console.log(e) }
-  }
+  //   try {
+  //     await AsyncStorage.multiSet([
+  //       ["email", encryptedEmail],
+  //       ["name", encryptedName],
+  //     ]);
+  //   } catch (e){ console.log(e) }
+  // }
 
-  async getSession(){
+  // async getSession(){
 
-    AsyncStorage.multiGet(['email', 'name']).then((data) => {
+  //   AsyncStorage.multiGet(['email', 'name']).then((data) => {
 
-      let email = data[0][1];
-      let name = data[1][1];
-      let session = {"email":email, "name":name};
+  //     let email = data[0][1];
+  //     let name = data[1][1];
+  //     let session = {"email":email, "name":name};
   
-      return session;
-  });
-  }
+  //     return session;
+  // });
+  // }
 
-  deleteSession(){
+  // deleteSession(){
     
-    let keys = ['email', 'name'];
+  //   let keys = ['email', 'name'];
 
-    AsyncStorage.multiRemove(keys, (err) => {
-      console.log('Local storage session is removed.');
-  });
-  }
+  //   AsyncStorage.multiRemove(keys, (err) => {
+  //     console.log('Local storage session is removed.');
+  // });
+  // }
 
 
   // checks if currently logged in user is existing or not
@@ -99,7 +100,7 @@ export default class LoginScreen extends Component {
         if (this._isMounted) {
           global.googleUserName = result.user.name;
           global.googleUserEmail = result.user.email;
-          this.setState({loggedIn: true }); // now user is logged in.
+          global.loggedIn = true; // now user is logged in.
 
           // check if existing user or not
           this.checkIfExistingUser(result.user.name, result.user.email);
@@ -121,7 +122,7 @@ export default class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {!this.state.loggedIn &&
+        {!global.loggedIn &&
         <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
           <TouchableOpacity style={styles.button} onPress={() => this.signInWithGoogleAsync()}>
             <Image
@@ -135,8 +136,8 @@ export default class LoginScreen extends Component {
           </TouchableOpacity>
         </ImageBackground>
         }
-        {(this.state.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(this.state.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
+        {(global.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
+        {(global.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
       </View>
     );
   }

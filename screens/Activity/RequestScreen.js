@@ -4,8 +4,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-let title = "";
-let memo = "";
 export default class RequestScreen extends React.Component {
 
   state = {
@@ -205,14 +203,21 @@ export default class RequestScreen extends React.Component {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
-          <DateTimePickerModal
+          {this.state.isStartTime ? <DateTimePickerModal
             isVisible={this.state.isDatePickerVisible}
             date={this.state.startTime}
             mode="datetime"
             display="spinner"
             onConfirm={this.handleConfirm}
             onCancel={this.hideDatePicker}
-          />
+          /> : <DateTimePickerModal
+          isVisible={this.state.isDatePickerVisible}
+          date={this.state.endTime}
+          mode="datetime"
+          display="spinner"
+          onConfirm={this.handleConfirm}
+          onCancel={this.hideDatePicker}
+        />}
         </View>
         <View style={styles.box}>
           <View style={styles.list}>

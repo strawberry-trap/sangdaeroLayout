@@ -5,9 +5,8 @@ import { Badge, Button, ButtonGroup } from 'react-native-elements'
 import * as ImagePicker from 'expo-image-picker'; // for image access
 import Dialog from "react-native-dialog";
 
-let formData = new FormData();
-
 export default class ActivityDetailScreen extends React.Component {
+
   constructor(props) {
     super(props);
 
@@ -18,11 +17,12 @@ export default class ActivityDetailScreen extends React.Component {
       isUserRelated: 0, // for three cases: volunteer = 1, benefiting-user = 2, not related = 0
       image: null, // check if image is selected or not
       dialogVisible: false, // dialog for image picking
-      pictureSendingUrl:"",
+      pictureSendingUrl : "",
     };
 
     this.volunteerList = "";
     this.userList = ""
+    this.activityStatus = this.state.data.status;
 
     // check if user is related to this activity. Default is not-related.
     // 1) check if volunteer
@@ -236,6 +236,9 @@ export default class ActivityDetailScreen extends React.Component {
   render() {
 
     let { image } = this.state;
+
+    console.log('current status : ', this.activityStatus);
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.box}>
@@ -324,7 +327,9 @@ export default class ActivityDetailScreen extends React.Component {
                     Alert.alert('전송 완료!', '사진이 전송되었습니다.', [{
                       text: '확인',
                       onPress: () => { 
-                        this.setState({dialogVisible:false}); }
+                        this.setState({dialogVisible:false}); 
+                        this.setState({image:null});
+                      }
                     }]);
                   });
 
@@ -335,7 +340,7 @@ export default class ActivityDetailScreen extends React.Component {
         </Dialog.Container>
 
 
-        {this.state.isUserRelated == 0 &&
+        {this.state.isUserRelated == 0 && (this.activityStatus == 1) &&
         <TouchableOpacity
           onPress={() => 
             this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
@@ -350,31 +355,34 @@ export default class ActivityDetailScreen extends React.Component {
           </Text>
         </TouchableOpacity>}
 
-        {(this.state.isUserRelated == 0 || this.state.isUserRelated == 0) && <View style={styles.photoButtons}>
-          <TouchableOpacity onPress={() => {
+        <View style={styles.photoButtons}>
+        {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4) ) && <TouchableOpacity onPress={() => {
             this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadStartImg"});
             this.setState({ dialogVisible: true });
           }}>
             <Text style={styles.startButton}>
               시작 사진 전송
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
+        
 
-          <TouchableOpacity onPress={() => {
+          {(this.state.isUserRelated == 1 && this.activityStatus == 4) &&<TouchableOpacity onPress={() => {
             this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadEndImg"});
             this.setState({ dialogVisible: true });
           }}>
             <Text style={styles.endButton}>
               종료 사진 전송
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
+          </TouchableOpacity>}
+
+
+          {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.activityStatus == 1 ||this.activityStatus == 2)) &&<TouchableOpacity 
             onPress={() => Alert.alert('취소되었습니다')}>
             <Text style={styles.cancleButton}>
               취소하기
             </Text>
-          </TouchableOpacity>
-        </View>}
+          </TouchableOpacity>}
+        </View>
       </ScrollView>
     )
   }
