@@ -12,6 +12,10 @@ export default class RequestScreen extends React.Component {
     isDatePickerVisible: false, // date picker
     isStartTime: false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
 
+    // for start, end time validation
+    isStartTimeSelected: false,
+    isEndTimeSelected: false,
+
     // data to send to the web server
     startTime: null,
     endTime: null,
@@ -38,18 +42,21 @@ export default class RequestScreen extends React.Component {
   }
 
   handleConfirm = (date) => {
+    // startTime setting
     if (this.state.isStartTime == true) {
       this.setState({ startTime: date, startTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
       }
-    } else {
+      this.state.isStartTimeSelected = true;
+    } else { // endTime setting
       this.setState({ endTime: date, endTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
       }
+      this.state.isEndTimeSelected = true;
     }
     this.hideDatePicker();
   };
@@ -136,8 +143,13 @@ export default class RequestScreen extends React.Component {
       [
         {
           text: "신청", onPress: () => {
-            let data = this.generateDataToSend(); // generate data
-            this.sendRequestToServer(data); // send the generated data to server.
+            if (this.state.isStartTimeSelected && this.state.isEndTimeSelected) {
+              let data = this.generateDataToSend(); // generate data
+              this.sendRequestToServer(data); // send the generated data to server.
+            } else {
+              Alert.alert("시작시간과 종료시간을 선택해 주세요.");
+            }
+
           }
         },
         {
@@ -177,9 +189,6 @@ export default class RequestScreen extends React.Component {
     if (this.memo == undefined) {
       data["memo"] = "메모가 입력되지 않았습니다.";
     }
-    if (this.state.startTimeDataForServer == undefined) { data['startTime'] = '0000-00-00 00:00:00'; }
-    if (this.state.endTimeDataForServer == undefined) { data['endTime'] = '0000-00-00 00:00:00'; }
-
     return data;
   }
 
@@ -244,7 +253,9 @@ export default class RequestScreen extends React.Component {
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
+                  {this.state.isStartTimeSelected ? <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
+                  : <Text style={styles.date}>터치해서 시작 시간 선택</Text>}
+
               </TouchableOpacity>
             </View>
             <View style={styles.time}>
@@ -252,7 +263,8 @@ export default class RequestScreen extends React.Component {
               <TouchableOpacity
                 onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
                 }>
-                <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
+                {this.state.isEndTimeSelected ? <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
+                : <Text style={styles.date}>터치해서 종료 시간 선택</Text>}
               </TouchableOpacity>
             </View>
           </View>
