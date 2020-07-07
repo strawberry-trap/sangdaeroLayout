@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet,Image, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
+import { StyleSheet, Image, Text, View, Alert, TouchableOpacity, Platform, TouchableHighlightBase } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Input } from 'react-native-elements';
 
@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker'; // for image access
 import Dialog from "react-native-dialog";
 
 let formData = new FormData();
-const url="http://saevom06.cafe24.com/requestdata/newProduct";
+const url = "http://saevom06.cafe24.com/requestdata/newProduct";
 
 export default class ShareProductScreen extends React.Component {
 
@@ -18,9 +18,13 @@ export default class ShareProductScreen extends React.Component {
     isDataLoaded: false,
     isDatePickerVisible: false, // date picker
     isStartTime: false, // since I need to save both startTime and endTime with one picker, use a flag to seperate them
-    
+
+    // for start, end time validation
+    isStartTimeSelected: false,
+    isEndTimeSelected: false,
+
     // data to send to the web server
-    startTime: null, 
+    startTime: null,
     endTime: null,
     startTimeDataForServer: null,
     endTimeDataForServer: null,
@@ -94,8 +98,8 @@ export default class ShareProductScreen extends React.Component {
     return year + "년 " + month + "월 " + date + "일(" + day + ")" + ampm + " " + hour + "시 " + minute + "분";
   }
 
-  parseDateForServer(newDate){
-    
+  parseDateForServer(newDate) {
+
     var year = this.addZero(newDate.getFullYear());
     var month = this.addZero(newDate.getMonth() + 1);
     var date = this.addZero(newDate.getDate());
@@ -105,7 +109,7 @@ export default class ShareProductScreen extends React.Component {
     var minute = this.addZero(newDate.getMinutes());
 
     // YYYY-MM-DD HH:MM:00 (seconds are fixed to '00')
-    var startTimeForServer = year+"-"+month+"-"+date+" "+hour+":"+minute+":00";
+    var startTimeForServer = year + "-" + month + "-" + date + " " + hour + ":" + minute + ":00";
     return startTimeForServer;
   }
 
@@ -190,24 +194,28 @@ export default class ShareProductScreen extends React.Component {
 
   }
 
-  async sendPictureToServer(url){
+  generateDataToSend(){
+    
+  }
+
+  async sendPictureToServer(url) {
 
     // data validation check
     // ** divied user-input data and server-sending data. This logic is explained in line 167 of [RequestScreen.js]
     if (this.title == undefined) {
-        this.title = "제목이 입력되지 않았습니다.";
-        }
+      this.title = "제목이 입력되지 않았습니다.";
+    }
     if (this.memo == undefined) {
-        this.memo = "메모가 입력되지 않았습니다.";
-        }
+      this.memo = "메모가 입력되지 않았습니다.";
+    }
     let startTemp = "";
-    let endTemp="";
+    let endTemp = "";
 
-    if (this.state.startTimeDataForServer == undefined) { startTemp='0000-00-00 00:00:00'; }
+    if (this.state.startTimeDataForServer == undefined) { startTemp = '0000-00-00 00:00:00'; }
     else startTemp = this.state.startTimeDataForServer;
-    if (this.state.endTimeDataForServer == undefined) { endTemp='0000-00-00 00:00:00';}
+    if (this.state.endTimeDataForServer == undefined) { endTemp = '0000-00-00 00:00:00'; }
     else endTemp = this.state.endTimeDataForServer;
-      
+
     // at the point when the user picked an image, "id, image, name, email" are already appended to formData
     // hence, just add below values
     formData.append('startTime', startTemp);
@@ -221,7 +229,7 @@ export default class ShareProductScreen extends React.Component {
       headers: {
         'content-type': 'multipart/form-data',
       },
-    }).then(() => { console.log('success', url);});
+    }).then(() => { console.log('success', url); });
   }
 
   createTwoButtonAlert = () => {
@@ -233,17 +241,17 @@ export default class ShareProductScreen extends React.Component {
         {
           text: "확인", onPress: () => {
 
-            const url ="http://saevom06.cafe24.com/requestdata/newProduct";
+            const url = "http://saevom06.cafe24.com/requestdata/newProduct";
 
             this.sendPictureToServer(url);
             const result = this.state.isImageConfirmed;
 
-            if (result == true){
+            if (result == true) {
               Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
-              this.setState({dialogVisible:false});
+              this.setState({ dialogVisible: false });
             } else {
-                Alert.alert("사진이 등록되지 않았습니다.\n물건 나눔 사진 선택을 눌러주세요.");
-                this.setState({dialogVisible:false});
+              Alert.alert("사진이 등록되지 않았습니다.\n물건 나눔 사진 선택을 눌러주세요.");
+              this.setState({ dialogVisible: false });
             }
           }
         },
@@ -269,7 +277,7 @@ export default class ShareProductScreen extends React.Component {
           'Content-Type': 'application/json'
         },
         //credentials: 'include',
-  
+
         body: JSON.stringify(data),
       });
       console.log(url);
@@ -292,7 +300,7 @@ export default class ShareProductScreen extends React.Component {
       this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
-        this.setState({ endTime: this.state.startTime, endTimeDataForServer:this.state.startTimeDataForServer });
+        this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
       }
     } else {
       this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
@@ -324,7 +332,7 @@ export default class ShareProductScreen extends React.Component {
           {!image &&
             <Dialog.Title style={styles.photoHeader}>
               <Text>사진을 등록해 주세요.</Text>
-              </Dialog.Title>
+            </Dialog.Title>
           }
           {image &&
             <Dialog.Title style={styles.photoHeader}><Text>선택한 이미지를 전송하시겠습니까?</Text></Dialog.Title>
@@ -332,25 +340,25 @@ export default class ShareProductScreen extends React.Component {
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />
           }
-          
+
           {!image &&
-            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
               <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(url)} />
               <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(url)} />
             </View>
           }
           {image &&
-            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ isImageConfirmed:false, dialogVisible: false }); }} />
-              <Dialog.Button label="확인" color='#000' 
-                onPress={()=>{
-                    this.setState({isImageConfirmed:true});
-                    this.setState({dialogVisible:false});
-                }}/>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ isImageConfirmed: false, dialogVisible: false }); }} />
+              <Dialog.Button label="확인" color='#000'
+                onPress={() => {
+                  this.setState({ isImageConfirmed: true });
+                  this.setState({ dialogVisible: false });
+                }} />
             </View>
           }
-          
+
         </Dialog.Container>
 
         <View style={styles.box}>
@@ -427,7 +435,7 @@ export default class ShareProductScreen extends React.Component {
             </TouchableOpacity>
 
           </View>
-            
+
         </View>
         <TouchableOpacity onPress={() => this.createTwoButtonAlert()}>
           <Text style={styles.button}>
@@ -510,8 +518,8 @@ const styles = StyleSheet.create({
     color: 'rgb(29,140,121)',
     backgroundColor: '#FFF',
     borderRadius: 50,
-    borderColor:'rgb(29,140,121)',
-    borderRadius:1,
+    borderColor: 'rgb(29,140,121)',
+    borderRadius: 1,
     padding: 8,
   },
   button: {
@@ -529,13 +537,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoHeader: {
-    color:'#000',
+    color: '#000',
     marginBottom: 30,
   },
   photo: {
-    width:200,
-    height:200,
-    alignSelf:'center',
-    resizeMode:'center',
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    resizeMode: 'center',
   },
 });

@@ -320,7 +320,6 @@ console.log(this.state.name)
             </View>
           )
         }
-
       }
     }
   }
