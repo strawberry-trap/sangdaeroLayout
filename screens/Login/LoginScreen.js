@@ -79,7 +79,7 @@ export default class LoginScreen extends Component {
         "userEmail" : userEmail,
       }),
     }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
-      response === true ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:true})
+      response === true ? this.setState({isExistingUser:false}) : this.setState({isExistingUser:false})
     });
 
   }

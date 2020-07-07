@@ -10,29 +10,40 @@ export default class ActivityScreen extends React.Component {
 
     this.state = {
       data: [],
+      userData: [],
       isLoading: false,
-      donateId: "",
+      userLoading: false,
+      donateId: 0,
+      donateName:"",
     }
 
-    this.getData();
+    this.getData('Interest');
+    this.getData('User');
   }
 
   componentDidUpdate(){
     console.log("Update");
     if (this.props.route.params?.listType) {
-      this.props.navigation.navigate('활동 목록', { listType: this.props.route.params.listType, id: this.props.route.params.id, name:this.props.route.params.name});
+      this.props.navigation.navigate('활동 목록', { id: this.props.route.params.id, name:this.props.route.params.name,  interest: false,});
     }
     if (this.props.route.params?.set) {
       if (this.props.route.params.set) {
         console.log("Get new data");
         this.props.route.params.set= false;
-        this.getData();
+        this.getData('Interest');
+        this.getData('User');
       }
     }
   }
 
-  getData() {
-    fetch('http://saevom06.cafe24.com/interestdata/getAll', {
+  getData(type) {
+    var url;
+    if (type == 'Interest') {
+      url = 'http://saevom06.cafe24.com/interestdata/getAll'
+    } else {
+      url = "http://saevom06.cafe24.com/userdata/getUser?name=" + global.googleUserName + "&email=" + global.googleUserEmail;
+    }
+    fetch(url, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -42,45 +53,96 @@ export default class ActivityScreen extends React.Component {
     })
       .then((response) => response.json())
       .then((responseInJson) => {
-        this.setState({ data: responseInJson });
-        for (var i = 0; i < responseInJson.length; i++) {
-          if (responseInJson[i].name == '물건나누기')
-            this.setState({ donateId: responseInJson[i].id })
+        if (type == 'Interest') {
+          this.setState({ data: responseInJson });
+          for (var i = 0; i < responseInJson.length; i++) {
+            if (responseInJson[i].id == 1) {
+              this.setState({ donateId: responseInJson[i].id })
+              this.setState({ donateName: responseInJson[i].name })
+            }
+          }
+        } else {
+          var interestedList = [];
+          var notInterestedList = [];
+          var list = [];
+          console.log('user');
+          console.log(responseInJson.interestName);
+          for (var i = 0; i < responseInJson.interestName.length; i++) {
+            for (var j = 0; j < this.state.data.length; j++) {
+              console.log(j);
+              if (responseInJson.interestName[i] == this.state.data[j].name) {
+                console.log(this.state.data[j]);
+                interestedList.push(this.state.data[j]);
+                this.state.data.splice(j, 1);
+                break;
+              }
+            }
+          }
+
+          console.log(interestedList);
+          console.log(notInterestedList);
+
+          for (var i = 0; i < interestedList.length; i++)
+            list.push(interestedList[i]);
+          for (var i = 0; i < notInterestedList.length; i++)
+            list.push(notInterestedList[i]);
+
+          console.log(list);
+
+          this.setState({ userData: list });
+          console.log(this.state.data);
         }
       })
       .catch((e) => console.log(e))
       .finally(() => {
-        if (this.state.data.length > 0)
-          this.setState({ isLoading: true });
+        if (type == 'Interest') {
+          if (this.state.data.length > 0)
+            this.setState({ isLoading: true });
+        } else {
+          if (this.state.userData.length > 0)
+            this.setState({ userLoading: true });
+        }
       })
   }
 
-  createListItem(l, i) { // input l is not used?
-    if (this.state.data[i].name != '물건나누기') {
-      return (
-        <ListItem
-          key={i + 2}
-          title={this.state.data[i].name}
-          chevron={{ size: 30 }}
-          onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, listType: 0 })}
-          containerStyle={styles.item}
-          titleStyle={styles.text}
-        />
-      )
+  createListItem(l, i, interested) { // input l is not used?
+    if (l.id != 1) {
+      if (interested) {
+        return (
+          <ListItem
+            key={i + 2}
+            title={l.name}
+            chevron={{ size: 30 }}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, interest: true, listType: 0 })}
+            containerStyle={styles.itemInterested}
+            titleStyle={styles.text}
+          />
+        )
+      } else {
+        return (
+          <ListItem
+            key={i + 2}
+            title={l.name}
+            chevron={{ size: 30 }}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, interest: false, listType: 0 })}
+            containerStyle={styles.item}
+            titleStyle={styles.text}
+          />
+        )
+      }
+      
     }
   }
 
   render() {
-    const { data, isLoading } = this.state;
-
-    
+    const { data, userData, isLoading, userLoading } = this.state;
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
           <ListItem
             key={1}
-            title={'물건나누기'}
+            title={this.state.donateName}
             chevron={{ size: 30 }}
             onPress={
               () => {
@@ -97,8 +159,13 @@ export default class ActivityScreen extends React.Component {
             containerStyle={styles.itemFirst}
             titleStyle={styles.textFirst}
           />
+          {userLoading ?
+          (userData.map((l, i) => (this.createListItem(l, i, true)))) :
+          <View/>
+          }
           {isLoading ?
-            (data.map((l, i) => (this.createListItem(l, i))))
+            
+            (data.map((l, i) => (this.createListItem(l, i, false))))
             :
             <ListItem
               key={0}
@@ -133,6 +200,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     height: 90,
     elevation: 2,
+  },
+  itemInterested: {
+    flex: 1,
+    padding: 18,
+    backgroundColor: '#FFF',
+    margin: 8,
+    borderRadius: 10,
+    height: 90,
+    elevation: 2,
+    borderColor: 'rgb(29,140,121)',
+    borderWidth:2,
   },
   item: {
     flex: 1,

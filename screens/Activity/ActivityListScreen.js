@@ -14,7 +14,7 @@ export default class ActivityListScreen extends React.Component {
     this.state = {
       id: props.route.params.id,
       name: props.route.params.name,
-      interest : false,
+      interest : props.route.params.interest,
       data: [],
       urgentCheckedData: [],
       isLoading: false,
@@ -66,22 +66,25 @@ console.log(this.state.name)
     }
     console.log(url);
     var data = {
-      'name': global.googleUserName,
-      'email': global.googleUserEmail,
-      'id': this.state.id,
+      name: global.googleUserName,
+      email: global.googleUserEmail,
+      interestId: this.state.id,
     }
     console.log(data);
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        async: false,
-      },
-      body : data
-    }).then((res) => {
-    });
-
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          async: false,
+        },
+        body: JSON.stringify(data)
+      }).then((res) => {
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
   }
 
   // sort data by deadline, that the deadline is within 12 hours from current time
@@ -404,7 +407,7 @@ console.log(this.state.name)
         <View style={styles.box}>
           <View style={styles.name}>
             <Text style={styles.nameText}>{this.state.name}</Text>
-            {(this.state.id != -1 && this.state.id != 0) && this.state.interest ?
+            {(this.state.id != -1 && this.state.id != 0 && this.state.interest) ?
 
               <TouchableOpacity
                 onPress={() => {

@@ -12,6 +12,7 @@ export default class MypageScreen extends React.Component {
     userInfo: [],
     loadActivities: false,
     loadUserInfo: false,
+    loadInterest: false,
 
     // for dialog
     dialogVisible: false,
@@ -76,6 +77,9 @@ export default class MypageScreen extends React.Component {
             console.log(responseInJson);
             this.setState({ userInfo: responseInJson }); // assign data to state variable
             this.setState({ loadUserInfo: true });
+            if (this.state.userInfo.interestName.length > 0) {
+              this.setState({ loadInterest: true});
+            }
           } else {
             console.log("Get activity data");
             for (var i = 0; i < responseInJson.length; i++) {
@@ -97,7 +101,8 @@ export default class MypageScreen extends React.Component {
               }
             }
             this.setState({ allUserActivities: responseInJson }); // assign data to state variable
-            this.setState({ loadUserActivities: true });
+            if (responseInJson.length > 0)
+              this.setState({ loadUserActivities: true });
           }
 
         })
@@ -123,42 +128,75 @@ export default class MypageScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
-  createListItem(l, i) {
-    if (i == 0) {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.item}
-          containerStyle={styles.listFirst}
-          onPress={
-            () => {
-              this.setState({ postType: 2 });
-              this.setState({ userSelectedActivity: l });
-              this.setState({ userSelectedInterestCategory: l.interestCategory });
-              this.setState({ dialogVisible: true });
+  createListItem(l, i, type) {
+    if (type == 0) {
+      if (i == 0) {
+        return (
+          <ListItem
+            key={i}
+            title={l}
+            titleStyle={styles.item}
+            containerStyle={styles.listFirst}
+            onPress={
+              () => {
+                console.log(l)
+              }
             }
-          }
-        />
-      )
+          />
+        )
+      } else {
+        return (
+          <ListItem
+            key={i}
+            title={l}
+            titleStyle={styles.item}
+            containerStyle={styles.list}
+            onPress={
+              () => {
+                console.log(l)
+              }
+            }
+          />
+        )
+      }
     } else {
-      return (
-        <ListItem
-          key={i}
-          title={l.title}
-          titleStyle={styles.item}
-          containerStyle={styles.list}
-          onPress={
-            () => {
-              this.setState({ postType: 2 });
-              this.setState({ userSelectedActivity: l });
-              this.setState({ userSelectedInterestCategory: l.interestCategory });
-              this.setState({ dialogVisible: true });
+      if (i == 0) {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.item}
+            containerStyle={styles.listFirst}
+            onPress={
+              () => {
+                this.setState({ postType: 2 });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+              }
             }
-          }
-        />
-      )
+          />
+        )
+      } else {
+        return (
+          <ListItem
+            key={i}
+            title={l.title}
+            titleStyle={styles.item}
+            containerStyle={styles.list}
+            onPress={
+              () => {
+                this.setState({ postType: 2 });
+                this.setState({ userSelectedActivity: l });
+                this.setState({ userSelectedInterestCategory: l.interestCategory });
+                this.setState({ dialogVisible: true });
+              }
+            }
+          />
+        )
+      }
     }
+    
   }
 
   changeNickName = () => {
@@ -169,7 +207,7 @@ export default class MypageScreen extends React.Component {
     let data = {
       'name' : global.googleUserName,
       'email' : global.googleUserEmail,
-      'nickName' : nick,
+      'nickname' : nick+"",
     }
     console.log(data);
 
@@ -258,7 +296,7 @@ export default class MypageScreen extends React.Component {
   render() {
 
     console.disableYellowBox = true;
-    const { allUserActivities, userInfo, loadUserActivities, loadUserInfo } = this.state;
+    const { allUserActivities, userInfo, loadUserActivities, loadUserInfo, loadInterest } = this.state;
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -345,7 +383,28 @@ export default class MypageScreen extends React.Component {
             </View>
           </View>
         </View>
-
+        <View style={styles.box}>
+          <View style={styles.title}>
+            <Text style={styles.titleText}>관심사 즐겨찾기</Text>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:0}})}>
+              <Text style={styles.titleButton}>전체보기</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.activityBox}>
+            {loadInterest ?
+              userInfo.interestName.map((l, i) => (
+                this.createListItem(l, i, 0)
+              ))
+              :
+              <ListItem
+                key={0}
+                title='즐겨찾기 추가한 관심사가 없습니다'
+                titleStyle={styles.item}
+                containerStyle={styles.listFirst}
+              />
+            }
+          </View>
+        </View>
         <View style={styles.box}>
           <View style={styles.title}>
             <Text style={styles.titleText}>나의 활동</Text>
@@ -358,10 +417,15 @@ export default class MypageScreen extends React.Component {
           <View style={styles.activityBox}>
             {loadUserActivities ?
               allUserActivities.map((l, i) => (
-                this.createListItem(l, i)
+                this.createListItem(l, i, 1)
               ))
               :
-              <View />
+              <ListItem
+                key={0}
+                title='참여한 활동이 없습니다'
+                titleStyle={styles.item}
+                containerStyle={styles.listFirst}
+              />
             }
           </View>
         </View>

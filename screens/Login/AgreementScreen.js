@@ -29,6 +29,28 @@ export default class AgreementScreen extends Component {
 
   addUser() {
     console.log('Pass this method');
+    var data = {
+      name: global.googleUserName,
+      email: global.googleUserEmail,
+      phone: this.state.numberFirst+"-"+this.state.numberSecond+"-"+this.state.numberThird,
+      nickname: this.state.nickname,
+      phoneAgree: true,
+    }
+    var url = "http://saevom06.cafe24.com/userdata/setBasicInfo"
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        console.log("fetch successful!");
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
   }
 
   render() {
