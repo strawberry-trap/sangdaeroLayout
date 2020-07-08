@@ -194,10 +194,6 @@ export default class ShareProductScreen extends React.Component {
 
   }
 
-  generateDataToSend(){
-    
-  }
-
   async sendPictureToServer(url) {
 
     // data validation check
@@ -208,28 +204,27 @@ export default class ShareProductScreen extends React.Component {
     if (this.memo == undefined) {
       this.memo = "메모가 입력되지 않았습니다.";
     }
-    let startTemp = "";
-    let endTemp = "";
-
-    if (this.state.startTimeDataForServer == undefined) { startTemp = '0000-00-00 00:00:00'; }
-    else startTemp = this.state.startTimeDataForServer;
-    if (this.state.endTimeDataForServer == undefined) { endTemp = '0000-00-00 00:00:00'; }
-    else endTemp = this.state.endTimeDataForServer;
 
     // at the point when the user picked an image, "id, image, name, email" are already appended to formData
     // hence, just add below values
-    formData.append('startTime', startTemp);
-    formData.append('endTime', endTemp);
-    formData.append('title', this.title);
-    formData.append('memo', this.memo);
 
-    return await fetch(url, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    }).then(() => { console.log('success', url); });
+    if (isStartTimeSelected == false || isEndTimeSelected == false ){
+      Alert.alert("시작시간과 종료 시간을 선택해 주시기 바랍니다.");
+      return -1;
+    } else {
+      formData.append('startTime', startTemp);
+      formData.append('endTime', endTemp);
+      formData.append('title', this.title);
+      formData.append('memo', this.memo);
+  
+      return await fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      }).then(() => { console.log('success', url); });
+    }
   }
 
   createTwoButtonAlert = () => {
@@ -246,7 +241,7 @@ export default class ShareProductScreen extends React.Component {
             this.sendPictureToServer(url);
             const result = this.state.isImageConfirmed;
 
-            if (result == true) {
+            if (result != -1) {
               Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
               this.setState({ dialogVisible: false });
             } else {
@@ -302,12 +297,14 @@ export default class ShareProductScreen extends React.Component {
       if (this.state.startTime > this.state.endTime) {
         this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
       }
+      this.state.isStartTimeSelected = true;
     } else {
       this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
       }
+      this.state.isEndTimeSelected = true;
     }
     this.hideDatePicker();
   };
@@ -319,13 +316,24 @@ export default class ShareProductScreen extends React.Component {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
-          <DateTimePickerModal
-            isVisible={this.state.isDatePickerVisible}
-            mode="datetime"
-            display="spinner"
-            onConfirm={this.handleConfirm}
-            onCancel={this.hideDatePicker}
-          />
+          {this.state.isStartTime ?
+            <DateTimePickerModal
+              isVisible={this.state.isDatePickerVisible}
+              mode="datetime"
+              date={new Date(this.state.startTime)}
+              display="spinner"
+              onConfirm={this.handleConfirm}
+              onCancel={this.hideDatePicker}
+            /> :
+            <DateTimePickerModal
+              isVisible={this.state.isDatePickerVisible}
+              mode="datetime"
+              date={new Date(this.state.endTime)}
+              display="spinner"
+              onConfirm={this.handleConfirm}
+              onCancel={this.hideDatePicker}
+            />
+          }
         </View>
 
         <Dialog.Container visible={this.state.dialogVisible}>
@@ -383,7 +391,12 @@ export default class ShareProductScreen extends React.Component {
             <Text style={styles.title}>활동시간</Text>
             <View style={styles.time}>
               <TouchableOpacity
-                onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
+                onPress={() => {
+                  this.setState({
+                    isStartTime: true,
+                    isDatePickerVisible: true,
+                  })
+                }
                 }>
                 <Text style={styles.timeText}>시작시간 선택</Text>
               </TouchableOpacity>
@@ -394,7 +407,12 @@ export default class ShareProductScreen extends React.Component {
             </View>
             <View style={styles.time}>
               <TouchableOpacity
-                onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
+                onPress={() => {
+                  this.setState({
+                    isStartTime: false,
+                    isDatePickerVisible: true,
+                  })
+                }
                 }>
                 <Text style={styles.timeText}>종료시간 선택</Text>
               </TouchableOpacity>
