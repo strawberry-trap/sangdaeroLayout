@@ -47,8 +47,8 @@ export default class ShareProductScreen extends React.Component {
       categoryId: props.route.params.id,
       categoryName: props.route.params.name,
 
-      startTime: this.parseDate(date),
-      endTime: this.parseDate(date),
+      startTime: date,
+      endTime: date,
     }
   }
 
@@ -211,9 +211,9 @@ export default class ShareProductScreen extends React.Component {
     if (isStartTimeSelected == false || isEndTimeSelected == false ){
       Alert.alert("시작시간과 종료 시간을 선택해 주시기 바랍니다.");
       return -1;
-    } else {
-      formData.append('startTime', startTemp);
-      formData.append('endTime', endTemp);
+    } else { // startTime and endTime is selected
+      formData.append('startTime', startTimeDataForServer);
+      formData.append('endTime', endTimeDataForServer);
       formData.append('title', this.title);
       formData.append('memo', this.memo);
   
@@ -238,13 +238,18 @@ export default class ShareProductScreen extends React.Component {
 
             const url = "http://saevom06.cafe24.com/requestdata/newProduct";
 
-            this.sendPictureToServer(url);
-            const result = this.state.isImageConfirmed;
-
-            if (result != -1) {
-              Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
-              this.setState({ dialogVisible: false });
-            } else {
+            if (this.state.isImageConfirmed){ // image is uploaded
+              if (this.state.isStartTimeSelected && this.state.isEndTimeSelected) { // start, end time are selected
+                
+                this.sendPictureToServer(url); // send POST request to server only in this condition
+                
+                Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
+                this.setState({ dialogVisible: false });
+              } else {
+                Alert.alert("시작 시간과 종료 시간을 선택해 주세요.");
+                this.setState({ dialogVisible: false });
+              }
+            } else { // image is not uploaded
               Alert.alert("사진이 등록되지 않았습니다.\n물건 나눔 사진 선택을 눌러주세요.");
               this.setState({ dialogVisible: false });
             }
@@ -292,14 +297,14 @@ export default class ShareProductScreen extends React.Component {
 
   handleConfirm = (date) => {
     if (this.state.isStartTime == true) {
-      this.setState({ startTime: this.parseDate(date), startTimeDataForServer: this.parseDateForServer(date) });
+      this.setState({ startTime: date, startTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
       }
       this.state.isStartTimeSelected = true;
     } else {
-      this.setState({ endTime: this.parseDate(date), endTimeDataForServer: this.parseDateForServer(date) });
+      this.setState({ endTime: date, endTimeDataForServer: this.parseDateForServer(date) });
 
       if (this.state.startTime > this.state.endTime) {
         this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
@@ -320,7 +325,7 @@ export default class ShareProductScreen extends React.Component {
             <DateTimePickerModal
               isVisible={this.state.isDatePickerVisible}
               mode="datetime"
-              date={new Date(this.state.startTime)}
+              date={this.state.startTime}
               display="spinner"
               onConfirm={this.handleConfirm}
               onCancel={this.hideDatePicker}
@@ -328,7 +333,7 @@ export default class ShareProductScreen extends React.Component {
             <DateTimePickerModal
               isVisible={this.state.isDatePickerVisible}
               mode="datetime"
-              date={new Date(this.state.endTime)}
+              date={this.state.endTime}
               display="spinner"
               onConfirm={this.handleConfirm}
               onCancel={this.hideDatePicker}
@@ -401,8 +406,7 @@ export default class ShareProductScreen extends React.Component {
                 <Text style={styles.timeText}>시작시간 선택</Text>
               </TouchableOpacity>
               <View style={styles.timeList}>
-                <Text style={styles.date}>{this.state.startTime.substring(0, 16)}</Text>
-                <Text style={styles.date}>{this.state.startTime.substring(16, 26)}</Text>
+                <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
               </View>
             </View>
             <View style={styles.time}>
@@ -417,8 +421,7 @@ export default class ShareProductScreen extends React.Component {
                 <Text style={styles.timeText}>종료시간 선택</Text>
               </TouchableOpacity>
               <View style={styles.timeList}>
-                <Text style={styles.date}>{this.state.endTime.substring(0, 16)}</Text>
-                <Text style={styles.date}>{this.state.endTime.substring(16, 26)}</Text>
+              <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
               </View>
             </View>
           </View>
