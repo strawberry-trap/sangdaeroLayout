@@ -245,6 +245,7 @@ export default class ShareProductScreen extends React.Component {
                 
                 Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
                 this.setState({ dialogVisible: false });
+                this.props.navigation.goBack()
               } else {
                 Alert.alert("시작 시간과 종료 시간을 선택해 주세요.");
                 this.setState({ dialogVisible: false });
@@ -348,7 +349,7 @@ export default class ShareProductScreen extends React.Component {
             </Dialog.Title>
           }
           {image &&
-            <Dialog.Title style={styles.photoHeader}><Text>선택한 이미지를 전송하시겠습니까?</Text></Dialog.Title>
+            <Dialog.Title style={styles.photoHeader}><Text>선택한 이미지를 등록하시겠습니까?</Text></Dialog.Title>
           }
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />

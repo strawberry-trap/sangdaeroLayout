@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, Alert } from 'react-native';
 import * as Google from 'expo-google-app-auth';
 
 // reference) https://reactnative.dev/docs/asyncstorage.html
@@ -11,7 +11,7 @@ import * as Google from 'expo-google-app-auth';
 
 export default class LoginScreen extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     console.log("[ LoginScreen.js ]");
 
@@ -23,6 +23,7 @@ export default class LoginScreen extends Component {
   state = {
     userName: '', userEmail: '', userId: '',
     isExistingUser: false,
+    isProcedureCompleted: false,
   }
 
   // base64Encoding(string){
@@ -49,13 +50,13 @@ export default class LoginScreen extends Component {
   //     let email = data[0][1];
   //     let name = data[1][1];
   //     let session = {"email":email, "name":name};
-  
+
   //     return session;
   // });
   // }
 
   // deleteSession(){
-    
+
   //   let keys = ['email', 'name'];
 
   //   AsyncStorage.multiRemove(keys, (err) => {
@@ -65,23 +66,45 @@ export default class LoginScreen extends Component {
 
 
   // checks if currently logged in user is existing or not
-  checkIfExistingUser(userName, userEmail){
+  checkIfExistingUser(userName, userEmail) {
 
-    const url = 'http://saevom06.cafe24.com/'; // *** Restcontroller URL is needed
+    // ser?name=" + global.googleUserName + "&email=
+    const url = 'http://saevom06.cafe24.com/userdata/checkNewUser?name=' + userName + "&email="+userEmail;
+
     return fetch(url, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        async: false,
       },
-      body: JSON.stringify({ // send this data to server to authenticate user
-        "userName" : userName,
-        "userEmail" : userEmail,
-      }),
-    }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
-      response === true ? this.setState({isExistingUser:false}) : this.setState({isExistingUser:false})
-    });
+    })
+      .then((response) => response.json())
+      .then((responseInJson) => {
+        console.log(responseInJson);
+        responseInJson == true || responseInJson == "true" ? this.setState({isExistingUser:true}) : this.setState({isExistingUser:false})
+        this.setState({isProcedureCompleted:true});
+      })
+      .catch((e) => console.log(e))
 
+    // return fetch(url, {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({ // send this data to server to authenticate user
+    //     "userName": userName,
+    //     "userEmail": userEmail,
+    //   }),
+    // }).then((response) => response.json())
+    //   .then((responseInJson) => {
+    //     console.log(responseInJson);
+    //   })
+    // }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
+    // this.setState({test: response});
+    // response == "true" ? this.setState({isExistingUser:"true"}) : this.setState({isExistingUser:"false"})
+    // });
   }
 
   componentDidMount() {
@@ -89,6 +112,7 @@ export default class LoginScreen extends Component {
   }
 
   signInWithGoogleAsync = async () => {
+
     try {
       const result = await Google.logInAsync({
         // behavior: 'web',
@@ -119,25 +143,34 @@ export default class LoginScreen extends Component {
     this._isMounted = false;
   }
 
+  componentDidUpdate() {
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
+      Alert.alert('[디버깅용]처음 등록하는 유저');
+      this.props.navigation.navigate('Agreement');
+    }
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
+      Alert.alert('[디버깅용]이미 존재하는 유저');
+      this.props.navigation.navigate('Main');
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
         {!global.loggedIn &&
-        <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
-          <TouchableOpacity style={styles.button} onPress={() => this.signInWithGoogleAsync()}>
-            <Image
-              style={styles.logo}
-              source={require('../../assets/images/google_logo.png')}
-            />
-            <Text style={styles.text}>
-              Google 아이디로 로그인
+          <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
+            <TouchableOpacity style={styles.button} onPress={() => this.signInWithGoogleAsync()}>
+              <Image
+                style={styles.logo}
+                source={require('../../assets/images/google_logo.png')}
+              />
+              <Text style={styles.text}>
+                Google 아이디로 로그인
             </Text>
-            <View style={styles.space}/>
-          </TouchableOpacity>
-        </ImageBackground>
+              <View style={styles.space} />
+            </TouchableOpacity>
+          </ImageBackground>
         }
-        {(global.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(global.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Main')}
       </View>
     );
   }
@@ -151,40 +184,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageBackground: {
-    flex:1,
-    flexDirection:'column-reverse',
-    resizeMode:'cover',
+    flex: 1,
+    flexDirection: 'column-reverse',
+    resizeMode: 'cover',
   },
   button: {
     margin: 10,
     marginBottom: 95,
     height: 50,
-    borderRadius:50,
-    borderColor:'#FFF',
-    borderWidth:1,
-    backgroundColor:'rgba(255,255,255,0.25)',
-    flexDirection:'row',
+    borderRadius: 50,
+    borderColor: '#FFF',
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    flexDirection: 'row',
   },
   logo: {
-    width:28,
-    height:28,
-    marginTop:11,
-    marginLeft:35,
-    marginRight:10,
+    width: 28,
+    height: 28,
+    marginTop: 11,
+    marginLeft: 35,
+    marginRight: 10,
   },
   space: {
-    width:28,
-    height:28,
-    marginTop:11,
-    marginRight:35,
-    marginLeft:10,
+    width: 28,
+    height: 28,
+    marginTop: 11,
+    marginRight: 35,
+    marginLeft: 10,
   },
   text: {
-    flex:1,
-    fontSize:16,
-    paddingLeft:15,
-    textAlign:'center',
+    flex: 1,
+    fontSize: 16,
+    paddingLeft: 15,
+    textAlign: 'center',
     textAlignVertical: 'center',
-    color:'#FFF',
+    color: '#FFF',
   }
 });
