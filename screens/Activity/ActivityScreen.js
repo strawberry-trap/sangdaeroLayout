@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ListItem } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
 
 export default class ActivityScreen extends React.Component {
   constructor(props) {
@@ -24,7 +25,7 @@ export default class ActivityScreen extends React.Component {
   componentDidUpdate(){
     console.log("Update");
     if (this.props.route.params?.listType) {
-      this.props.navigation.navigate('활동 목록', { id: this.props.route.params.id, name:this.props.route.params.name,  interest: false,});
+      this.props.navigation.navigate('활동 목록', { id: this.props.route.params.id, name:this.props.route.params.name, interest: false,});
     }
     if (this.props.route.params?.set) {
       if (this.props.route.params.set) {
@@ -105,7 +106,7 @@ export default class ActivityScreen extends React.Component {
       })
   }
 
-  createListItem(l, i, interested) { // input l is not used?
+  createListItem(l, i, interested) {
     if (l.id != 1) {
       if (interested) {
         return (
@@ -113,8 +114,9 @@ export default class ActivityScreen extends React.Component {
             key={i + 2}
             title={l.name}
             chevron={{ size: 30 }}
-            onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, interest: true, listType: 0 })}
-            containerStyle={styles.itemInterested}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: true, listType: 0 })}
+            rightElement={<Ionicons name="md-heart" size={30} color="#F77" />}
+            containerStyle={styles.item}
             titleStyle={styles.text}
           />
         )
@@ -124,7 +126,7 @@ export default class ActivityScreen extends React.Component {
             key={i + 2}
             title={l.name}
             chevron={{ size: 30 }}
-            onPress={() => this.props.navigation.navigate('활동 목록', { id: this.state.data[i].id, name: this.state.data[i].name, interest: false, listType: 0 })}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: false, listType: 0 })}
             containerStyle={styles.item}
             titleStyle={styles.text}
           />
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#rgb(220,220,220)',
   },
   contentContainer: {
-    paddingTop: 15,
+    paddingTop: 5,
   },
   noActivityList: {
     textAlign: "center",

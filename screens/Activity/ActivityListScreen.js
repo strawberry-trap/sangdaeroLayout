@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ListItem, SearchBar } from 'react-native-elements'
-import Icon from 'react-native-ionicons'
+import Dialog from "react-native-dialog";
 import { Ionicons } from '@expo/vector-icons';
 
 export default class ActivityListScreen extends React.Component {
@@ -19,9 +19,10 @@ export default class ActivityListScreen extends React.Component {
       urgentCheckedData: [],
       isLoading: false,
       search: '',
+      filterStatus: 1,
+      statusVisible: false,
     }
 
-    console.log(this.state.name)
 
     this.getData();
   }
@@ -136,14 +137,11 @@ export default class ActivityListScreen extends React.Component {
 
   }
 
-  getImage(props, urgent) {
+  getImage(props, urgent, type) {
     var path;
 
     // Allocating path as dynamic will cause error
     switch (props) {
-      case 0:
-        path = require('../../assets/images/status_0.png');
-        break;
       case 1:
         path = require('../../assets/images/status_1.png');
         break;
@@ -156,8 +154,11 @@ export default class ActivityListScreen extends React.Component {
       case 4:
         path = require('../../assets/images/status_4.png');
         break;
-      default:
+      case 5:
         path = require('../../assets/images/status_5.png');
+        break;
+      default:
+        path = require('../../assets/images/status_6.png');
         break;
     }
 
@@ -169,31 +170,51 @@ export default class ActivityListScreen extends React.Component {
             source={path}
             style={styles.statusButton}
           />
-          <Image
-            source={require('../../assets/images/right_arrow.png')}
-            style={styles.arrow}
-          />
         </View>
       )
-    } else {
+    } else if (type == 0) {
       return (
         <View style={styles.imageGroup}>
           <Image
             source={path}
             style={styles.statusButton}
           />
+        </View>
+      )
+    } else if (type == 1) {
+      return (
+        <View style={styles.imageGroup}>
           <Image
-            source={require('../../assets/images/right_arrow.png')}
-            style={styles.arrow}
+            source={path}
+            style={styles.filterButton}
           />
         </View>
       )
+    } else {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            this.setState({ filterStatus: props})
+            this.setState({ statusVisible: false})
+          }}
+        >
+          <View style={styles.imageGroup}>
+            <Image
+              source={path}
+              style={styles.statusListButton}
+            />
+          </View>
+        </TouchableOpacity>
+      )
     }
-
   }
 
+  getStatusList(i) {
+    return this.getImage(i, false, 1);
+  }
+
+
   createListItem(l, i) {
-    l.status = this.editStatus(l.status, l.deadline, l.startTime, l.endTime);
 
     if (l.isUrgent == 1) {
       // Urgent : true
@@ -207,7 +228,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -221,7 +242,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -238,7 +259,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -252,7 +273,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -272,7 +293,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -286,7 +307,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -303,7 +324,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -317,7 +338,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -343,31 +364,6 @@ export default class ActivityListScreen extends React.Component {
     return false;
   }
 
-  editStatus(status, deadline, startTime, endTime) {
-    var newStatus = status;
-    var date = new Date();
-    var givenDeadline = this.parseDate(deadline);
-    var givenStartTime = this.parseDate(startTime);
-    var givenEndTime = this.parseDate(endTime);
-
-    var year = date.getFullYear() * 100000000;
-    var month = this.addZero(date.getMonth() + 1) * 1000000;
-    var day = this.addZero(date.getDate()) * 10000;
-    var hour = this.addZero(date.getHours()) * 100;
-    var minute = this.addZero(date.getMinutes()) * 1;
-    var nowDate = year + month + day + hour + minute;
-    if (newStatus == 1 && givenDeadline < nowDate) {
-      newStatus = 2
-    }
-    if (newStatus == 2 && givenStartTime < nowDate) {
-      newStatus = 3
-    }
-    if (newStatus == 3 && givenEndTime < nowDate) {
-      newStatus = 4
-    }
-    return newStatus;
-  }
-
   parseDate(date) {
     var splitDash = date.split('-');
     var year = splitDash[0] * 100000000;
@@ -387,15 +383,60 @@ export default class ActivityListScreen extends React.Component {
     } else {
       return num + "";
     }
+  }
 
+  checkInterest(id, interest) {
+    if (id == -1 || id == 0) {
+      return (<View />)
+    } else {
+      if (interest) {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ interest: false })
+              this.interestPost(1)
+            }}
+            style={styles.nameButton}
+          >
+            <Ionicons name="md-heart" size={30} color="#F77" />
+          </TouchableOpacity>
+        )
+      } else {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ interest: true })
+              this.interestPost(0)
+            }}
+            style={styles.nameButton}
+          >
+            <Ionicons name="md-heart-empty" size={30} color="#F77" />
+          </TouchableOpacity>
+        )
+      }
+    }
   }
 
   render() {
 
     const { data, urgentCheckedData, isLoading } = this.state;
 
+    const statusList = [1, 2, 3, 4, 5, 6];
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+        <Dialog.Container visible={this.state.statusVisible}>
+          <View>
+            {this.getImage(0, false, 2)}
+            {this.getImage(1, false, 2)}
+            {this.getImage(2, false, 2)}
+            {this.getImage(3, false, 2)}
+            {this.getImage(4, false, 2)}
+            {this.getImage(5, false, 2)}
+          </View>
+        </Dialog.Container>
+
         {(this.state.id != -1 && this.state.id != 0) &&
           <TouchableOpacity onPress={() => {
             this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
@@ -408,30 +449,9 @@ export default class ActivityListScreen extends React.Component {
         <View style={styles.box}>
           <View style={styles.name}>
             <Text style={styles.nameText}>{this.state.name}</Text>
-            {(this.state.id != -1 && this.state.id != 0 && this.state.interest) ?
-
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ interest: false })
-                  this.interestPost(1)
-                }}
-                style={styles.nameButton}
-              >
-                <Ionicons name="ios-star" size={24} color="black" />
-              </TouchableOpacity>
-              :
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ interest: true })
-                  this.interestPost(0)
-                }}
-                style={styles.nameButton}
-              >
-                <Ionicons name="ios-star-outline" size={24} color="black" />
-              </TouchableOpacity>
-            }
+            {this.checkInterest(this.state.id, this.state.interest)}
           </View>
-          <View>
+          <View style={{flexDirection:'row'}}>
             <SearchBar
               containerStyle={styles.searchContainerStyle}
               inputContainerStyle={styles.inputContainerStyle}
@@ -443,6 +463,12 @@ export default class ActivityListScreen extends React.Component {
               }}
               value={this.state.search}
             />
+            <TouchableOpacity
+              style={styles.filterContainer}
+              onPress={() => this.setState({statusVisible: true})}
+            >
+              {this.getImage(this.state.filterStatus, false, 1)}
+            </TouchableOpacity>
           </View>
 
           <View style={styles.listBox}>
@@ -470,10 +496,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   contentContainer: {
-    paddingTop: 25,
+    paddingTop: 0,
   },
   searchContainerStyle: {
-    width: '70%',
+    flex: 2,
     backgroundColor: 'white',
     borderWidth: 1,
     borderRadius: 5,
@@ -483,6 +509,22 @@ const styles = StyleSheet.create({
   },
   inputContainerStyle: {
     backgroundColor: 'transparent',
+  },
+  filterContainer: {
+    flex:1,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  filterButton: {
+    width: 70,
+    height: 20,
+    resizeMode: 'contain',
+  },
+  statusListButton: {
+    flex: 1,
+    padding:25,
+    marginBottom: 30,
+    resizeMode: 'contain',
   },
   urgentText: {
     color: 'red',
@@ -496,7 +538,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    marginBottom: 25,
+    marginBottom: 15,
+    marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',

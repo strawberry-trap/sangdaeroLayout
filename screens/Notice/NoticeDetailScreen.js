@@ -10,8 +10,30 @@ export default class NoticeDetailScreen extends React.Component {
 
     this.state = {
       data: props.route.params.data, // single notice data
-    };
+    }
+
+    if (this.state.data.modDate.charAt(4) != '/') {
+      this.state.data.modDate = this.parseDate(this.state.data.modDate);
+    }
   };
+
+  parseDate(date) {
+    console.log(date);
+    var splitDash = date.split('-');
+
+    var year = splitDash[0] + '/';
+    var month = splitDash[1] + '/';
+
+    var splitT = splitDash[2].split('T');
+
+    var day = splitT[0] + ' ';
+
+    var splitColon = splitT[1].split(':');
+    var hour = splitColon[0] + ':';
+    var minute = splitColon[1];
+
+    return year + month + day + hour + minute;
+  }
   
   render() {
 
@@ -34,6 +56,10 @@ export default class NoticeDetailScreen extends React.Component {
               <View style={styles.data}>
                 <Text style={styles.header}>작성자</Text>
                 <Text style={styles.content}>{this.state.data.writer}</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.header}>작성일시</Text>
+                <Text style={styles.content}>{this.state.data.modDate}</Text>
               </View>
             </View>
           </View>

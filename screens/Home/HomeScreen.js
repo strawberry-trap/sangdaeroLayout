@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ImageBackground, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ImageBackground, Alert, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
 
 export default class HomeScreen extends React.Component {
   state = {
@@ -20,6 +21,8 @@ export default class HomeScreen extends React.Component {
     finalConfirmDialog: false,
     postType: 1,
     register: false,
+
+    information: false,
 
     // additional data to send to the web server
     userSelectedActivity: {},
@@ -171,6 +174,41 @@ export default class HomeScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
+  getImage(props) {
+    var path;
+
+    // Allocating path as dynamic will cause error
+    switch (props) {
+      case 0:
+        path = require('../../assets/images/status_0.png');
+        break;
+      case 1:
+        path = require('../../assets/images/status_1.png');
+        break;
+      case 2:
+        path = require('../../assets/images/status_2.png');
+        break;
+      case 3:
+        path = require('../../assets/images/status_3.png');
+        break;
+      case 4:
+        path = require('../../assets/images/status_4.png');
+        break;
+      default:
+        path = require('../../assets/images/status_5.png');
+        break;
+    }
+
+    return (
+      <View style={styles.imageGroup}>
+        <Image
+          source={path}
+          style={styles.statusButton}
+        />
+      </View>
+    )
+  }
+
   createListItem(l, i, type) {
     var related = true;
     if (type == 1) {
@@ -179,6 +217,7 @@ export default class HomeScreen extends React.Component {
     }
     if (i == 0) {
       if (type == 0) {
+        // Notice
         return (
           <ListItem
             key={i}
@@ -190,18 +229,20 @@ export default class HomeScreen extends React.Component {
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: false });
+                this.setState({ related: true });
               }
             }
           />
         )
-      } else if (type == 1 && related == true) {
+      } else if ((type == 1 && related == true) || type == 2) {
+        // Activity 
         return (
           <ListItem
             key={i}
             title={l.title}
             titleStyle={styles.text}
             containerStyle={styles.listFirst}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: type });
@@ -220,6 +261,7 @@ export default class HomeScreen extends React.Component {
             title={l.title}
             titleStyle={styles.text}
             containerStyle={styles.listFirst}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: type });
@@ -245,18 +287,19 @@ export default class HomeScreen extends React.Component {
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: false });
+                this.setState({ related: true });
               }
             }
           />
         )
-      } else if (type == 1 && related == true) {
+      } else if ((type == 1 && related == true) || type == 2) {
         return (
           <ListItem
             key={i}
             title={l.title}
             titleStyle={styles.text}
             containerStyle={styles.list}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: type });
@@ -275,6 +318,7 @@ export default class HomeScreen extends React.Component {
             title={l.title}
             titleStyle={styles.text}
             containerStyle={styles.list}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: type });
@@ -360,7 +404,7 @@ export default class HomeScreen extends React.Component {
                   </Dialog.Description>
                 </View>
               }
-              {this.state.related == true &&
+              {this.state.related == false &&
                 <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
                   () => {
                     this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
@@ -375,9 +419,26 @@ export default class HomeScreen extends React.Component {
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
             </Dialog.Container>
 
+
+            <Dialog.Container visible={this.state.information}>
+              <Dialog.Title style={{ color: '#000' }} children='required'>상대로 사용 설명서</Dialog.Title>
+                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+                  
+                </ScrollView>
+              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ information: false }); }} />
+            </Dialog.Container>
+
             <View style={styles.topSpace}>
-              <Text style={styles.topText}>환영합니다</Text>
-              <Text style={styles.topText}>{global.googleUserName}님</Text>
+              <View style={styles.topSpaceText}>
+                <Text style={styles.topText}>환영합니다</Text>
+                <Text style={styles.topText}>{global.googleUserName}님</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.topSpaceTouch}
+                onPress={() => this.setState({ information: true })}
+              >
+                <Ionicons style={styles.informationButton} name="ios-information-circle" size={40} color="#FFF" />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.box}>
@@ -451,6 +512,16 @@ export default class HomeScreen extends React.Component {
               </View>
             </View>
 
+            <View style={styles.box}>
+              <TouchableOpacity
+                onPress={() => this.setState({ information: true })}
+              >
+                <View style={{ padding: 3, }}>
+                  <Text style={{ fontSize: 25, textAlign: 'center', textAlignVertical: 'center', color: 'rgb(29,140,121)', fontWeight: 'bold' }}>사용 설명서</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
           </ScrollView>
 
         </ImageBackground>
@@ -458,6 +529,15 @@ export default class HomeScreen extends React.Component {
     )
   };
 }
+
+/*
+<TouchableOpacity style={styles.topSpaceTouch}>
+                <Text style={styles.informationButton}>
+                  사용
+                  설명서
+                </Text>
+              </TouchableOpacity>
+*/
 
 HomeScreen.navigationOptions = {
   header: null,
@@ -478,12 +558,25 @@ const styles = StyleSheet.create({
   topSpace: {
     paddingTop: 20,
     marginBottom: 40,
+    flexDirection: 'row',
+  },
+  topSpaceText: {
+    flex : 3,
   },
   topText: {
     color: '#FFF',
     fontSize: 30,
     padding: 5,
     paddingLeft: 20,
+  },
+  topSpaceTouch: {
+    flex: 1,
+    marginRight: 20,
+  },
+  informationButton: {
+    flex: 1,
+    textAlign:'right',
+    fontWeight:'bold',
   },
   box: {
     flex: 1,
@@ -511,6 +604,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     justifyContent: 'center',
     color: 'rgb(140,140,140)'
+  },
+  statusButton: {
+    width: 70,
+    height: 20,
+    resizeMode: 'contain',
+    marginLeft: 10,
   },
   listBox: {
     padding: 3,
