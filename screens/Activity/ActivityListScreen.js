@@ -20,7 +20,6 @@ export default class ActivityListScreen extends React.Component {
       isLoading: false,
     }
 
-console.log(this.state.name)
 
     this.getData();
   }
@@ -386,7 +385,38 @@ console.log(this.state.name)
     } else {
       return num+"";
     }
+  }
 
+  checkInterest(id, interest) {
+    if (id == -1 || id == 0) {
+      return (<View />)
+    } else {
+      if (interest) {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ interest: false })
+              this.interestPost(1)
+            }}
+            style={styles.nameButton}
+          >
+            <Ionicons name="ios-star" size={24} color="black" />
+          </TouchableOpacity>
+        )
+      } else {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ interest: true })
+              this.interestPost(0)
+            }}
+            style={styles.nameButton}
+          >
+            <Ionicons name="ios-star-outline" size={24} color="black" />
+          </TouchableOpacity>
+        )
+      }
+    }
   }
 
   render() {
@@ -407,28 +437,7 @@ console.log(this.state.name)
         <View style={styles.box}>
           <View style={styles.name}>
             <Text style={styles.nameText}>{this.state.name}</Text>
-            {(this.state.id != -1 && this.state.id != 0 && this.state.interest) ?
-
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ interest: false })
-                  this.interestPost(1)
-                }}
-                style={styles.nameButton}
-              >
-                <Ionicons name="ios-star" size={24} color="black" />
-              </TouchableOpacity>
-              :
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ interest: true })
-                  this.interestPost(0)
-                }}
-                style={styles.nameButton}
-              >
-                <Ionicons name="ios-star-outline" size={24} color="black" />
-              </TouchableOpacity>
-            }
+            {this.checkInterest(this.state.id, this.state.interest)}
           </View>
           <View style={styles.listBox}>
             {isLoading ?
@@ -455,7 +464,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   contentContainer: {
-    paddingTop: 25,
+    paddingTop: 0,
   },
   urgentText :{
     color: 'red',
@@ -469,7 +478,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    marginBottom: 25,
+    marginBottom: 15,
+    marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',

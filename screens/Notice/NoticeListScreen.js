@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fafafa',
     },
     contentContainer: {
-        paddingTop: 25,
+        paddingTop: 0,
     },
     button: {
         textAlign: 'center',

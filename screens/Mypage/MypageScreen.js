@@ -433,6 +433,7 @@ export default class MypageScreen extends React.Component {
           <View style={styles.title}>
             <Text style={styles.titleText}>계정관리</Text>
           </View>
+
           <View style={styles.listBox}>
             <TouchableOpacity
               style={styles.listFirst}
@@ -441,22 +442,26 @@ export default class MypageScreen extends React.Component {
               <Text style={styles.item}>설정</Text>
             </TouchableOpacity>
           </View>
+
           <View style={styles.listBox}>
-            <View style={styles.list}>
-              <TouchableOpacity
-                onPress={() => {
-                  global.loggedIn = false; // this variable will be set to be 'false' at the constructor of LoginScreen anyway.
-                  this.props.navigation.navigate('Log', {params: {reset: true}});
-                }}
-              >
-                <Text style={styles.item}>로그아웃</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.list}
+              onPress={() => {
+                global.loggedIn = false; // this variable will be set to be 'false' at the constructor of LoginScreen anyway.
+                this.props.navigation.navigate('Log', { params: { reset: true } });
+              }}
+            >
+              <Text style={styles.item}>로그아웃</Text>
+            </TouchableOpacity>
           </View>
+
           <View style={styles.listBox}>
-            <View style={styles.list}>
-              <Text style={styles.item}>회원탈퇴</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.list}
+              onPress={() => this.props.navigation.navigate('설정')}
+            >
+              <Text style={styles.item}>회원 탈퇴</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

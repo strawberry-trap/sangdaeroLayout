@@ -18,6 +18,29 @@ export default class ConfigScreen extends React.Component {
     console.log('Config Screen');
   }
 
+  fetchPost(agree) {
+    var url = 'http://saevom06.cafe24.com/userdata/setPhoneAgree';
+    var data = {
+      name : global.googleUserName,
+      email : global.googleUserEmail,
+      phoneAgree : agree,
+    }
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        console.log('Change to '+agree);
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
+  }
+
   render() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -54,7 +77,10 @@ export default class ConfigScreen extends React.Component {
               <Text style={styles.item}>전화번호 공유 승인</Text>
               {this.state.button ?
                 <TouchableOpacity
-                  onPress={() => this.setState({ button: false })}
+                  onPress={() => {
+                    this.fetchPost(false);
+                    this.setState({ button: false });
+                  }}
                 >
                   <Ionicons
                     name='ios-checkmark-circle'
@@ -65,7 +91,10 @@ export default class ConfigScreen extends React.Component {
                 </TouchableOpacity>
                 :
                 <TouchableOpacity
-                  onPress={() => this.setState({ button: true })}
+                  onPress={() => {
+                    this.fetchPost(true);
+                    this.setState({ button: true });
+                  }}
                 >
                   <Ionicons
                     name='ios-checkmark-circle-outline'
@@ -77,11 +106,10 @@ export default class ConfigScreen extends React.Component {
               }
             </View>
             <TouchableOpacity
+              style={styles.sub}
               onPress={() => this.setState({ dialogVisible: true })}
             >
-              <View style={styles.sub}>
-                <Text style={styles.subText}>개인정보 공유 동의 약관</Text>
-              </View>
+              <Text style={styles.subText}>개인정보 공유 동의 약관</Text>
             </TouchableOpacity>
           </View>
 
