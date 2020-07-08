@@ -254,7 +254,7 @@ export default class RequestScreen extends React.Component {
                 onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
                 }>
                   {this.state.isStartTimeSelected ? <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
-                  : <Text style={styles.date}>터치해서 시작 시간 선택</Text>}
+                  : <Text style={styles.touchSelectTime}>시작 시간 선택</Text>}
 
               </TouchableOpacity>
             </View>
@@ -264,7 +264,9 @@ export default class RequestScreen extends React.Component {
                 onPress={() => { this.setState({ isStartTime: false, isDatePickerVisible: true }) }
                 }>
                 {this.state.isEndTimeSelected ? <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
-                : <Text style={styles.date}>터치해서 종료 시간 선택</Text>}
+                : 
+                <Text style={styles.touchSelectTime}>종료 시간 선택</Text>
+                }
               </TouchableOpacity>
             </View>
           </View>
@@ -305,6 +307,16 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 25,
     padding: 5,
+  },
+  touchSelectTime: {
+    flex: 1,
+    padding: 5,
+    paddingRight: 10,
+    fontSize: 15,
+    textAlignVertical: 'center',
+    borderColor: 'black',
+    borderWidth:0.5,
+    borderRadius:10,
   },
   box: {
     flex: 1,

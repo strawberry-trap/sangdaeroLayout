@@ -17,7 +17,10 @@ export default class ActivityDetailScreen extends React.Component {
       isUserRelated: 0, // for three cases: volunteer = 1, benefiting-user = 2, not related = 0
       image: null, // check if image is selected or not
       dialogVisible: false, // dialog for image picking
-      pictureSendingUrl : "",
+      memoDialogVisible: false,
+      pictureSendingUrl: "",
+      memo: "복지관에 전달 할 메모를 남겨 주세요.",
+      isMemoWritten: false,
     };
 
     this.volunteerList = "";
@@ -28,7 +31,7 @@ export default class ActivityDetailScreen extends React.Component {
     // 1) check if volunteer
     for (var i = 0; i < this.state.data.activityVolunteers.length; i++) {
       if (i == 0) {
-        this.volunteerList = this.state.data.activityVolunteers[i].user.nickname+"";
+        this.volunteerList = this.state.data.activityVolunteers[i].user.nickname + "";
       } else {
         this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.nickname;
       }
@@ -42,9 +45,9 @@ export default class ActivityDetailScreen extends React.Component {
     // 2) check if benefiting-user
     for (var i = 0; i < this.state.data.activityUsers.length; i++) {
       if (i == 0) {
-        this.userList = this.state.data.activityUsers[i].user.nickname+"";
+        this.userList = this.state.data.activityUsers[i].user.nickname + "";
       } else {
-        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.nickname+"";
+        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.nickname + "";
       }
 
       if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
@@ -112,7 +115,7 @@ export default class ActivityDetailScreen extends React.Component {
     this.formData.append('email', global.googleUserEmail);
     this.formData.append('id', this.state.data.id);
 
-    this.setState({pictureSendingUrl:url});
+    this.setState({ pictureSendingUrl: url });
   }
 
   async pickImageFromGallery(url) {
@@ -150,11 +153,11 @@ export default class ActivityDetailScreen extends React.Component {
     this.formData.append('email', global.googleUserEmail);
     this.formData.append('id', this.state.data.id);
 
-    this.setState({pictureSendingUrl:url});
+    this.setState({ pictureSendingUrl: url });
   }
 
   // sending 'image' to server needs different body format from previous 'fetchPost', which is 'content-type': 'multipart/form-data'
-  async sendPictureToServer(url){
+  async sendPictureToServer(url) {
     return await fetch(url, {
       method: 'POST',
       body: this.formData,
@@ -234,11 +237,44 @@ export default class ActivityDetailScreen extends React.Component {
     )
   }
 
+  sendMemo(){
+
+    const url = "http://saevom06.cafe24.com/activitydata/updateMemo"
+    let memo = this.state.memo;
+
+    if (this.state.isMemoWritten == false){
+      memo = "";
+    }
+
+    let data = {
+      name:global.googleUserName,
+      email:global.googleUserEmail,
+      id:this.state.data.id,
+      memo:memo,
+    }
+
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        Alert.alert("메모가 저장 되었습니다.");
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
+
+  }
+
   render() {
 
     let { image } = this.state;
 
-    console.log('current status : ', this.activityStatus);
+    // console.log('current status : ', this.activityStatus);
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -298,6 +334,22 @@ export default class ActivityDetailScreen extends React.Component {
               </View>
             </View>
           </View>
+
+
+          <View style={styles.line} />
+          <View style={styles.list}>
+            <View style={styles.titleList}>
+              <Text style={styles.title}>메모</Text>
+            </View>
+            <View style={styles.dataList}>
+              <View style={styles.data}>
+                <Text style={styles.header}>
+                  {this.state.memo}
+                </Text>
+              </View>
+            </View>
+          </View>
+
         </View>
 
 
@@ -311,64 +363,64 @@ export default class ActivityDetailScreen extends React.Component {
           {image &&
             <Image source={{ uri: image }} style={styles.photo} />
           }
-          
+
           {!image &&
-            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
               <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(this.state.pictureSendingUrl)} />
               <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(this.state.pictureSendingUrl)} />
             </View>
           }
           {image &&
-            <View style={{flexDirection:'row-reverse', alignItems:'flex-end'}}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
               <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false, image: null }); }} />
-              <Dialog.Button label="전송하기" color='#000' 
+              <Dialog.Button label="전송하기" color='#000'
                 onPress={() => {
-                  this.sendPictureToServer(this.state.pictureSendingUrl).then(()=>{
+                  this.sendPictureToServer(this.state.pictureSendingUrl).then(() => {
                     Alert.alert('전송 완료!', '사진이 전송되었습니다.', [{
                       text: '확인',
-                      onPress: () => { 
-                        this.setState({dialogVisible:false}); 
-                        this.setState({image:null});
+                      onPress: () => {
+                        this.setState({ dialogVisible: false });
+                        this.setState({ image: null });
                       }
                     }]);
                   });
 
-                }}/>
+                }} />
             </View>
           }
-          
+
         </Dialog.Container>
 
 
         {this.state.isUserRelated == 0 && (this.activityStatus == 1) &&
-        <TouchableOpacity
-          onPress={() => 
-            this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
-              id: this.state.data.id, // id of the activity that user chose
-              name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
-              email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
-              type: 1,
-            })}
+          <TouchableOpacity
+            onPress={() =>
+              this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
+                id: this.state.data.id, // id of the activity that user chose
+                name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+                email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+                type: 1,
+              })}
           >
-          <Text style={styles.button}>
-            봉사자 지원
+            <Text style={styles.button}>
+              봉사자 지원
           </Text>
-        </TouchableOpacity>}
+          </TouchableOpacity>}
 
         <View style={styles.photoButtons}>
-        {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4) ) && <TouchableOpacity onPress={() => {
-            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadStartImg"});
+          {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4)) && <TouchableOpacity onPress={() => {
+            this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadStartImg" });
             this.setState({ dialogVisible: true });
           }}>
             <Text style={styles.startButton}>
               시작 사진 전송
             </Text>
           </TouchableOpacity>}
-        
 
-          {(this.state.isUserRelated == 1 && this.activityStatus == 4) &&<TouchableOpacity onPress={() => {
-            this.setState({pictureSendingUrl : "http://saevom06.cafe24.com/activitydata/uploadEndImg"});
+
+          {(this.state.isUserRelated == 1 && this.activityStatus == 4) && <TouchableOpacity onPress={() => {
+            this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadEndImg" });
             this.setState({ dialogVisible: true });
           }}>
             <Text style={styles.endButton}>
@@ -376,8 +428,42 @@ export default class ActivityDetailScreen extends React.Component {
             </Text>
           </TouchableOpacity>}
 
+          {(this.state.isUserRelated == 1 && this.activityStatus <= 4) && <TouchableOpacity onPress={() => {
+            this.setState({memoDialogVisible: true});
+          }}>
+            <Text style={styles.memoButton}>
+              메모 작성
+            </Text>
+          </TouchableOpacity>}
 
-          {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.activityStatus == 1 ||this.activityStatus == 2)) &&<TouchableOpacity 
+          <Dialog.Container visible={this.state.memoDialogVisible}>
+
+            <View>
+              <Dialog.Input 
+                autoFocus
+                onChangeText={(text) => this.setState({ memo: text })}
+                placeholder="메모를 작성해 주세요."
+              >
+              </Dialog.Input>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
+                <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ 
+                  memo: "복지관에 전달 할 메모를 남겨 주세요.",
+                  isMemoWritten:false,
+                  memoDialogVisible: false }); 
+                  }} />
+                <Dialog.Button title='작성 완료' label='작성 완료' color='#000' onPress={() => { 
+                  this.setState({ 
+                    memoDialogVisible: false ,
+                    isMemoWritten:true,
+                  }); 
+                  this.sendMemo();
+                  }} />
+              </View>
+            </View>
+          </Dialog.Container>
+
+
+          {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.activityStatus == 1 || this.activityStatus == 2)) && <TouchableOpacity
             onPress={() => Alert.alert('취소되었습니다')}>
             <Text style={styles.cancleButton}>
               취소하기
@@ -472,18 +558,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoHeader: {
-    color:'#000',
+    color: '#000',
     marginBottom: 30,
   },
   photo: {
-    width:200,
-    height:200,
-    alignSelf:'center',
-    resizeMode:'center',
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    resizeMode: 'center',
   },
   startButton: {
     flex: 1,
-    width:100,
+    width: 100,
     textAlign: 'center',
     marginLeft: 0,
     marginRight: 10,
@@ -495,16 +581,30 @@ const styles = StyleSheet.create({
   },
   endButton: {
     flex: 1,
-    width:100,
+    width: 100,
     textAlign: 'center',
+    marginLeft: 0,
+    marginRight: 10,
     fontSize: 14,
     color: '#FFF',
     backgroundColor: 'rgb(29,140,121)',
     borderRadius: 50,
     padding: 8,
   },
+  memoButton: {
+    flex: 1,
+    width: 100,
+    textAlign: 'center',
+    marginLeft: 0,
+    marginRight: 10,
+    fontSize: 14,
+    color: '#FFF',
+    backgroundColor: 'rgb(100,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  },
   cancleButton: {
-    flex:1,
+    flex: 1,
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
