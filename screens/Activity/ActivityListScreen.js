@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { ListItem } from 'react-native-elements'
+import { ListItem, SearchBar } from 'react-native-elements'
 import Icon from 'react-native-ionicons'
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,22 +14,23 @@ export default class ActivityListScreen extends React.Component {
     this.state = {
       id: props.route.params.id,
       name: props.route.params.name,
-      interest : props.route.params.interest,
+      interest: props.route.params.interest,
       data: [],
       urgentCheckedData: [],
       isLoading: false,
+      search: '',
     }
 
-console.log(this.state.name)
+    console.log(this.state.name)
 
     this.getData();
   }
 
   getData() {
     if (this.state.id == -1) {
-      var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name='+ global.googleUserName + '&email='+global.googleUserEmail;
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name=' + global.googleUserName + '&email=' + global.googleUserEmail;
     } else {
-      var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id='+ this.state.id;
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id=' + this.state.id;
     }
 
     console.log(url);
@@ -59,7 +60,7 @@ console.log(this.state.name)
   // need restcontroller
   interestPost(type) {
     console.log('change interest');
-    if (type==0) {
+    if (type == 0) {
       var url = 'http://saevom06.cafe24.com/userdata/addInterest';
     } else {
       var url = 'http://saevom06.cafe24.com/userdata/removeInterest';
@@ -188,7 +189,7 @@ console.log(this.state.name)
         </View>
       )
     }
-    
+
   }
 
   createListItem(l, i) {
@@ -375,16 +376,16 @@ console.log(this.state.name)
     var day = splitT[0] * 10000;
     var splitColon = splitT[1].split(':');
     var hour = splitColon[0] * 100;
-    var minute = splitColon[1]*1;
+    var minute = splitColon[1] * 1;
 
     return year + month + day + hour + minute;
   }
 
   addZero(num) {
     if (num < 10) {
-      return '0'+num;
+      return '0' + num;
     } else {
-      return num+"";
+      return num + "";
     }
 
   }
@@ -395,14 +396,14 @@ console.log(this.state.name)
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {(this.state.id != -1 && this.state.id != 0)&&
-        <TouchableOpacity onPress={() => {
-          this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
-        }}>
-          <Text style={styles.button}>
-            새로운 활동 추가하기 +
+        {(this.state.id != -1 && this.state.id != 0) &&
+          <TouchableOpacity onPress={() => {
+            this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
+          }}>
+            <Text style={styles.button}>
+              새로운 활동 추가하기 +
           </Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
         }
         <View style={styles.box}>
           <View style={styles.name}>
@@ -430,6 +431,20 @@ console.log(this.state.name)
               </TouchableOpacity>
             }
           </View>
+          <View>
+            <SearchBar
+              containerStyle={styles.searchContainerStyle}
+              inputContainerStyle={styles.inputContainerStyle}
+              placeholder="제목 검색"
+              lightTheme
+              round
+              onChangeText={(text) => {
+                this.setState({ search: text });
+              }}
+              value={this.state.search}
+            />
+          </View>
+
           <View style={styles.listBox}>
             {isLoading ?
               (data.map((l, i) => (
@@ -457,7 +472,19 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 25,
   },
-  urgentText :{
+  searchContainerStyle: {
+    width: '70%',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderRadius: 5,
+    borderBottomColor: 'transparent',
+    borderTopColor: 'transparent',
+    borderColor: 'transparent',
+  },
+  inputContainerStyle: {
+    backgroundColor: 'transparent',
+  },
+  urgentText: {
     color: 'red',
     fontWeight: 'bold',
   },
@@ -510,33 +537,33 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   listFirst: {
-    
+
   },
   list: {
-    borderTopWidth:0.5,
-    borderColor:'rgb(220,220,220)',
+    borderTopWidth: 0.5,
+    borderColor: 'rgb(220,220,220)',
   },
   roundList: {
-    flex:1,
+    flex: 1,
     padding: 5,
-    paddingRight:10,
-    paddingLeft:10,
+    paddingRight: 10,
+    paddingLeft: 10,
     marginTop: 3,
-    marginBottom:3,
-    flexDirection:'row',
-    backgroundColor:'#FFF',
-    borderRadius:50
+    marginBottom: 3,
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    borderRadius: 50
   },
-  roundUserList:{
-    flex:1,
+  roundUserList: {
+    flex: 1,
     padding: 5,
-    paddingRight:10,
-    paddingLeft:10,
+    paddingRight: 10,
+    paddingLeft: 10,
     marginTop: 3,
-    marginBottom:3,
-    flexDirection:'row',
-    backgroundColor:'rgb(223,244,243)',
-    borderRadius:50
+    marginBottom: 3,
+    flexDirection: 'row',
+    backgroundColor: 'rgb(223,244,243)',
+    borderRadius: 50
   },
   title: {
     margin: 5,
