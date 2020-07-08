@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { ListItem } from 'react-native-elements'
-import Icon from 'react-native-ionicons'
+import { ListItem, SearchBar } from 'react-native-elements'
+import Dialog from "react-native-dialog";
 import { Ionicons } from '@expo/vector-icons';
 
 export default class ActivityListScreen extends React.Component {
@@ -14,10 +14,13 @@ export default class ActivityListScreen extends React.Component {
     this.state = {
       id: props.route.params.id,
       name: props.route.params.name,
-      interest : props.route.params.interest,
+      interest: props.route.params.interest,
       data: [],
       urgentCheckedData: [],
       isLoading: false,
+      search: '',
+      filterStatus: 1,
+      statusVisible: false,
     }
 
 
@@ -26,9 +29,9 @@ export default class ActivityListScreen extends React.Component {
 
   getData() {
     if (this.state.id == -1) {
-      var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name='+ global.googleUserName + '&email='+global.googleUserEmail;
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivitiesForUser?name=' + global.googleUserName + '&email=' + global.googleUserEmail;
     } else {
-      var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id='+ this.state.id;
+      var url = 'http://saevom06.cafe24.com/activitydata/getActivities?id=' + this.state.id;
     }
 
     console.log(url);
@@ -58,7 +61,7 @@ export default class ActivityListScreen extends React.Component {
   // need restcontroller
   interestPost(type) {
     console.log('change interest');
-    if (type==0) {
+    if (type == 0) {
       var url = 'http://saevom06.cafe24.com/userdata/addInterest';
     } else {
       var url = 'http://saevom06.cafe24.com/userdata/removeInterest';
@@ -134,14 +137,11 @@ export default class ActivityListScreen extends React.Component {
 
   }
 
-  getImage(props, urgent) {
+  getImage(props, urgent, type) {
     var path;
 
     // Allocating path as dynamic will cause error
     switch (props) {
-      case 0:
-        path = require('../../assets/images/status_0.png');
-        break;
       case 1:
         path = require('../../assets/images/status_1.png');
         break;
@@ -154,8 +154,11 @@ export default class ActivityListScreen extends React.Component {
       case 4:
         path = require('../../assets/images/status_4.png');
         break;
-      default:
+      case 5:
         path = require('../../assets/images/status_5.png');
+        break;
+      default:
+        path = require('../../assets/images/status_6.png');
         break;
     }
 
@@ -167,31 +170,51 @@ export default class ActivityListScreen extends React.Component {
             source={path}
             style={styles.statusButton}
           />
-          <Image
-            source={require('../../assets/images/right_arrow.png')}
-            style={styles.arrow}
-          />
         </View>
       )
-    } else {
+    } else if (type == 0) {
       return (
         <View style={styles.imageGroup}>
           <Image
             source={path}
             style={styles.statusButton}
           />
+        </View>
+      )
+    } else if (type == 1) {
+      return (
+        <View style={styles.imageGroup}>
           <Image
-            source={require('../../assets/images/right_arrow.png')}
-            style={styles.arrow}
+            source={path}
+            style={styles.filterButton}
           />
         </View>
       )
+    } else {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            this.setState({ filterStatus: props})
+            this.setState({ statusVisible: false})
+          }}
+        >
+          <View style={styles.imageGroup}>
+            <Image
+              source={path}
+              style={styles.statusListButton}
+            />
+          </View>
+        </TouchableOpacity>
+      )
     }
-    
   }
 
+  getStatusList(i) {
+    return this.getImage(i, false, 1);
+  }
+
+
   createListItem(l, i) {
-    l.status = this.editStatus(l.status, l.deadline, l.startTime, l.endTime);
 
     if (l.isUrgent == 1) {
       // Urgent : true
@@ -205,7 +228,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -219,7 +242,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -236,7 +259,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -250,7 +273,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -270,7 +293,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -284,7 +307,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -301,7 +324,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundUserList}
               />
@@ -315,7 +338,7 @@ export default class ActivityListScreen extends React.Component {
                 key={i}
                 title={l.title}
                 titleStyle={styles.title}
-                rightElement={this.getImage(l.status, l.isUrgent)}
+                rightElement={this.getImage(l.status, l.isUrgent, 0)}
                 onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
                 containerStyle={styles.roundList}
               />
@@ -341,31 +364,6 @@ export default class ActivityListScreen extends React.Component {
     return false;
   }
 
-  editStatus(status, deadline, startTime, endTime) {
-    var newStatus = status;
-    var date = new Date();
-    var givenDeadline = this.parseDate(deadline);
-    var givenStartTime = this.parseDate(startTime);
-    var givenEndTime = this.parseDate(endTime);
-
-    var year = date.getFullYear() * 100000000;
-    var month = this.addZero(date.getMonth() + 1) * 1000000;
-    var day = this.addZero(date.getDate()) * 10000;
-    var hour = this.addZero(date.getHours()) * 100;
-    var minute = this.addZero(date.getMinutes()) * 1;
-    var nowDate = year + month + day + hour + minute;
-    if (newStatus == 1 && givenDeadline < nowDate) {
-      newStatus = 2
-    }
-    if (newStatus == 2 && givenStartTime < nowDate) {
-      newStatus = 3
-    }
-    if (newStatus == 3 && givenEndTime < nowDate) {
-      newStatus = 4
-    }
-    return newStatus;
-  }
-
   parseDate(date) {
     var splitDash = date.split('-');
     var year = splitDash[0] * 100000000;
@@ -374,16 +372,16 @@ export default class ActivityListScreen extends React.Component {
     var day = splitT[0] * 10000;
     var splitColon = splitT[1].split(':');
     var hour = splitColon[0] * 100;
-    var minute = splitColon[1]*1;
+    var minute = splitColon[1] * 1;
 
     return year + month + day + hour + minute;
   }
 
   addZero(num) {
     if (num < 10) {
-      return '0'+num;
+      return '0' + num;
     } else {
-      return num+"";
+      return num + "";
     }
   }
 
@@ -400,7 +398,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="ios-star" size={24} color="black" />
+            <Ionicons name="md-heart" size={30} color="#F77" />
           </TouchableOpacity>
         )
       } else {
@@ -412,7 +410,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="ios-star-outline" size={24} color="black" />
+            <Ionicons name="md-heart-empty" size={30} color="#F77" />
           </TouchableOpacity>
         )
       }
@@ -423,22 +421,56 @@ export default class ActivityListScreen extends React.Component {
 
     const { data, urgentCheckedData, isLoading } = this.state;
 
+    const statusList = [1, 2, 3, 4, 5, 6];
+
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {(this.state.id != -1 && this.state.id != 0)&&
-        <TouchableOpacity onPress={() => {
-          this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
-        }}>
-          <Text style={styles.button}>
-            새로운 활동 추가하기 +
+
+        <Dialog.Container visible={this.state.statusVisible}>
+          <View>
+            {this.getImage(0, false, 2)}
+            {this.getImage(1, false, 2)}
+            {this.getImage(2, false, 2)}
+            {this.getImage(3, false, 2)}
+            {this.getImage(4, false, 2)}
+            {this.getImage(5, false, 2)}
+          </View>
+        </Dialog.Container>
+
+        {(this.state.id != -1 && this.state.id != 0) &&
+          <TouchableOpacity onPress={() => {
+            this.props.navigation.navigate('요청하기', { test: 'test', categoryName: this.state.name, categoryId: this.state.id })
+          }}>
+            <Text style={styles.button}>
+              새로운 활동 추가하기 +
           </Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
         }
         <View style={styles.box}>
           <View style={styles.name}>
             <Text style={styles.nameText}>{this.state.name}</Text>
             {this.checkInterest(this.state.id, this.state.interest)}
           </View>
+          <View style={{flexDirection:'row'}}>
+            <SearchBar
+              containerStyle={styles.searchContainerStyle}
+              inputContainerStyle={styles.inputContainerStyle}
+              placeholder="제목 검색"
+              lightTheme
+              round
+              onChangeText={(text) => {
+                this.setState({ search: text });
+              }}
+              value={this.state.search}
+            />
+            <TouchableOpacity
+              style={styles.filterContainer}
+              onPress={() => this.setState({statusVisible: true})}
+            >
+              {this.getImage(this.state.filterStatus, false, 1)}
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.listBox}>
             {isLoading ?
               (data.map((l, i) => (
@@ -466,7 +498,35 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 0,
   },
-  urgentText :{
+  searchContainerStyle: {
+    flex: 2,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderRadius: 5,
+    borderBottomColor: 'transparent',
+    borderTopColor: 'transparent',
+    borderColor: 'transparent',
+  },
+  inputContainerStyle: {
+    backgroundColor: 'transparent',
+  },
+  filterContainer: {
+    flex:1,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  filterButton: {
+    width: 70,
+    height: 20,
+    resizeMode: 'contain',
+  },
+  statusListButton: {
+    flex: 1,
+    padding:25,
+    marginBottom: 30,
+    resizeMode: 'contain',
+  },
+  urgentText: {
     color: 'red',
     fontWeight: 'bold',
   },
@@ -520,33 +580,33 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   listFirst: {
-    
+
   },
   list: {
-    borderTopWidth:0.5,
-    borderColor:'rgb(220,220,220)',
+    borderTopWidth: 0.5,
+    borderColor: 'rgb(220,220,220)',
   },
   roundList: {
-    flex:1,
+    flex: 1,
     padding: 5,
-    paddingRight:10,
-    paddingLeft:10,
+    paddingRight: 10,
+    paddingLeft: 10,
     marginTop: 3,
-    marginBottom:3,
-    flexDirection:'row',
-    backgroundColor:'#FFF',
-    borderRadius:50
+    marginBottom: 3,
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    borderRadius: 50
   },
-  roundUserList:{
-    flex:1,
+  roundUserList: {
+    flex: 1,
     padding: 5,
-    paddingRight:10,
-    paddingLeft:10,
+    paddingRight: 10,
+    paddingLeft: 10,
     marginTop: 3,
-    marginBottom:3,
-    flexDirection:'row',
-    backgroundColor:'rgb(223,244,243)',
-    borderRadius:50
+    marginBottom: 3,
+    flexDirection: 'row',
+    backgroundColor: 'rgb(223,244,243)',
+    borderRadius: 50
   },
   title: {
     margin: 5,

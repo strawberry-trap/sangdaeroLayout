@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ListItem } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
 
 export default class ActivityScreen extends React.Component {
   constructor(props) {
@@ -105,7 +106,7 @@ export default class ActivityScreen extends React.Component {
       })
   }
 
-  createListItem(l, i, interested) { // input l is not used?
+  createListItem(l, i, interested) {
     if (l.id != 1) {
       if (interested) {
         return (
@@ -114,7 +115,8 @@ export default class ActivityScreen extends React.Component {
             title={l.name}
             chevron={{ size: 30 }}
             onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: true, listType: 0 })}
-            containerStyle={styles.itemInterested}
+            rightElement={<Ionicons name="md-heart" size={30} color="#F77" />}
+            containerStyle={styles.item}
             titleStyle={styles.text}
           />
         )

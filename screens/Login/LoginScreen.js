@@ -137,7 +137,7 @@ export default class LoginScreen extends Component {
         </ImageBackground>
         }
         {(global.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(global.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Agreement')}
+        {(global.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Main')}
       </View>
     );
   }
