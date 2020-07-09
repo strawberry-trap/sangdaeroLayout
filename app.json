@@ -2,17 +2,17 @@
   "expo": {
     "name": "Sangdaero",
     "slug": "sangdaero",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "myapp",
     "platforms": [
       "ios",
       "android",
       "web"
     ],
-    "version": "1.0.0",
-    "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
     "splash": {
-      "image": "./assets/images/Sangdaero.jpg",
+      "image": "./assets/images/Sangdaero.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -25,9 +25,19 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.test.app",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
+      "config": {
+        "googleSignIn": {
+            "apiKey": "AIzaSyBvARDZSagC90mJrcKlF5qx1EUupNzH5MY",
+            "certificateHash": "8F:D4:93:05:52:EB:E6:07:76:7D:F0:52:A3:E1:D5:40:54:15:11:41"
+        }
+    }
+    },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    },
-    "description": ""
+    }
   }
 }

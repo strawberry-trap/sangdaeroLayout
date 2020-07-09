@@ -205,6 +205,7 @@ export default class RequestScreen extends React.Component {
       body: JSON.stringify(data),
     }).then(() => {
       Alert.alert("등록 완료", "새로운 봉사활동 요청이 등록 되었습니다!");
+      this.props.navigation.goBack()
     });
   }
 
