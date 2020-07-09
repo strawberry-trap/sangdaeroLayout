@@ -249,16 +249,23 @@ export default class RequestScreen extends React.Component {
           </View>
           <View style={styles.list}>
             <Text style={styles.title}>활동시간</Text>
+
             <View style={styles.time}>
               <Text style={styles.text}>시작시간</Text>
               <TouchableOpacity
-                onPress={() => { this.setState({ isStartTime: true, isDatePickerVisible: true }) }
-                }>
-                  {this.state.isStartTimeSelected ? <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
+                onPress={() => {
+                  this.setState({
+                    isStartTime: true, isDatePickerVisible: true
+                  })
+                }}
+              >
+                {this.state.isStartTimeSelected ?
+                  <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
                   : <Text style={styles.touchSelectTime}>시작 시간 선택</Text>}
 
               </TouchableOpacity>
             </View>
+
             <View style={styles.time}>
               <Text style={styles.text}>종료시간</Text>
               <TouchableOpacity

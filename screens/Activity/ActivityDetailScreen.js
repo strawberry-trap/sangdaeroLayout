@@ -24,37 +24,67 @@ export default class ActivityDetailScreen extends React.Component {
     };
 
     this.volunteerList = "";
-    this.userList = ""
+    this.volunteerListWithNumber = [];
+    this.userList = "";
+    this.userListWithNumber = [];
     this.activityStatus = this.state.data.status;
 
     // check if user is related to this activity. Default is not-related.
     // 1) check if volunteer
     for (var i = 0; i < this.state.data.activityVolunteers.length; i++) {
-      if (i == 0) {
-        this.volunteerList = this.state.data.activityVolunteers[i].user.nickname + "";
-      } else {
-        this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.nickname;
-      }
+      console.log(this.state.data.activityVolunteers[i]);
+      if (this.state.data.activityVolunteers[i].status == 1) {
+        if (this.volunteerList.length == 0) {
+          this.volunteerList = this.state.data.activityVolunteers[i].user.nickname + "";
+        } else {
+          this.volunteerList = this.volunteerList + ", " + this.state.data.activityVolunteers[i].user.nickname;
+        }
 
-      if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
-        this.state.isUserRelated = 1;
-        console.log("current user is volunteer");
-        console.log(this.state.isUserRelated);
+        if (this.state.data.activityVolunteers[i].phoneAgree == 1 && this.state.data.activityVolunteers[i].user.phoneAgree == 1) {
+          console.log('agree')
+          this.volunteerListWithNumber.push(this.state.data.activityVolunteers[i].user.nickname + " - " + this.state.data.activityVolunteers[i].user.phone);
+        } else {
+          console.log('disagree')
+          this.volunteerListWithNumber.push(this.state.data.activityVolunteers[i].user.nickname);
+        }
+  
+        if (this.state.data.activityVolunteers[i].user.socialId == global.googleUserEmail) {
+          this.state.isUserRelated = 1;
+          console.log("current user is volunteer");
+          console.log(this.state.isUserRelated);
+        }
       }
     }
+
+    console.log(this.volunteerListWithNumber)
+
     // 2) check if benefiting-user
     for (var i = 0; i < this.state.data.activityUsers.length; i++) {
-      if (i == 0) {
-        this.userList = this.state.data.activityUsers[i].user.nickname + "";
-      } else {
-        this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.nickname + "";
-      }
+      console.log(this.state.data.activityUsers[i]);
+      if (this.state.data.activityUsers[i].status == 1) {
+        if (this.userList.length == 0) {
+          this.userList = this.state.data.activityUsers[i].user.nickname + "";
+        } else {
+          this.userList = this.userList + ", " + this.state.data.activityUsers[i].user.nickname;
+        }
 
-      if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
-        this.state.isUserRelated = 2;
-        console.log("current user is benefiting-user");
+        if (this.state.data.activityUsers[i].phoneAgree == 1 && this.state.data.activityUsers[i].user.phoneAgree == 1) {
+          console.log('agree')
+          this.userListWithNumber.push(this.state.data.activityUsers[i].user.nickname + " - " + this.state.data.activityUsers[i].user.phone);
+        } else {
+          console.log('disagree')
+          this.userListWithNumber.push(this.state.data.activityUsers[i].user.nickname);
+        }
+  
+        if (this.state.data.activityUsers[i].user.socialId == global.googleUserEmail) {
+          this.state.isUserRelated = 1;
+          console.log("current user is volunteer");
+          console.log(this.state.isUserRelated);
+        }
       }
     }
+
+    console.log(this.userListWithNumber)
 
     this.status = [
       '매칭 전',
@@ -185,8 +215,51 @@ export default class ActivityDetailScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
+  checkAlert(url, data, type) {
+    if (type == 'register') {
+      Alert.alert(
+        "봉사자로 지원하시겠습니까?",
+        "",
+        [
+          {
+            text: "확인", onPress: () => {
+              this.fetchPost(url, data, type)
+            }
+          },
+          {
+            text: "닫기",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      Alert.alert(
+        "활동을 취소하시겠습니까?",
+        "",
+        [
+          {
+            text: "확인", onPress: () => {
+              this.fetchPost(url, data, type)
+            }
+          },
+          {
+            text: "닫기",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+
+  }
+
   // send POST request to server url
-  fetchPost(url, data) {
+  fetchPost(url, data, type) {
+    console.log(url)
+    console.log(data);
 
     try {
       fetch(url, {
@@ -197,8 +270,14 @@ export default class ActivityDetailScreen extends React.Component {
         },
         body: JSON.stringify(data),
       }).then((res) => {
-        Alert.alert("신청 되었습니다");
-        this.setState({ dialogVisible: false });
+        if (type == 'register') {
+          Alert.alert("신청 되었습니다");
+          this.props.navigation.goBack();
+        } else {
+          Alert.alert("취소 되었습니다");
+          this.props.navigation.goBack();
+        }
+        
       });
     } catch (e) {
       console.warn('fetch failed', e, url);
@@ -303,11 +382,31 @@ export default class ActivityDetailScreen extends React.Component {
             <View style={styles.dataList}>
               <View style={styles.data}>
                 <Text style={styles.header}>봉사자</Text>
+                {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.state.data.status == 2 || this.state.data.status == 3)) ?
+                <View style={styles.content}>
+                  {(this.volunteerListWithNumber.map((l, i) => (
+                    <Text>
+                      {l}
+                    </Text>
+                  )))}
+                </View>
+                :
                 <Text style={styles.content}>{this.volunteerList}</Text>
+                }
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>이용자</Text>
+                {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.state.data.status == 2 || this.state.data.status == 3)) ?
+                <View style={styles.content}>
+                  {(this.userListWithNumber.map((l, i) => (
+                    <Text>
+                      {l}
+                    </Text>
+                  )))}
+                </View>
+                :
                 <Text style={styles.content}>{this.userList}</Text>
+                }
               </View>
             </View>
           </View>
@@ -326,7 +425,7 @@ export default class ActivityDetailScreen extends React.Component {
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>장소</Text>
-                <Text style={styles.content}>{this.state.data.place}</Text>
+                <Text style={styles.content}>{this.state.data.place} {this.state.data.placeDetail}</Text>
               </View>
               <View style={styles.data}>
                 <Text style={styles.header}>세부내용</Text>
@@ -349,7 +448,6 @@ export default class ActivityDetailScreen extends React.Component {
               </View>
             </View>
           </View>
-
         </View>
 
 
@@ -396,47 +494,82 @@ export default class ActivityDetailScreen extends React.Component {
         {this.state.isUserRelated == 0 && (this.activityStatus == 1) &&
           <TouchableOpacity
             onPress={() =>
-              this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
+              this.checkAlert('http://saevom06.cafe24.com/requestdata/register', {
                 id: this.state.data.id, // id of the activity that user chose
                 name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
                 email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
                 type: 1,
-              })}
+              }, 'register')}
           >
             <Text style={styles.button}>
               봉사자 지원
-          </Text>
-          </TouchableOpacity>}
-
-        <View style={styles.photoButtons}>
-          {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4)) && <TouchableOpacity onPress={() => {
-            this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadStartImg" });
-            this.setState({ dialogVisible: true });
-          }}>
-            <Text style={styles.startButton}>
-              시작 사진 전송
             </Text>
           </TouchableOpacity>}
 
-          {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4)) && <TouchableOpacity onPress={() => {
-            this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadEndImg" });
-            this.setState({ dialogVisible: true });
-          }}>
-            <Text style={styles.endButton}>
-              종료 사진 전송
+        {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.activityStatus == 1 || this.activityStatus == 2)) &&
+          <TouchableOpacity
+            onPress={() =>
+              this.fetchPost('http://saevom06.cafe24.com/activitydata/unregister ', {
+                id: this.state.data.id, // id of the activity that user chose
+                name: global.googleUserName,//this.props.navigation.getParam('userName', 'invalid name from App: Homescreen.js [in <Dialog>]'),
+                email: global.googleUserEmail,// this.props.navigation.getParam('userEmail', 'invalid email from App: Homescreen.js [in <Dialog>]'),
+              }, 'cancle')}
+          >
+            <Text style={styles.cancleButton}>
+              취소하기
             </Text>
           </TouchableOpacity>}
 
-          {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4)) && <TouchableOpacity onPress={() => {
-            this.setState({memoDialogVisible: true});
-          }}>
-            <Text style={styles.memoButton}>
+        {(this.state.isUserRelated == 1 && (this.activityStatus == 4)) &&
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ memoDialogVisible: true });
+            }}
+          >
+            <Text style={styles.memoFinishButton}>
               메모 작성
             </Text>
           </TouchableOpacity>}
 
-          <Dialog.Container visible={this.state.memoDialogVisible}>
 
+        <View style={styles.photoButtons}>
+          {(this.state.isUserRelated == 1 && this.activityStatus == 3) &&
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadStartImg" });
+                this.setState({ dialogVisible: true });
+              }}
+            >
+              <Text style={styles.startButton}>
+                시작 사진 전송
+            </Text>
+            </TouchableOpacity>}
+
+          {(this.state.isUserRelated == 1 && this.activityStatus == 3) &&
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ pictureSendingUrl: "http://saevom06.cafe24.com/activitydata/uploadEndImg" });
+                this.setState({ dialogVisible: true });
+              }}
+            >
+              <Text style={styles.endButton}>
+                종료 사진 전송
+            </Text>
+            </TouchableOpacity>}
+
+          {(this.state.isUserRelated == 1 && this.activityStatus == 3) &&
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ memoDialogVisible: true });
+              }}
+            >
+              <Text style={styles.memoButton}>
+                메모 작성
+            </Text>
+            </TouchableOpacity>}
+        </View>
+
+        <Dialog.Container visible={this.state.memoDialogVisible}>
             <View>
               <Dialog.Input 
                 autoFocus
@@ -460,15 +593,6 @@ export default class ActivityDetailScreen extends React.Component {
               </View>
             </View>
           </Dialog.Container>
-
-
-          {((this.state.isUserRelated == 1 || this.state.isUserRelated == 2) && (this.activityStatus == 1 || this.activityStatus == 2)) && <TouchableOpacity
-            onPress={() => Alert.alert('취소되었습니다')}>
-            <Text style={styles.cancleButton}>
-              취소하기
-            </Text>
-          </TouchableOpacity>}
-        </View>
       </ScrollView>
     )
   }
@@ -479,7 +603,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 25,
+    paddingTop: 15,
+    paddingBottom:15,
     padding: 3,
   },
   box: {
@@ -552,6 +677,28 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 8,
   },
+  cancleButton: {
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: '#777',
+    borderRadius: 50,
+    padding: 8,
+  },
+  memoFinishButton: {
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: 35,
+    marginRight: 35,
+    fontSize: 22,
+    color: '#FFF',
+    backgroundColor: 'rgb(100,140,121)',
+    borderRadius: 50,
+    padding: 8,
+  },
   photoButtons: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -602,15 +749,4 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 8,
   },
-  cancleButton: {
-    flex: 1,
-    textAlign: 'center',
-    marginLeft: 35,
-    marginRight: 35,
-    fontSize: 22,
-    color: '#FFF',
-    backgroundColor: '#777',
-    borderRadius: 50,
-    padding: 8,
-  }
 });

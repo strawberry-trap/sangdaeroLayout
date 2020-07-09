@@ -123,7 +123,6 @@ export default class HomeScreen extends React.Component {
             if (this.state.allNotices.length > 0)
               this.setState({ loadNotices: true })
           } else if (type == 'Activity') {
-            console.log(this.state.allActivities.length)
             if (this.state.allActivities.length > 0)
               this.setState({ loadActivities: true })
           } else {
@@ -213,7 +212,7 @@ export default class HomeScreen extends React.Component {
     var related = true;
     if (type == 1) {
       console.log(l);
-      //related = this.checkUser(l);
+      related = this.checkUser(l);
     }
     if (i == 0) {
       if (type == 0) {
@@ -249,7 +248,7 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: true });
+                this.setState({ related: related });
               }
             }
           />
@@ -268,7 +267,7 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: false });
+                this.setState({ related: related });
               }
             }
           />
@@ -306,7 +305,7 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: true });
+                this.setState({ related: related });
               }
             }
           />
@@ -325,7 +324,7 @@ export default class HomeScreen extends React.Component {
                 this.setState({ userSelectedActivity: l });
                 this.setState({ userSelectedInterestCategory: l.interestCategory });
                 this.setState({ dialogVisible: true });
-                this.setState({ related: false });
+                this.setState({ related: related });
               }
             }
           />
@@ -335,7 +334,7 @@ export default class HomeScreen extends React.Component {
   }
 
   checkUser(l) {
-
+    console.log(l);
     for (var i = 0; i < l.activityVolunteers.length; i++) {
       if (l.activityVolunteers[i].user.socialId == global.googleUserEmail) {
         return true;
@@ -347,6 +346,27 @@ export default class HomeScreen extends React.Component {
       }
     }
     return false;
+  }
+
+  checkUserStatus(l) {
+    for (var i = 0; i < l.activityVolunteers.length; i++) {
+      if (l.activityVolunteers[i].user.socialId == global.googleUserEmail) {
+        switch(l.activityVolunteers[i].status) {
+          case 0:
+            return '승인 대기중'
+          case 1:
+            return '승인'
+          default:
+            return '취소'
+        }
+      }
+    }
+    for (var i = 0; i < l.activityUsers.length; i++) {
+      if (l.activityUsers[i].user.socialId == global.googleUserEmail) {
+        return '이용자';
+      }
+    }
+    return '에러';
   }
 
   render() {
@@ -361,7 +381,9 @@ export default class HomeScreen extends React.Component {
 
             <Dialog.Container visible={this.state.dialogVisible}>
               {this.state.postType != 0 ?
-                <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title} ({this.status[this.state.userSelectedActivity.status]})</Dialog.Title>
+                <Dialog.Title style={{ color: '#000' }} children='required'>
+                  {this.state.userSelectedActivity.title}
+                </Dialog.Title>
                 :
                 <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
               }
@@ -380,7 +402,7 @@ export default class HomeScreen extends React.Component {
 
                   <Dialog.Description>
                     <Text>
-                      {this.state.userSelectedActivity.place}
+                      {this.state.userSelectedActivity.place} {this.state.userSelectedActivity.placeDetail}
                     </Text>
                   </Dialog.Description>
 
@@ -404,7 +426,7 @@ export default class HomeScreen extends React.Component {
                   </Dialog.Description>
                 </View>
               }
-              {this.state.related == false &&
+              {this.state.related == false && this.state.userSelectedActivity.statue == 1 &&
                 <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
                   () => {
                     this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {

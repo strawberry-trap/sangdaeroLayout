@@ -10,6 +10,7 @@ export default class MypageScreen extends React.Component {
   state = {
     allUserActivities: [],
     userInfo: [],
+    interestList:[],
     loadActivities: false,
     loadUserInfo: false,
     loadInterest: false,
@@ -42,6 +43,7 @@ export default class MypageScreen extends React.Component {
 
     this.getData('User');
     this.getData('Activity');
+    this.getInterest();
   }
 
   componentDidUpdate() {
@@ -51,7 +53,33 @@ export default class MypageScreen extends React.Component {
         this.props.route.params.set = false;
         this.getData('User');
         this.getData('Activity');
+        this.getInterest();
       }
+    }
+  }
+
+  getInterest() {
+    var url = "http://saevom06.cafe24.com/userdata/eachUserInterest?name="+global.googleUserName+"&email="+global.googleUserEmail;
+
+console.log(url);
+
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then((response) => response.json())
+        .then((responseInJson) => {
+          if (responseInJson.length > 0) {
+            this.setState({ loadInterest: true });
+            this.setState({ interestList: responseInJson});
+          }
+          console.log(this.state.interestList);
+        })
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -77,9 +105,6 @@ export default class MypageScreen extends React.Component {
             console.log(responseInJson);
             this.setState({ userInfo: responseInJson }); // assign data to state variable
             this.setState({ loadUserInfo: true });
-            if (this.state.userInfo.interestName.length > 0) {
-              this.setState({ loadInterest: true });
-            }
           } else {
             console.log("Get activity data");
             for (var i = 0; i < responseInJson.length; i++) {
@@ -169,12 +194,12 @@ export default class MypageScreen extends React.Component {
         return (
           <ListItem
             key={i}
-            title={l}
+            title={l.interestName}
             titleStyle={styles.item}
             containerStyle={styles.listFirst}
             onPress={
               () => {
-                console.log(l)
+                this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2, id: l.id, name: l.interestName }})
               }
             }
           />
@@ -183,12 +208,12 @@ export default class MypageScreen extends React.Component {
         return (
           <ListItem
             key={i}
-            title={l}
+            title={l.interestName}
             titleStyle={styles.item}
             containerStyle={styles.list}
             onPress={
               () => {
-                console.log(l)
+                this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2, id: l.id, name: l.interestName }})
               }
             }
           />
@@ -333,7 +358,7 @@ export default class MypageScreen extends React.Component {
   render() {
 
     console.disableYellowBox = true;
-    const { allUserActivities, userInfo, loadUserActivities, loadUserInfo, loadInterest } = this.state;
+    const { allUserActivities, userInfo, interestList, loadUserActivities, loadUserInfo, loadInterest } = this.state;
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -355,7 +380,7 @@ export default class MypageScreen extends React.Component {
 
             <Dialog.Description>
               <Text>
-                {this.state.userSelectedActivity.place}
+                {this.state.userSelectedActivity.place} {this.state.userSelectedActivity.placeDetail}
               </Text>
             </Dialog.Description>
 
@@ -422,7 +447,7 @@ export default class MypageScreen extends React.Component {
           </View>
           <View style={styles.activityBox}>
             {loadInterest ?
-              userInfo.interestName.map((l, i) => (
+              interestList.map((l, i) => (
                 this.createListItem(l, i, 0)
               ))
               :
@@ -467,7 +492,7 @@ export default class MypageScreen extends React.Component {
           <View style={styles.listBox}>
             <TouchableOpacity
               style={styles.listFirst}
-              onPress={() => this.props.navigation.navigate('설정')}
+              onPress={() => this.props.navigation.navigate('설정', {params: {phoneAgree : this.state.userInfo.phoneAgree}})}
             >
               <Text style={styles.item}>설정</Text>
             </TouchableOpacity>

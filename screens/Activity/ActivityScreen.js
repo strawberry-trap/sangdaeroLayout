@@ -42,7 +42,7 @@ export default class ActivityScreen extends React.Component {
     if (type == 'Interest') {
       url = 'http://saevom06.cafe24.com/interestdata/getAll'
     } else {
-      url = "http://saevom06.cafe24.com/userdata/getUser?name=" + global.googleUserName + "&email=" + global.googleUserEmail;
+      url = "http://saevom06.cafe24.com/userdata/eachUserInterest?name=" + global.googleUserName + "&email=" + global.googleUserEmail;
     }
     fetch(url, {
       method: 'GET',
@@ -67,11 +67,11 @@ export default class ActivityScreen extends React.Component {
           var notInterestedList = [];
           var list = [];
           console.log('user');
-          console.log(responseInJson.interestName);
-          for (var i = 0; i < responseInJson.interestName.length; i++) {
+          console.log(responseInJson);
+          for (var i = 0; i < responseInJson.length; i++) {
             for (var j = 0; j < this.state.data.length; j++) {
               console.log(j);
-              if (responseInJson.interestName[i] == this.state.data[j].name) {
+              if (responseInJson[i].interestName == this.state.data[j].name) {
                 console.log(this.state.data[j]);
                 interestedList.push(this.state.data[j]);
                 this.state.data.splice(j, 1);

@@ -7,8 +7,6 @@ import Dialog from "react-native-dialog";
 
 export default class ConfigScreen extends React.Component {
   state = {
-    button: true,
-
     // for dialog
     dialogVisible: false,
   };
@@ -16,6 +14,10 @@ export default class ConfigScreen extends React.Component {
   constructor(props) {
     super(props);
     console.log('Config Screen');
+
+    this.state = {
+      phoneAgree: props.route.params.phoneAgree,
+    }
   }
 
   fetchPost(agree) {
@@ -75,11 +77,11 @@ export default class ConfigScreen extends React.Component {
           <View style={styles.listBox}>
             <View style={styles.list}>
               <Text style={styles.item}>전화번호 공유 승인</Text>
-              {this.state.button ?
+              {this.state.phoneAgree ?
                 <TouchableOpacity
                   onPress={() => {
                     this.fetchPost(false);
-                    this.setState({ button: false });
+                    this.setState({ phoneAgree: false });
                   }}
                 >
                   <Ionicons
@@ -93,7 +95,7 @@ export default class ConfigScreen extends React.Component {
                 <TouchableOpacity
                   onPress={() => {
                     this.fetchPost(true);
-                    this.setState({ button: true });
+                    this.setState({ phoneAgree: true });
                   }}
                 >
                   <Ionicons

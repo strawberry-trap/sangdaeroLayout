@@ -53,6 +53,7 @@ export default class ActivityListScreen extends React.Component {
       .then((response) => response.json())
       .then((responseInJson) => {
         console.log('Get activity list');
+        console.log(responseInJson);
         this.setState({ data: responseInJson });
         this.sortDataByUrgentDateTime(responseInJson, 12); // sort data regarding 'deadline'
       })
@@ -290,7 +291,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundUserList}
               />
             </View>
@@ -304,7 +305,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundList}
               />
             </View>
@@ -321,7 +322,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundUserList}
               />
             </View>
@@ -335,7 +336,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundList}
               />
             </View>
@@ -355,7 +356,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundUserList}
               />
             </View>
@@ -369,7 +370,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundList}
               />
             </View>
@@ -386,7 +387,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundUserList}
               />
             </View>
@@ -400,7 +401,7 @@ export default class ActivityListScreen extends React.Component {
                 title={l.title}
                 titleStyle={styles.title}
                 rightElement={this.getImage(l.status, l.isUrgent, 0)}
-                onPress={() => this.props.navigation.navigate('활동 내용', { data: this.state.data[i] })}
+                onPress={() => this.props.navigation.navigate('활동 내용', { data: l })}
                 containerStyle={styles.roundList}
               />
             </View>
@@ -413,12 +414,12 @@ export default class ActivityListScreen extends React.Component {
   checkUser(l) {
     var email = global.googleUserEmail;
     for (var i = 0; i < l.activityVolunteers.length; i++) {
-      if (email == l.activityVolunteers[i].user.socialId) {
+      if (email == l.activityVolunteers[i].user.socialId && l.activityVolunteers[i].status == 1) {
         return true;
       }
     }
     for (var i = 0; i < l.activityUsers.length; i++) {
-      if (email == l.activityUsers[i].user.socialId) {
+      if (email == l.activityUsers[i].user.socialId && l.activityUsers[i].status == 1) {
         return true;
       }
     }

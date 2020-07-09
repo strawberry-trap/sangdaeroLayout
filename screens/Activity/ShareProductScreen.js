@@ -95,7 +95,7 @@ export default class ShareProductScreen extends React.Component {
     hour = this.addZero(hour);
     var minute = this.addZero(newDate.getMinutes());
 
-    return year + "년 " + month + "월 " + date + "일(" + day + ")" + ampm + " " + hour + "시 " + minute + "분";
+    return year + "/" + month + "/" + date + "(" + day + ") " + ampm + " " + hour + ":" + minute;
   }
 
   parseDateForServer(newDate) {
@@ -208,12 +208,12 @@ export default class ShareProductScreen extends React.Component {
     // at the point when the user picked an image, "id, image, name, email" are already appended to formData
     // hence, just add below values
 
-    if (isStartTimeSelected == false || isEndTimeSelected == false ){
+    if (this.state.isStartTimeSelected == false || this.state.isEndTimeSelected == false ){
       Alert.alert("시작시간과 종료 시간을 선택해 주시기 바랍니다.");
       return -1;
     } else { // startTime and endTime is selected
-      formData.append('startTime', startTimeDataForServer);
-      formData.append('endTime', endTimeDataForServer);
+      formData.append('startTime', this.state.startTimeDataForServer);
+      formData.append('endTime', this.state.endTimeDataForServer);
       formData.append('title', this.title);
       formData.append('memo', this.memo);
   
@@ -242,6 +242,7 @@ export default class ShareProductScreen extends React.Component {
               if (this.state.isStartTimeSelected && this.state.isEndTimeSelected) { // start, end time are selected
                 
                 this.sendPictureToServer(url); // send POST request to server only in this condition
+                formData = new FormData();
                 
                 Alert.alert("물건 나눔이 등록되었습니다!\n물건 나눔은 복지관 승인 후 등록됩니다.");
                 this.setState({ dialogVisible: false });
@@ -297,21 +298,16 @@ export default class ShareProductScreen extends React.Component {
   };
 
   handleConfirm = (date) => {
-    if (this.state.isStartTime == true) {
-      this.setState({ startTime: date, startTimeDataForServer: this.parseDateForServer(date) });
+    this.setState({
+      startTime: date,
+      startTimeDataForServer: this.parseDateForServer(date),
+      endTime: date,
+      endTimeDataForServer: this.parseDateForServer(date),
+    });
 
-      if (this.state.startTime > this.state.endTime) {
-        this.setState({ endTime: this.state.startTime, endTimeDataForServer: this.state.startTimeDataForServer });
-      }
-      this.state.isStartTimeSelected = true;
-    } else {
-      this.setState({ endTime: date, endTimeDataForServer: this.parseDateForServer(date) });
+    this.state.isStartTimeSelected = true;
+    this.state.isEndTimeSelected = true;
 
-      if (this.state.startTime > this.state.endTime) {
-        this.setState({ startTime: this.state.endTime, startTimeDataForServer: this.state.endTimeDataForServer });
-      }
-      this.state.isEndTimeSelected = true;
-    }
     this.hideDatePicker();
   };
 
@@ -322,24 +318,14 @@ export default class ShareProductScreen extends React.Component {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View>
-          {this.state.isStartTime ?
-            <DateTimePickerModal
+          <DateTimePickerModal
               isVisible={this.state.isDatePickerVisible}
               mode="datetime"
               date={this.state.startTime}
               display="spinner"
               onConfirm={this.handleConfirm}
               onCancel={this.hideDatePicker}
-            /> :
-            <DateTimePickerModal
-              isVisible={this.state.isDatePickerVisible}
-              mode="datetime"
-              date={this.state.endTime}
-              display="spinner"
-              onConfirm={this.handleConfirm}
-              onCancel={this.hideDatePicker}
             />
-          }
         </View>
 
         <Dialog.Container visible={this.state.dialogVisible}>
@@ -394,38 +380,23 @@ export default class ShareProductScreen extends React.Component {
             </Text>
           </View>
           <View style={styles.list}>
-            <Text style={styles.title}>활동시간</Text>
-            <View style={styles.time}>
+            <Text style={styles.title}>물건 전달 시간</Text>
+
+            <View>
               <TouchableOpacity
                 onPress={() => {
                   this.setState({
-                    isStartTime: true,
                     isDatePickerVisible: true,
                   })
-                }
-                }>
-                <Text style={styles.timeText}>시작시간 선택</Text>
+                }}
+              >
+                {this.state.isStartTimeSelected ?
+                  <Text style={styles.text}>{this.parseDate(this.state.startTime)}</Text>
+                  : <Text style={styles.touchSelectTime}>전달 시간 선택</Text>}
               </TouchableOpacity>
-              <View style={styles.timeList}>
-                <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
-              </View>
-            </View>
-            <View style={styles.time}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({
-                    isStartTime: false,
-                    isDatePickerVisible: true,
-                  })
-                }
-                }>
-                <Text style={styles.timeText}>종료시간 선택</Text>
-              </TouchableOpacity>
-              <View style={styles.timeList}>
-              <Text style={styles.date}>{this.parseDate(this.state.endTime)}</Text>
-              </View>
             </View>
           </View>
+
           <View style={styles.list}>
             <Text style={styles.title}>지원자</Text>
             <Text style={styles.text}>
@@ -505,7 +476,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     paddingLeft: 10,
-    fontSize: 15,
+    fontSize: 18,
     textAlignVertical: 'center',
   },
   time: {
@@ -526,22 +497,34 @@ const styles = StyleSheet.create({
     color: '#FFF',
     backgroundColor: 'rgb(29,140,121)',
   },
+  touchSelectTime: {
+    flex: 1,
+    padding: 5,
+    paddingRight: 10,
+    fontSize: 15,
+    textAlignVertical: 'center',
+    textAlign:'center',
+    borderColor: 'black',
+    borderWidth:0.5,
+    borderRadius:10,
+  },
   date: {
     flex: 1,
-    paddingLeft: 5,
+    padding: 5,
+    paddingRight: 10,
     fontSize: 15,
-    textAlign: 'left',
+    textAlignVertical: 'center',
   },
   selectButton: {
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
     fontSize: 22,
-    color: 'rgb(29,140,121)',
-    backgroundColor: '#FFF',
+    backgroundColor: 'rgb(1, 192, 99)',
+    color:'#FFF',
     borderRadius: 50,
-    borderColor: 'rgb(29,140,121)',
-    borderRadius: 1,
+    borderColor: '#000',
+    borderRadius: 50,
     padding: 8,
   },
   button: {
