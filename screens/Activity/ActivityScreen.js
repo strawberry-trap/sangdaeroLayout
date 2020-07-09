@@ -158,8 +158,8 @@ export default class ActivityScreen extends React.Component {
             title={'전체 활동'}
             chevron={{ size: 30 }}
             onPress={() => this.props.navigation.navigate('활동 목록', { id: 0, name: '전체 활동', listType: 1 })}
-            containerStyle={styles.itemFirst}
-            titleStyle={styles.textFirst}
+            containerStyle={styles.itemInterested}
+            titleStyle={styles.text}
           />
           {userLoading ?
           (userData.map((l, i) => (this.createListItem(l, i, true)))) :

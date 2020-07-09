@@ -385,6 +385,16 @@ export default class MypageScreen extends React.Component {
         </View>
         <View style={styles.box}>
           <View style={styles.title}>
+            <Text style={styles.titleText}>봉사시간</Text>
+          </View>
+          <View style={styles.listBox}>
+            <View style={styles.listFirst}>
+              <Text style={styles.item}>{this.state.userInfo.volunteerTime} 시간</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.box}>
+          <View style={styles.title}>
             <Text style={styles.titleText}>관심사 즐겨찾기</Text>
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:0}})}>
               <Text style={styles.titleButton}>전체보기</Text>

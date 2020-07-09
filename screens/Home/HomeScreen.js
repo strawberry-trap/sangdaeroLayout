@@ -511,19 +511,7 @@ export default class HomeScreen extends React.Component {
                 }
               </View>
             </View>
-
-            <View style={styles.box}>
-              <TouchableOpacity
-                onPress={() => this.setState({ information: true })}
-              >
-                <View style={{ padding: 3, }}>
-                  <Text style={{ fontSize: 25, textAlign: 'center', textAlignVertical: 'center', color: 'rgb(29,140,121)', fontWeight: 'bold' }}>사용 설명서</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-
           </ScrollView>
-
         </ImageBackground>
       </View>
     )

@@ -16,7 +16,12 @@ export default class ActivityListScreen extends React.Component {
       name: props.route.params.name,
       interest: props.route.params.interest,
       data: [],
-      urgentCheckedData: [],
+      doingMatch: [],
+      finishedMatch:[],
+      doingActivity:[],
+      finishedActivity:[],
+      cancledActivity:[],
+      filterList: [],
       isLoading: false,
       search: '',
       filterStatus: 1,
@@ -58,7 +63,6 @@ export default class ActivityListScreen extends React.Component {
       })
   }
 
-  // need restcontroller
   interestPost(type) {
     console.log('change interest');
     if (type == 0) {
@@ -109,6 +113,24 @@ export default class ActivityListScreen extends React.Component {
 
     for (var i in allActivities) {
 
+      switch(allActivities[i].status) {
+        case 1:
+          this.state.doingMatch.push(allActivities[i]);
+          break;
+        case 2:
+          this.state.finishedMatch.push(allActivities[i]);
+          break;
+        case 3:
+          this.state.doingActivity.push(allActivities[i]);
+          break;
+        case 4:
+          this.state.finishedActivity.push(allActivities[i]);
+          break;
+        default:
+          this.state.cancledActivity.push(allActivities[i]);
+          break;
+      }
+
       var deadline = new Date(allActivities[i].deadline); // deadline of activity
 
       // difference between 'deadline' and '12 hours from right now' in hours
@@ -122,11 +144,13 @@ export default class ActivityListScreen extends React.Component {
         notUrgent.push(allActivities[i]);
       }
     }
+
     // sorted as urgent activities first, then not-urgent activities later
     for (var i = 0; i < urgent.length; i++) total.push(urgent[i]);
     for (var i = 0; i < notUrgent.length; i++) total.push(notUrgent[i]);
 
     this.setState({ data: total });
+    this.setList(this.state.filterStatus, this.state.search);
   }
 
   compareAttribute(a, b) {
@@ -134,7 +158,6 @@ export default class ActivityListScreen extends React.Component {
     if (a.isUrgent > b.isUrgent) return 1;
     // else
     return 0;
-
   }
 
   getImage(props, urgent, type) {
@@ -191,11 +214,13 @@ export default class ActivityListScreen extends React.Component {
         </View>
       )
     } else {
+      // Button at dialog list
       return (
         <TouchableOpacity
           onPress={() => {
             this.setState({ filterStatus: props})
             this.setState({ statusVisible: false})
+            this.setList(props, this.state.search)
           }}
         >
           <View style={styles.imageGroup}>
@@ -209,10 +234,46 @@ export default class ActivityListScreen extends React.Component {
     }
   }
 
-  getStatusList(i) {
-    return this.getImage(i, false, 1);
-  }
+  setList(status, search) {
+    var tmplist = [];
+    var list = [];
+    switch (status) {
+      case 1:
+        tmplist = this.state.doingMatch;
+        console.log('1')
+        break;
+      case 2:
+        tmplist = this.state.finishedMatch;
+        console.log('2')
+        break;
+      case 3:
+        tmplist = this.state.doingActivity;
+        console.log('3')
+        break;
+      case 4:
+        tmplist = this.state.finishedActivity;
+        console.log('4')
+        break;
+      case 5:
+        tmplist = this.state.cancledActivity;
+        console.log('5')
+        break;
+      default:
+        tmplist = this.state.data;
+        console.log('0')
+        break;
+    }
 
+    console.log(search);
+    for (var i = 0; i < tmplist.length; i++) {
+      console.log(tmplist[i].title);
+      if (tmplist[i].title.match(search)) {
+        list.push(tmplist[i]);
+      }
+    }
+    //console.log(list);
+    this.setState({ filterList : list })
+  }
 
   createListItem(l, i) {
 
@@ -419,7 +480,7 @@ export default class ActivityListScreen extends React.Component {
 
   render() {
 
-    const { data, urgentCheckedData, isLoading } = this.state;
+    const { filterList, isLoading, filterStatus } = this.state;
 
     const statusList = [1, 2, 3, 4, 5, 6];
 
@@ -459,7 +520,8 @@ export default class ActivityListScreen extends React.Component {
               lightTheme
               round
               onChangeText={(text) => {
-                this.setState({ search: text });
+                this.setState({ search: text },
+                this.setList(this.state.filterStatus, text))
               }}
               value={this.state.search}
             />
@@ -467,21 +529,23 @@ export default class ActivityListScreen extends React.Component {
               style={styles.filterContainer}
               onPress={() => this.setState({statusVisible: true})}
             >
-              {this.getImage(this.state.filterStatus, false, 1)}
+              {this.getImage(filterStatus, false, 1)}
             </TouchableOpacity>
           </View>
 
           <View style={styles.listBox}>
-            {isLoading ?
-              (data.map((l, i) => (
-                this.createListItem(l, i)
-              ))
-              ) :
-              <ListItem
-                key={0}
-                title='등록된 활동이 없습니다'
-                containerStyle={styles.listFirst}
-              />}
+            {
+              !isLoading &&
+                <ListItem
+                  key={0}
+                  title='등록된 활동이 없습니다'
+                  containerStyle={styles.listFirst}
+                />
+              || isLoading &&
+                (filterList.map((l, i) => (
+                  this.createListItem(l, i)
+                )))
+            }
           </View>
 
         </View>
