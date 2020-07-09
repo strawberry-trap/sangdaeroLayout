@@ -1,143 +1,131 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
-import * as Google from 'expo-google-app-auth';
-
-// reference) https://reactnative.dev/docs/asyncstorage.html
-// import { AsyncStorage } from '@react-native-community/async-storage';
-// import { Base64 } from 'js-base64';
-
-// ** You may use below line when exporting, because 'expo-google-app-auth' doesn't work when the app is released.
-// import * as Google from 'expo-google-sign-in';
+import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, Alert } from 'react-native';
+import * as GoogleSignIn from 'expo-google-sign-in'; // *** Current version only works for android.
 
 export default class LoginScreen extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     console.log("[ LoginScreen.js ]");
-
     global.loggedIn = false;
   }
 
-  _isMounted = false;
-
   state = {
-    userName: '', userEmail: '', userId: '',
-    isExistingUser: false,
-  }
-
-  // base64Encoding(string){
-  //   return Base64.encode(string);
-  // }
-
-  // async setSession(email, name){
-
-  //   let encryptedEmail = this.base64Encoding(email);
-  //   let encryptedName = this.base64Encoding(name);
-
-  //   try {
-  //     await AsyncStorage.multiSet([
-  //       ["email", encryptedEmail],
-  //       ["name", encryptedName],
-  //     ]);
-  //   } catch (e){ console.log(e) }
-  // }
-
-  // async getSession(){
-
-  //   AsyncStorage.multiGet(['email', 'name']).then((data) => {
-
-  //     let email = data[0][1];
-  //     let name = data[1][1];
-  //     let session = {"email":email, "name":name};
-  
-  //     return session;
-  // });
-  // }
-
-  // deleteSession(){
-    
-  //   let keys = ['email', 'name'];
-
-  //   AsyncStorage.multiRemove(keys, (err) => {
-  //     console.log('Local storage session is removed.');
-  // });
-  // }
-
-
-  // checks if currently logged in user is existing or not
-  checkIfExistingUser(userName, userEmail){
-
-    const url = 'http://saevom06.cafe24.com/'; // *** Restcontroller URL is needed
-    return fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ // send this data to server to authenticate user
-        "userName" : userName,
-        "userEmail" : userEmail,
-      }),
-    }).then((response) => {  // restcontroller should return "true" or "false". Also, you must check if the response data is boolean or string.
-      response === true ? this.setState({isExistingUser:false}) : this.setState({isExistingUser:false})
-    });
-
+    user: null,
+    userName: '',
+    userEmail: '',
+    isExistingUser: true,
+    isProcedureCompleted: false,
   }
 
   componentDidMount() {
-    this._isMounted = true;
+    this.initAsync();
   }
 
-  signInWithGoogleAsync = async () => {
+  // google sign in for standalone apps
+  initAsync = async () => {
+
+    // for android
+    const clientId = '700723661373-oomfpjnkd2hifvo77qjj129k7vqhnb4h.apps.googleusercontent.com';
+    /*
+    in app.json, 
+    Note that if you've enabled Google Play's app signing service, you will need to grab their app signing certificate in production rather than the upload certificate returned by expo fetch:android:hashes. You can do this by grabbing the signature from Play Console -> Your App -> Release management -> App signing, and then going to the API Dashboard -> Credentials and adding the signature to your existing credential.
+    */
+    
     try {
-      const result = await Google.logInAsync({
-        // behavior: 'web',
-        androidClientId: '700723661373-ckna2mf0s53q9bv2q2eelpcneh0jdhg3.apps.googleusercontent.com',
-        iosClientId: '700723661373-oomfpjnkd2hifvo77qjj129k7vqhnb4h.apps.googleusercontent.com',
-        scopes: ['profile', 'email']
+      await GoogleSignIn.initAsync({
+        behavior:"web",
+        androidStandaloneAppClientId: clientId,
+        scopes: ['profile', 'email'],
       });
-      if (result.type === 'success') {
-        if (this._isMounted) {
-          global.googleUserName = result.user.name;
-          global.googleUserEmail = result.user.email;
-          global.loggedIn = true; // now user is logged in.
-
-          // check if existing user or not
-          this.checkIfExistingUser(result.user.name, result.user.email);
-        }
-        return result.accessToken;
-      } else {
-        return { cancelled: true };
-      }
-    } // end of try
-    catch (e) {
-      return { error: true };
+      this._syncUserWithStateAsync();
+    } catch (e) {
+      alert('GoogleSignIn.initAsync(): ' + e);
     }
+  };
+
+  _syncUserWithStateAsync = async () => {
+
+    const user = await GoogleSignIn.signInSilentlyAsync();
+    this.setState({ user });
+
+    var fullName = user.lastName + user.firstName;
+
+    global.googleUserName = fullName;
+    global.googleUserEmail = user.email;
+    global.loggedIn = true; // now user is logged in.
+
+    this.checkIfExistingUser(fullName, user.email);
+  };
+
+  signOutAsync = async () => {
+    await GoogleSignIn.signOutAsync();
+    this.setState({ user: null });
+  };
+
+  signInAsync = async () => {
+
+    try {
+      await GoogleSignIn.askForPlayServicesAsync();
+      const { type, user } = await GoogleSignIn.signInAsync();
+      if (type === 'success') {
+        this._syncUserWithStateAsync();
+      }
+    } catch ({ message }) {
+      alert('login: Error:' + message);
+    }
+  };
+
+  // checks if currently logged in user is existing or not
+  checkIfExistingUser(userName, userEmail) {
+
+    // ser?name=" + global.googleUserName + "&email=
+    const url = 'http://saevom06.cafe24.com/userdata/checkNewUser?name=' + userName + "&email=" + userEmail;
+
+    return fetch(url, {
+      method: 'GET',
+      headers: { 
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        async: false,
+      },
+    })
+      .then((response) => response.json())
+      .then((responseInJson) => {
+        console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
+        responseInJson == false || responseInJson == "false" ? this.setState({ isExistingUser: true }) : this.setState({ isExistingUser: false })
+
+        this.setState({ isProcedureCompleted: true });
+      })
+      .catch((e) => console.log(e))
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
+  componentDidUpdate() {
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
+      this.props.navigation.navigate('Agreement');
+    }
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
+      this.props.navigation.navigate('Main');
+    }
   }
 
   render() {
     return (
       <View style={styles.container}>
         {!global.loggedIn &&
-        <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
-          <TouchableOpacity style={styles.button} onPress={() => this.signInWithGoogleAsync()}>
-            <Image
-              style={styles.logo}
-              source={require('../../assets/images/google_logo.png')}
-            />
-            <Text style={styles.text}>
-              Google 아이디로 로그인
+          <ImageBackground source={require('../../assets/images/login.png')} style={styles.imageBackground}>
+            <TouchableOpacity style={styles.button} onPress={this.signInAsync}>
+              <Image
+                style={styles.logo}
+                source={require('../../assets/images/google_logo.png')}
+              />
+              <Text style={styles.text}>
+                Google 아이디로 로그인
             </Text>
-            <View style={styles.space}/>
-          </TouchableOpacity>
-        </ImageBackground>
+              <View style={styles.space} />
+            </TouchableOpacity>
+          </ImageBackground>
         }
-        {(global.loggedIn == true && this.state.isExistingUser == true) && this.props.navigation.navigate('Main')}
-        {(global.loggedIn == true && this.state.isExistingUser == false) && this.props.navigation.navigate('Main')}
       </View>
     );
   }
@@ -151,40 +139,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageBackground: {
-    flex:1,
-    flexDirection:'column-reverse',
-    resizeMode:'cover',
+    flex: 1,
+    flexDirection: 'column-reverse',
+    resizeMode: 'cover',
   },
   button: {
     margin: 10,
     marginBottom: 95,
     height: 50,
-    borderRadius:50,
-    borderColor:'#FFF',
-    borderWidth:1,
-    backgroundColor:'rgba(255,255,255,0.25)',
-    flexDirection:'row',
+    borderRadius: 50,
+    borderColor: '#FFF',
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    flexDirection: 'row',
   },
   logo: {
-    width:28,
-    height:28,
-    marginTop:11,
-    marginLeft:35,
-    marginRight:10,
+    width: 28,
+    height: 28,
+    marginTop: 11,
+    marginLeft: 35,
+    marginRight: 10,
   },
   space: {
-    width:28,
-    height:28,
-    marginTop:11,
-    marginRight:35,
-    marginLeft:10,
+    width: 28,
+    height: 28,
+    marginTop: 11,
+    marginRight: 35,
+    marginLeft: 10,
   },
   text: {
-    flex:1,
-    fontSize:16,
-    paddingLeft:15,
-    textAlign:'center',
+    flex: 1,
+    fontSize: 16,
+    paddingLeft: 15,
+    textAlign: 'center',
     textAlignVertical: 'center',
-    color:'#FFF',
+    color: '#FFF',
   }
 });
