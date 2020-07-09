@@ -28,6 +28,7 @@ export default class NoticeListScreen extends React.Component {
     }
 
     getData() {
+        
         fetch('http://saevom06.cafe24.com/noticedata/getNotices', {
             method: 'GET',
             headers: {
