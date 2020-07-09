@@ -428,7 +428,7 @@ export default class ActivityDetailScreen extends React.Component {
             </Text>
           </TouchableOpacity>}
 
-          {(this.state.isUserRelated == 1 && this.activityStatus <= 4) && <TouchableOpacity onPress={() => {
+          {(this.state.isUserRelated == 1 && (this.activityStatus == 3 || this.activityStatus == 4)) && <TouchableOpacity onPress={() => {
             this.setState({memoDialogVisible: true});
           }}>
             <Text style={styles.memoButton}>

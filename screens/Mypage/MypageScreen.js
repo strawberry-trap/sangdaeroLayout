@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, Input, TouchableOpacity, View, TextInput, ImageBackground, Alert } from 'react-native';
+import { StyleSheet, Text, Image, TouchableOpacity, View, TextInput, ImageBackground, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import Dialog from "react-native-dialog";
@@ -24,7 +24,7 @@ export default class MypageScreen extends React.Component {
     serverUrl: '',
 
     //nickname change
-    changedNickName : "",
+    changedNickName: "",
   };
 
   constructor(props) {
@@ -44,11 +44,11 @@ export default class MypageScreen extends React.Component {
     this.getData('Activity');
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     if (this.props.route.params?.set) {
       if (this.props.route.params.set) {
         console.log("Get new data");
-        this.props.route.params.set= false;
+        this.props.route.params.set = false;
         this.getData('User');
         this.getData('Activity');
       }
@@ -78,7 +78,7 @@ export default class MypageScreen extends React.Component {
             this.setState({ userInfo: responseInJson }); // assign data to state variable
             this.setState({ loadUserInfo: true });
             if (this.state.userInfo.interestName.length > 0) {
-              this.setState({ loadInterest: true});
+              this.setState({ loadInterest: true });
             }
           } else {
             console.log("Get activity data");
@@ -128,6 +128,41 @@ export default class MypageScreen extends React.Component {
     return year + month + day + hour + minute;
   }
 
+  getImage(props) {
+    var path;
+
+    // Allocating path as dynamic will cause error
+    switch (props) {
+      case 0:
+        path = require('../../assets/images/status_0.png');
+        break;
+      case 1:
+        path = require('../../assets/images/status_1.png');
+        break;
+      case 2:
+        path = require('../../assets/images/status_2.png');
+        break;
+      case 3:
+        path = require('../../assets/images/status_3.png');
+        break;
+      case 4:
+        path = require('../../assets/images/status_4.png');
+        break;
+      default:
+        path = require('../../assets/images/status_5.png');
+        break;
+    }
+
+    return (
+      <View style={styles.imageGroup}>
+        <Image
+          source={path}
+          style={styles.statusButton}
+        />
+      </View>
+    )
+  }
+
   createListItem(l, i, type) {
     if (type == 0) {
       if (i == 0) {
@@ -167,6 +202,7 @@ export default class MypageScreen extends React.Component {
             title={l.title}
             titleStyle={styles.item}
             containerStyle={styles.listFirst}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: 2 });
@@ -184,6 +220,7 @@ export default class MypageScreen extends React.Component {
             title={l.title}
             titleStyle={styles.item}
             containerStyle={styles.list}
+            rightElement={this.getImage(l.status)}
             onPress={
               () => {
                 this.setState({ postType: 2 });
@@ -196,18 +233,18 @@ export default class MypageScreen extends React.Component {
         )
       }
     }
-    
+
   }
 
   changeNickName = () => {
 
     let nick = this.state.changedNickName;
     if (nick == "") nick = this.state.userInfo.nickname;
-    
+
     let data = {
-      'name' : global.googleUserName,
-      'email' : global.googleUserEmail,
-      'nickname' : nick+"",
+      'name': global.googleUserName,
+      'email': global.googleUserEmail,
+      'nickname': nick + "",
     }
     console.log(data);
 
@@ -249,10 +286,10 @@ export default class MypageScreen extends React.Component {
   }
 
   unregister = () => {
-    
+
     let data = {
-      'name' : global.googleUserName,
-      'email' : global.googleUserEmail,
+      'name': global.googleUserName,
+      'email': global.googleUserEmail,
     }
 
     Alert.alert(
@@ -302,49 +339,32 @@ export default class MypageScreen extends React.Component {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: '#000' }} children='required'><Text>{this.state.userSelectedActivity.title}</Text></Dialog.Title>
+          <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
 
-          <Dialog.Description>
-            <Text>
-              {this.status[this.state.userSelectedActivity.status]}
-            </Text>
-          </Dialog.Description>
+          <View>
+            <Dialog.Description>
+              <Text>
+                {this.state.userSelectedInterestCategory.name}
+              </Text>
+            </Dialog.Description>
+            <Dialog.Description>
+              <Text>
+                {this.state.userSelectedActivity.startTime} ~ {this.state.userSelectedActivity.endTime}
+              </Text>
+            </Dialog.Description>
 
-          <Dialog.Description>
-            <Text>
-              마감 기한 : {this.state.userSelectedActivity.deadline}
-            </Text>
-          </Dialog.Description>
+            <Dialog.Description>
+              <Text>
+                {this.state.userSelectedActivity.place}
+              </Text>
+            </Dialog.Description>
 
-          <Dialog.Description>
-            <Text>
-              관심사 : {this.state.userSelectedInterestCategory.name}
-            </Text>
-          </Dialog.Description>
-
-          <Dialog.Description>
-            <Text>
-              시작시간 : {this.state.userSelectedActivity.startTime}
-            </Text>
-          </Dialog.Description>
-
-          <Dialog.Description>
-            <Text>
-              종료시간 : {this.state.userSelectedActivity.endTime}
-            </Text>
-          </Dialog.Description>
-
-          <Dialog.Description>
-            <Text>
-              장소 : {this.state.userSelectedActivity.place}
-            </Text>
-          </Dialog.Description>
-
-          <Dialog.Description>
-            <Text>
-              세부 내용 : {this.state.userSelectedActivity.content}
-            </Text>
-          </Dialog.Description>
+            <Dialog.Description>
+              <Text>
+                {this.state.userSelectedActivity.content}
+              </Text>
+            </Dialog.Description>
+          </View>
 
           <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
 
@@ -369,12 +389,12 @@ export default class MypageScreen extends React.Component {
               <TextInput
                 style={styles.item}
                 defaultValue={this.state.userInfo.nickname}
-                onChangeText={(input) => { 
-                  this.setState({changedNickName: input});
-               }}
+                onChangeText={(input) => {
+                  this.setState({ changedNickName: input });
+                }}
               />
               <Ionicons
-                onPress={() => {this.changeNickName();}}
+                onPress={() => { this.changeNickName(); }}
                 name={'ios-build'}
                 size={30}
                 style={{ marginTop: 7 }}
@@ -396,7 +416,7 @@ export default class MypageScreen extends React.Component {
         <View style={styles.box}>
           <View style={styles.title}>
             <Text style={styles.titleText}>관심사 즐겨찾기</Text>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:0}})}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 0 } })}>
               <Text style={styles.titleButton}>전체보기</Text>
             </TouchableOpacity>
           </View>
@@ -418,7 +438,7 @@ export default class MypageScreen extends React.Component {
         <View style={styles.box}>
           <View style={styles.title}>
             <Text style={styles.titleText}>나의 활동</Text>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params:{set:true, listType:2}})}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Activity', { screen: '관심사 목록', params: { set: true, listType: 2 } })}>
               <Text style={styles.titleButton}>전체보기</Text>
             </TouchableOpacity>
           </View>
@@ -532,6 +552,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingRight: 8,
     paddingLeft: 8,
+  },
+  statusButton: {
+    width: 70,
+    height: 20,
+    resizeMode: 'contain',
+    marginLeft: 10,
   },
   listFirst: {
     flex: 1,
