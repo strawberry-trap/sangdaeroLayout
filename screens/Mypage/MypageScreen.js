@@ -497,27 +497,6 @@ console.log(url);
               <Text style={styles.item}>설정</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.listBox}>
-            <TouchableOpacity
-              style={styles.list}
-              onPress={() => {
-                global.loggedIn = false; // this variable will be set to be 'false' at the constructor of LoginScreen anyway.
-                this.props.navigation.navigate('Log', { params: { reset: true } });
-              }}
-            >
-              <Text style={styles.item}>로그아웃</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.listBox}>
-            <TouchableOpacity
-              style={styles.list}
-              onPress={() => this.props.navigation.navigate('설정')}
-            >
-              <Text style={styles.item}>회원 탈퇴</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
     )
