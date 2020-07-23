@@ -37,14 +37,6 @@ export default class NoticeDetailScreen extends React.Component {
   
   render() {
 
-    var url = 'http://saevom06.cafe24.com/notice/post/' + this.state.data.id; // *** Must fix the url, given from Server developers.
-
-    return ( 
-    <WebView
-      source={{ uri: url}}
-      style={{ marginTop: 20 }}
-    />)
-
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.box}>

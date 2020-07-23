@@ -14,15 +14,13 @@ export default class LoginScreen extends Component {
     user: null,
     userName: '',
     userEmail: '',
-    isExistingUser: false,
+    isExistingUser: true,
     isProcedureCompleted: false,
   }
 
   componentDidMount() {
     this.initAsync();
   }
-
-
 
   // google sign in for standalone apps
   initAsync = async () => {
@@ -78,7 +76,6 @@ export default class LoginScreen extends Component {
     }
   };
 
-
   // checks if currently logged in user is existing or not
   checkIfExistingUser(userName, userEmail) {
 
@@ -87,7 +84,7 @@ export default class LoginScreen extends Component {
 
     return fetch(url, {
       method: 'GET',
-      headers: {
+      headers: { 
         Accept: 'application/json',
         'Content-Type': 'application/json',
         async: false,
@@ -95,8 +92,9 @@ export default class LoginScreen extends Component {
     })
       .then((response) => response.json())
       .then((responseInJson) => {
-        console.log(responseInJson);
-        responseInJson == true || responseInJson == "true" ? this.setState({ isExistingUser: true }) : this.setState({ isExistingUser: false })
+        console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
+        responseInJson == false || responseInJson == "false" ? this.setState({ isExistingUser: true }) : this.setState({ isExistingUser: false })
+
         this.setState({ isProcedureCompleted: true });
       })
       .catch((e) => console.log(e))
@@ -104,11 +102,9 @@ export default class LoginScreen extends Component {
 
   componentDidUpdate() {
     if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
-      Alert.alert('[디버깅용]처음 등록하는 유저');
       this.props.navigation.navigate('Agreement');
     }
     if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
-      Alert.alert('[디버깅용]이미 존재하는 유저');
       this.props.navigation.navigate('Main');
     }
   }
