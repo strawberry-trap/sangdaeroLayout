@@ -25,6 +25,7 @@
     "android": {
       "package": "com.sangdaero.app",
       "versionCode": 1,
+      "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "config" :{
         "googleSignIn" : {
