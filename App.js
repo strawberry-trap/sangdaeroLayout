@@ -1,8 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import * as React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Platform, StatusBar, StyleSheet, View, Text } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
+import Constants from 'expo-constants';
 
 import useCachedResources from './hooks/useCachedResources';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
@@ -55,8 +58,9 @@ export default class App extends React.Component {
                 headerShown: false,
               }}
             >
-              <Stack.Screen name="Log" component={LoginScreen} />
               <Stack.Screen name="Main" component={BottomTabNavigator} />
+              <Stack.Screen name="Log" component={LoginScreen} />
+              
               <Stack.Screen name="Agreement" component={AgreementScreen}/>
               
             </Stack.Navigator>
