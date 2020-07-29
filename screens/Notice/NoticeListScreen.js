@@ -58,7 +58,7 @@ export default class NoticeListScreen extends React.Component {
       async sendPushNotification(expoPushToken) {
 
         const message = {
-          to: 'ExponentPushToken[YadEHlHnt_Ks9qRolTIb9y]',
+          to: global.token,
           sound: 'default',
           title: 'Original Title',
           body: 'And here is the body!',

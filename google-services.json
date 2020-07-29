@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "295208700040-sal8boioolpkcu3l47i1sa4gbi41ff1t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sangdaero.app",
+            "certificate_hash": "e6c0ffdfce604ad9efd478a88abb6f91b5db4128"
+          }
+        },
+        {
+          "client_id": "295208700040-ft0auv98mlnvhvusddcf2ggot6avnmf7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sangdaero.app",
+            "certificate_hash": "835305136ce43cd8fd388779ff4ab59a7bfd1802"
+          }
+        },
+        {
           "client_id": "295208700040-9j2hianpa7a402hj61j9t273kie75dhg.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -26,7 +26,7 @@ export default class LoginScreen extends Component {
   initAsync = async () => {
 
     // for android
-    const clientId = '700723661373-oomfpjnkd2hifvo77qjj129k7vqhnb4h.apps.googleusercontent.com';
+    const clientId = '295208700040-ft0auv98mlnvhvusddcf2ggot6avnmf7.apps.googleusercontent.com';
     /*
     in app.json, 
     Note that if you've enabled Google Play's app signing service, you will need to grab their app signing certificate in production rather than the upload certificate returned by expo fetch:android:hashes. You can do this by grabbing the signature from Play Console -> Your App -> Release management -> App signing, and then going to the API Dashboard -> Credentials and adding the signature to your existing credential.
@@ -93,11 +93,41 @@ export default class LoginScreen extends Component {
       .then((response) => response.json())
       .then((responseInJson) => {
         console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
-        responseInJson == false || responseInJson == "false" ? this.setState({ isExistingUser: true }) : this.setState({ isExistingUser: false })
 
+        if (responseInJson == false || responseInJson == "false") {
+          this.setState({ isExistingUser: true }); 
+        } else {
+          this.setState({ isExistingUser: false });
+        }
+        this.addToken(userName, userEmail, global.token);
         this.setState({ isProcedureCompleted: true });
       })
       .catch((e) => console.log(e))
+  }
+
+  addToken(userName, userEmail, token) {
+    
+    var data = {
+      name : userName,
+      email : userEmail,
+      token : token,
+    }
+    var url = "http://saevom06.cafe24.com/userdata/addToken"
+
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        console.log(token+'Token Added');
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
   }
 
   componentDidUpdate() {
@@ -112,11 +142,11 @@ export default class LoginScreen extends Component {
   render() {
 
     // for debugging, move to homeScreen right away
+    /*
     global.googleUserName = "권현우";
     global.googleUserEmail = "21400045@handong.edu";
     global.loggedIn = true;
-
-    this.props.navigation.navigate('Main');
+    */
 
     return (
       <View style={styles.container}>

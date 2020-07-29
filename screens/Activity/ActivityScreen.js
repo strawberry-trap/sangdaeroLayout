@@ -114,7 +114,7 @@ export default class ActivityScreen extends React.Component {
             key={i + 2}
             title={l.name}
             chevron={{ size: 30 }}
-            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: true, listType: 0 })}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: true })}
             rightElement={<Ionicons name="md-heart" size={30} color="#F77" />}
             containerStyle={styles.item}
             titleStyle={styles.text}
@@ -126,7 +126,7 @@ export default class ActivityScreen extends React.Component {
             key={i + 2}
             title={l.name}
             chevron={{ size: 30 }}
-            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: false, listType: 0 })}
+            onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: false})}
             containerStyle={styles.item}
             titleStyle={styles.text}
           />

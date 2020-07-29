@@ -435,6 +435,7 @@ console.log(url);
           <View style={styles.listBox}>
             <View style={styles.listFirst}>
               <Text style={styles.item}>{this.state.userInfo.volunteerTime} 시간</Text>
+              <Text style={styles.itemReverse}>{this.state.userInfo.rank}등 / {this.state.userInfo.totalUser}등</Text>
             </View>
           </View>
         </View>
@@ -579,8 +580,16 @@ const styles = StyleSheet.create({
   },
   item: {
     flex: 1,
+    textAlign:'left',
     fontSize: 20,
     paddingTop: 8,
     paddingBottom: 8,
-  }
+  },
+  itemReverse: {
+    flex: 1,
+    textAlign:'right',
+    fontSize: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
 });

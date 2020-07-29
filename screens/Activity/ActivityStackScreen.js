@@ -14,7 +14,7 @@ const ActivityStack = createStackNavigator();
 
 export default function ActivityStackScreen({ navigation, route }) {
   return (
-    <ActivityStack.Navigator initialRouteName='관심사 목록'
+    <ActivityStack.Navigator initialRouteName='활동 목록'
       screenOptions={{
         headerRight: () => (
           <TouchableOpacity
@@ -39,8 +39,8 @@ export default function ActivityStackScreen({ navigation, route }) {
         headerTintColor: '#FFF',
       }}
     >
-      <ActivityStack.Screen name='관심사 목록' component={ActivityScreen} />
       <ActivityStack.Screen name='활동 목록' component={ActivityListScreen} />
+      <ActivityStack.Screen name='관심사 목록' component={ActivityScreen} />
       <ActivityStack.Screen name='활동 내용' component={ActivityDetailScreen} />
       <ActivityStack.Screen name='요청하기' component={RequestScreen} />
       <ActivityStack.Screen name='물건 나눔' component={ShareProductScreen} />

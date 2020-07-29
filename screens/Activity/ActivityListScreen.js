@@ -460,7 +460,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart" size={30} color="#F77" />
+            <Ionicons name="md-heart" size={45} color="#F77" />
           </TouchableOpacity>
         )
       } else {
@@ -472,7 +472,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart-empty" size={30} color="#F77" />
+            <Ionicons name="md-heart-empty" size={45} color="#F77" />
           </TouchableOpacity>
         )
       }
@@ -510,7 +510,12 @@ export default class ActivityListScreen extends React.Component {
         }
         <View style={styles.box}>
           <View style={styles.name}>
-            <Text style={styles.nameText}>{this.state.name}</Text>
+            <TouchableOpacity
+              style={styles.nameTextBox}
+              onPress={() => this.props.navigation.navigate('Activity', {screen: '관심사 목록', params: {set: true, listType:0}})}
+              >
+              <Text style={styles.nameText}>{this.state.name}</Text>
+            </TouchableOpacity>
             {this.checkInterest(this.state.id, this.state.interest)}
           </View>
           <View style={{flexDirection:'row'}}>
@@ -603,7 +608,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    marginBottom: 15,
+    marginBottom: 10,
     marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
@@ -630,12 +635,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 15,
   },
-  nameText: {
+  nameTextBox: {
     flex: 1,
+  },
+  nameText: {
     alignSelf: 'flex-start',
+    textAlign:'center',
+    textAlignVertical:'center',
     fontSize: 25,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
+    borderWidth:2,
+    borderRadius:50,
+    paddingRight:10,
+    paddingLeft:10,
+    paddingTop:5,
+    paddingBottom:5,
+    borderColor: 'rgb(29,140,121)',
+    backgroundColor: 'rgb(223,244,243)',
   },
   nameButton: {
     color: 'rgb(140,140,140)',
