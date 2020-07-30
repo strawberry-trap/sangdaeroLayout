@@ -33,6 +33,7 @@ export default function NoticeStackScreen({ navigation, route }) {
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerLeft: null,
         headerTintColor: '#FFF',
       }}
     >

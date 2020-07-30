@@ -20,7 +20,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         activeTintColor: 'rgb(1, 192, 99)',
         inactiveTintColor: 'gray',
       }
-    }
+}
     >
       <BottomTab.Screen
         name="Home"

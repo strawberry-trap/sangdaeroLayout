@@ -460,7 +460,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart" size={30} color="#F77" />
+            <Ionicons name="md-heart" size={45} color="#F77" />
           </TouchableOpacity>
         )
       } else {
@@ -472,7 +472,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart-empty" size={30} color="#F77" />
+            <Ionicons name="md-heart-empty" size={45} color="#F77" />
           </TouchableOpacity>
         )
       }
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    marginBottom: 15,
+    marginBottom: 10,
     marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
@@ -630,10 +630,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 15,
   },
+  nameTextBox: {
+    flex: 1,
+  },
   nameText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 25,
+    textAlignVertical:'center',
+    fontSize: 35,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
   },

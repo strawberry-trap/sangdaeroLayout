@@ -47,13 +47,7 @@
     "react-native-safe-area-context": "~3.0.7",
     "react-native-screens": "~2.9.0",
     "react-native-web": "~0.11.7",
-<<<<<<< HEAD
-    "react-native-webview": "^10.3.2",
-    "expo-notifications": "~0.1.1",
-    "expo-permissions": "~8.1.0"
-=======
     "react-native-webview": "9.4.0"
->>>>>>> ad944bbf746acc04a06503200ba275368776d7d8
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

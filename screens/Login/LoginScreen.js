@@ -14,7 +14,7 @@ export default class LoginScreen extends Component {
     user: null,
     userName: '',
     userEmail: '',
-    isExistingUser: false,
+    isExistingUser: true,
     isProcedureCompleted: false,
   }
 
@@ -22,13 +22,11 @@ export default class LoginScreen extends Component {
     this.initAsync();
   }
 
-
-
   // google sign in for standalone apps
   initAsync = async () => {
 
     // for android
-    const clientId = '700723661373-oomfpjnkd2hifvo77qjj129k7vqhnb4h.apps.googleusercontent.com';
+    const clientId = '295208700040-ft0auv98mlnvhvusddcf2ggot6avnmf7.apps.googleusercontent.com';
     /*
     in app.json, 
     Note that if you've enabled Google Play's app signing service, you will need to grab their app signing certificate in production rather than the upload certificate returned by expo fetch:android:hashes. You can do this by grabbing the signature from Play Console -> Your App -> Release management -> App signing, and then going to the API Dashboard -> Credentials and adding the signature to your existing credential.
@@ -78,7 +76,6 @@ export default class LoginScreen extends Component {
     }
   };
 
-
   // checks if currently logged in user is existing or not
   checkIfExistingUser(userName, userEmail) {
 
@@ -87,7 +84,7 @@ export default class LoginScreen extends Component {
 
     return fetch(url, {
       method: 'GET',
-      headers: {
+      headers: { 
         Accept: 'application/json',
         'Content-Type': 'application/json',
         async: false,
@@ -95,33 +92,68 @@ export default class LoginScreen extends Component {
     })
       .then((response) => response.json())
       .then((responseInJson) => {
-        console.log(responseInJson);
-        responseInJson == true || responseInJson == "true" ? this.setState({ isExistingUser: true }) : this.setState({ isExistingUser: false })
+        console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
+
+        if (responseInJson == false || responseInJson == "false") {
+          this.setState({ isExistingUser: true }); 
+        } else {
+          this.setState({ isExistingUser: false });
+        }
+        if (token != null) {
+          this.addToken(userName, userEmail, global.token);
+        }
+        
         this.setState({ isProcedureCompleted: true });
       })
       .catch((e) => console.log(e))
   }
 
+  addToken(userName, userEmail, token) {
+    
+    var data = {
+      name : userName,
+      email : userEmail,
+      token : token,
+    }
+    var url = "http://saevom06.cafe24.com/userdata/addToken"
+
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+      }).then((res) => {
+        console.log(token+'Token Added');
+      });
+    } catch (e) {
+      console.warn('fetch failed', e, url);
+    }
+  }
+
   componentDidUpdate() {
+    console.log(global.loggedIn);
     if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
-      Alert.alert('[디버깅용]처음 등록하는 유저');
       this.props.navigation.navigate('Agreement');
     }
     if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
-      Alert.alert('[디버깅용]이미 존재하는 유저');
       this.props.navigation.navigate('Main');
     }
   }
 
   render() {
-
     // for debugging, move to homeScreen right away
-    global.googleUserName = "권현우";
-    global.googleUserEmail = "21400045@handong.edu";
-    global.loggedIn = true;
-
-    this.props.navigation.navigate('Main');
-
+/*
+    console.log('login');
+    
+    global.googleUserName = "윤하늘";
+    global.googleUserEmail = "hnsamuel1226@gmail.com";
+    //global.loggedIn = true;
+    if (global.loggedIn)
+      this.props.navigation.navigate('Main');
+*/
     return (
       <View style={styles.container}>
         {!global.loggedIn &&
