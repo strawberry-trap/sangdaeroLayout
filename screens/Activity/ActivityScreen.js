@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   text: {
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold',
     paddingLeft: 20,
     color: 'rgb(29,140,121)',

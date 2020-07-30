@@ -379,33 +379,41 @@ export default class HomeScreen extends React.Component {
 
             <Dialog.Container visible={this.state.dialogVisible}>
               {this.state.postType != 0 ?
-                <Dialog.Title style={{ color: '#000' }} children='required'>
+                <Dialog.Title style={{ color: 'green', fontSize: 30, }} children='required'>
                   {this.state.userSelectedActivity.title}
                 </Dialog.Title>
                 :
-                <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
+                <Dialog.Title style={{ color: 'green' }} children='required'>{this.state.userSelectedNotice.title}</Dialog.Title>
               }
               {this.state.postType != 0 ?
                 <View>
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       {this.state.userSelectedInterestCategory.name}
                     </Text>
                   </Dialog.Description>
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       {this.state.userSelectedActivity.startTime} ~ {this.state.userSelectedActivity.endTime}
                     </Text>
                   </Dialog.Description>
 
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       {this.state.userSelectedActivity.place} {this.state.userSelectedActivity.placeDetail}
                     </Text>
                   </Dialog.Description>
 
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       {this.state.userSelectedActivity.content}
                     </Text>
                   </Dialog.Description>
@@ -413,12 +421,16 @@ export default class HomeScreen extends React.Component {
                 :
                 <View>
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       등록일 : {this.state.userSelectedNotice.modDate}
                     </Text>
                   </Dialog.Description>
                   <Dialog.Description>
-                    <Text>
+                    <Text
+                      style={styles.popUpText}
+                    >
                       {this.state.userSelectedNotice.content}
                     </Text>
                   </Dialog.Description>
@@ -436,27 +448,27 @@ export default class HomeScreen extends React.Component {
                   }
                 } />
               }
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button style={{fontSize:25}} label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
             </Dialog.Container>
 
 
             <Dialog.Container visible={this.state.information}>
-              <Dialog.Title style={{ color: '#000', fontSize:25 }} children='required'>상대로 사용 설명서</Dialog.Title>
+              <Dialog.Title style={{ color: '#000', fontSize:40 }} children='required'>상대로 사용 설명서</Dialog.Title>
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                   <Text style={styles.userManual}>
                   {"\n"}
                   {"\n"}
-                    1. 홈 페이지{"\n"}
-                    홈 페이지는 공지사항, 최근 등록된 활동, 나의 활동이 보여집니다. {"\n"}
-                    각 항목별로, 우측의 "전체보기" 를 터치하여 전체 리스트를 열람할 수 있습니다.{"\n"}
-                    공지, 활동을 터치하면 팝업과 함께 간단한 정보를 확인할 수 있습니다.{"\n"}
-                    화면 우측 상단의 종 아이콘을 터치하여 나에게 온 알림들을 볼 수 있습니다.{"\n"}
+                    1. 홈 페이지{"\n"}{"\n"}
+                    홈 페이지는 공지사항, 최근 등록된 활동, 나의 활동이 보여집니다. {"\n"}{"\n"}
+                    각 항목별로, 우측의 "전체보기" 를 터치하여 전체 리스트를 열람할 수 있습니다.{"\n"}{"\n"}
+                    공지, 활동을 터치하면 팝업과 함께 간단한 정보를 확인할 수 있습니다.{"\n"}{"\n"}
+                    화면 우측 상단의 종 아이콘을 터치하여 나에게 온 알림들을 볼 수 있습니다.{"\n"}{"\n"}
                     {"\n"}{"\n"}
                     
-                    2. 활동 페이지{"\n"}
+                    2. 활동 페이지{"\n"}{"\n"}
                     활동 페이지에서는 물건나눔을 하거나, 봉사활동 목록 열람, 그리고 봉사자로서
-                    활동을 하겠다는 신청을 할 수 있습니다.{"\n"}
-                    물건 나눔 메뉴를 통해 필요한 정보를 입력하고, 복지관에 전달할 수 있습니다.{"\n"}
+                    활동을 하겠다는 신청을 할 수 있습니다.{"\n"}{"\n"}
+                    물건 나눔 메뉴를 통해 필요한 정보를 입력하고, 복지관에 전달할 수 있습니다.{"\n"}{"\n"}
                     {"\n"}{"\n"}
 
                     3. 공지사항 페이지{"\n"}{"\n"}
@@ -585,7 +597,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userManual:{
-    fontSize: 18,
+    fontSize: 30,
   },
   background: {
     flex: 1,
@@ -600,7 +612,7 @@ const styles = StyleSheet.create({
   },
   topText: {
     color: '#FFF',
-    fontSize: 30,
+    fontSize: 40,
     padding: 5,
     paddingLeft: 20,
   },
@@ -631,20 +643,24 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 19,
+    fontSize: 30,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
   },
+  text:{
+    fontSize: 25,
+  },
   titleButton: {
+    fontSize: 25,
     alignSelf: 'flex-end',
     justifyContent: 'center',
     color: 'rgb(140,140,140)'
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 100,
+    height: 40,
     resizeMode: 'contain',
-    marginLeft: 10,
+    marginLeft: 0,
   },
   listBox: {
     padding: 3,
@@ -667,4 +683,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderColor: 'rgb(220,220,220)',
   },
+  popUpText: {
+    fontSize: 25,
+  }
 });
