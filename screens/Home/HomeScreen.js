@@ -224,9 +224,12 @@ export default class HomeScreen extends React.Component {
             containerStyle={styles.listFirst}
             onPress={
               () => {
+
+                this.props.navigation.navigate('홈 공지 내용', { data: l.id })
+
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
-                this.setState({ dialogVisible: true });
+                this.setState({ dialogVisible: false });
                 this.setState({ related: true });
               }
             }
@@ -282,9 +285,12 @@ export default class HomeScreen extends React.Component {
             containerStyle={styles.list}
             onPress={
               () => {
+
+                this.props.navigation.navigate('홈 공지 내용', { data: l.id })
+
                 this.setState({ postType: type });
                 this.setState({ userSelectedNotice: l });
-                this.setState({ dialogVisible: true });
+                this.setState({ dialogVisible: false });
                 this.setState({ related: true });
               }
             }

@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
+import * as GoogleSignIn from 'expo-google-sign-in'; // *** Current version only works for android.
 
 export default class MypageScreen extends React.Component {
 
@@ -355,6 +356,13 @@ console.log(url);
 
   }
 
+  signOutAsync = async () => {
+    console.log('signOut clicked')
+    await GoogleSignIn.signOutAsync();
+    global.loggedIn = false;
+    // this.props.navigation.navigate('Log');
+  };
+
   render() {
 
     console.disableYellowBox = true;
@@ -507,6 +515,16 @@ console.log(url);
               <Text style={styles.item}>로그아웃</Text>
             </TouchableOpacity>
           </View>
+
+          <View style={styles.listBox}>
+            <TouchableOpacity
+              style={styles.listFirst}
+              onPress={this.signOutAsync}
+            >
+              <Text style={styles.item}>로그아웃</Text>
+            </TouchableOpacity>
+          </View>
+
         </View>
       </ScrollView>
     )

@@ -146,6 +146,7 @@ export default class LoginScreen extends Component {
   render() {
     // for debugging, move to homeScreen right away
 
+
     console.log('login');
     
     global.googleUserName = "윤하늘";

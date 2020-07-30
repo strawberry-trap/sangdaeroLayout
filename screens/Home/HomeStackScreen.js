@@ -50,7 +50,6 @@ export default function HomeStackScreen({ navigation, route }) {
     >
       <HomeStack.Screen name='홈' component={HomeScreen} />
       <HomeStack.Screen name='알림' component={NotificationScreen} />
-
     </HomeStack.Navigator>
   )
 }
