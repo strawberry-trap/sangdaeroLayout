@@ -142,11 +142,13 @@ export default class LoginScreen extends Component {
   render() {
 
     // for debugging, move to homeScreen right away
-    /*
+
     global.googleUserName = "권현우";
     global.googleUserEmail = "21400045@handong.edu";
     global.loggedIn = true;
-    */
+
+    this.props.navigation.navigate('Main');
+
 
     return (
       <View style={styles.container}>

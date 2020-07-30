@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
   topText: {
     color: '#FFF',
-    fontSize: 25,
+    fontSize: 30,
     padding: 0,
     paddingLeft: 20,
   },
@@ -539,14 +539,15 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 15,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#888',
   },
   titleButton: {
     alignSelf: 'flex-end',
     justifyContent: 'center',
-    color: 'rgb(140,140,140)'
+    color: 'rgb(140,140,140)',
+    fontSize: 22,
   },
   listBox: {
     backgroundColor: '#FFF',
@@ -559,8 +560,8 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 100,
+    height: 40,
     resizeMode: 'contain',
     marginLeft: 10,
   },
@@ -581,14 +582,14 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     textAlign:'left',
-    fontSize: 20,
+    fontSize: 25,
     paddingTop: 8,
     paddingBottom: 8,
   },
   itemReverse: {
     flex: 1,
     textAlign:'right',
-    fontSize: 20,
+    fontSize: 25,
     paddingTop: 8,
     paddingBottom: 8,
   },

@@ -189,7 +189,7 @@ export default class ActivityListScreen extends React.Component {
     if (urgent) {
       return (
         <View style={styles.imageGroup}>
-          <Ionicons name="ios-alert" size={20} color="rgb(29,140,121)" />
+          <Ionicons name="ios-alert" size={30} color="rgb(29,140,121)" />
           <Image
             source={path}
             style={styles.statusButton}
@@ -522,6 +522,8 @@ export default class ActivityListScreen extends React.Component {
             <SearchBar
               containerStyle={styles.searchContainerStyle}
               inputContainerStyle={styles.inputContainerStyle}
+              searchIcon={{size:30}}
+              inputStyle={{fontSize:25}}
               placeholder="제목 검색"
               lightTheme
               round
@@ -579,6 +581,7 @@ const styles = StyleSheet.create({
   },
   inputContainerStyle: {
     backgroundColor: 'transparent',
+    
   },
   filterContainer: {
     flex:1,
@@ -599,6 +602,7 @@ const styles = StyleSheet.create({
   urgentText: {
     color: 'red',
     fontWeight: 'bold',
+    fontSize: 20,
   },
   noActivityList: {
     textAlign: "center",
@@ -692,14 +696,14 @@ const styles = StyleSheet.create({
   },
   title: {
     margin: 5,
-    fontSize: 16,
+    fontSize: 25,
   },
   imageGroup: {
     flexDirection: 'row',
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 100,
+    height: 40,
     resizeMode: 'contain',
     marginLeft: 10,
   },
