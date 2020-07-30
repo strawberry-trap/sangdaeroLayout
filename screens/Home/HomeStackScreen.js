@@ -7,6 +7,7 @@ import Dialog from "react-native-dialog";
 
 import HomeScreen from './HomeScreen';
 import NotificationScreen from './NotificationScreen';
+import HomeNoticeScreen from './HomeNoticeScreen';
 
 
 const HomeStack = createStackNavigator();
@@ -50,6 +51,7 @@ export default function HomeStackScreen({ navigation, route }) {
     >
       <HomeStack.Screen name='홈' component={HomeScreen} />
       <HomeStack.Screen name='알림' component={NotificationScreen} />
+      <HomeStack.Screen name='홈 공지 내용' component={HomeNoticeScreen} />
 
     </HomeStack.Navigator>
   )
