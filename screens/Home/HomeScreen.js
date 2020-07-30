@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ImageBackground, Alert, Image } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { ScrollView } from 'react-native-gesture-handler';
 import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
@@ -23,6 +24,7 @@ export default class HomeScreen extends React.Component {
     register: false,
 
     information: false,
+    noticeNum:1,
 
     // additional data to send to the web server
     userSelectedActivity: {},
@@ -224,10 +226,8 @@ export default class HomeScreen extends React.Component {
             containerStyle={styles.listFirst}
             onPress={
               () => {
-                this.setState({ postType: type });
-                this.setState({ userSelectedNotice: l });
-                this.setState({ dialogVisible: true });
-                this.setState({ related: true });
+                this.setState({ information: true });
+                this.setState({ noticeNum: l.id });
               }
             }
           />
@@ -282,10 +282,8 @@ export default class HomeScreen extends React.Component {
             containerStyle={styles.list}
             onPress={
               () => {
-                this.setState({ postType: type });
-                this.setState({ userSelectedNotice: l });
-                this.setState({ dialogVisible: true });
-                this.setState({ related: true });
+                this.setState({ information: true });
+                this.setState({ noticeNum: l.id });
               }
             }
           />
@@ -441,35 +439,13 @@ export default class HomeScreen extends React.Component {
 
 
             <Dialog.Container visible={this.state.information}>
-              <Dialog.Title style={{ color: '#000', fontSize:25 }} children='required'>상대로 사용 설명서</Dialog.Title>
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                  <Text style={styles.userManual}>
-                  {"\n"}
-                  {"\n"}
-                    1. 홈 페이지{"\n"}
-                    홈 페이지는 공지사항, 최근 등록된 활동, 나의 활동이 보여집니다. {"\n"}
-                    각 항목별로, 우측의 "전체보기" 를 터치하여 전체 리스트를 열람할 수 있습니다.{"\n"}
-                    공지, 활동을 터치하면 팝업과 함께 간단한 정보를 확인할 수 있습니다.{"\n"}
-                    화면 우측 상단의 종 아이콘을 터치하여 나에게 온 알림들을 볼 수 있습니다.{"\n"}
-                    {"\n"}{"\n"}
-                    
-                    2. 활동 페이지{"\n"}
-                    활동 페이지에서는 물건나눔을 하거나, 봉사활동 목록 열람, 그리고 봉사자로서
-                    활동을 하겠다는 신청을 할 수 있습니다.{"\n"}
-                    물건 나눔 메뉴를 통해 필요한 정보를 입력하고, 복지관에 전달할 수 있습니다.{"\n"}
-                    {"\n"}{"\n"}
-
-                    3. 공지사항 페이지{"\n"}{"\n"}
-                    공지 사항들을 볼 수 있습니다.{"\n"}{"\n"}
-                    {"\n"}{"\n"}
-
-                    4. 내 정보 페이지{"\n"}{"\n"}
-                    닉네임을 터치하여 수정한 위, 우측의 스패너 아이콘을 터치하여 닉네임 변경 요청을 할 수 있습니다.{"\n"}{"\n"}
-                    계정관리의 "설정" 을 터치하여 전화번호 공유 승인을 수락 또는 거절할 수 있습니다.{"\n"}{"\n"}
-
-                  </Text>
-                </ScrollView>
-              <Dialog.Button label="확인" color='black' onPress={() => { this.setState({ information: false }); }} />
+            <WebView
+                source={{
+                  uri: 'http://saevom06.cafe24.com/notice/mobile/detail/' + this.state.noticeNum
+                }}
+                style={{ marginTop: 0 }}
+              />
+              <Dialog.Button label="닫기" color='gray' onPress={() => { this.setState({ information: false }); }} />
             </Dialog.Container>
 
             <View style={styles.topSpace}>
@@ -479,7 +455,10 @@ export default class HomeScreen extends React.Component {
               </View>
               <TouchableOpacity
                 style={styles.topSpaceTouch}
-                onPress={() => this.setState({ information: true })}
+                onPress={() => {
+                  this.setState({ information: true })
+                  this.setState({ noticeNum: 1 })
+                }}
               >
                 <Ionicons style={styles.informationButton} name="ios-information-circle" size={40} color="#FFF" />
               </TouchableOpacity>
