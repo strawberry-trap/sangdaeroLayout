@@ -23,7 +23,7 @@ export default function HomeStackScreen({ navigation, route }) {
             style={styles.rightIconContainer}>
             <Ionicons
               name='ios-notifications-outline'
-              size={30}
+              size={45}
               style={{ marginBottom: -3 }}
               color={'#FFF'}
             />
@@ -50,7 +50,6 @@ export default function HomeStackScreen({ navigation, route }) {
     >
       <HomeStack.Screen name='홈' component={HomeScreen} />
       <HomeStack.Screen name='알림' component={NotificationScreen} />
-
     </HomeStack.Navigator>
   )
 }
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
   leftIconContainer: {
     flexDirection: "row",
     justifyContent: 'center',
-    width: 110,
+    width: 130,
     resizeMode: 'contain',
     marginLeft: 25,
   },

@@ -104,7 +104,6 @@ async function registerForPushNotificationsAsync() {
   }
 
   global.token = token;
-  Alert.alert(token);
 }
 
 

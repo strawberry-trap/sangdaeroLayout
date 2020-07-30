@@ -113,9 +113,8 @@ export default class ActivityScreen extends React.Component {
           <ListItem
             key={i + 2}
             title={l.name}
-            chevron={{ size: 30 }}
             onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: true })}
-            rightElement={<Ionicons name="md-heart" size={30} color="#F77" />}
+            rightElement={<Ionicons name="md-heart" size={45} color="#F77"/>}
             containerStyle={styles.item}
             titleStyle={styles.text}
           />
@@ -125,7 +124,7 @@ export default class ActivityScreen extends React.Component {
           <ListItem
             key={i + 2}
             title={l.name}
-            chevron={{ size: 30 }}
+            chevron={{ size: 45 }}
             onPress={() => this.props.navigation.navigate('활동 목록', { id: l.id, name: l.name, interest: false})}
             containerStyle={styles.item}
             titleStyle={styles.text}
@@ -192,7 +191,7 @@ const styles = StyleSheet.create({
   },
   noActivityList: {
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 45,
   },
   itemFirst: {
     flex: 1,
@@ -224,13 +223,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   textFirst: {
-    fontSize: 25,
+    fontSize: 40,
     fontWeight: 'bold',
     paddingLeft: 20,
     color: '#FFF',
   },
   text: {
-    fontSize: 25,
+    fontSize: 40,
     fontWeight: 'bold',
     paddingLeft: 20,
     color: 'rgb(29,140,121)',

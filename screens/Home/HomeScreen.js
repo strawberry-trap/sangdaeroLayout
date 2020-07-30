@@ -377,7 +377,7 @@ export default class HomeScreen extends React.Component {
 
             <Dialog.Container visible={this.state.dialogVisible}>
               {this.state.postType != 0 ?
-                <Dialog.Title style={{ color: '#000' }} children='required'>
+                <Dialog.Title style={{ color: '#000', fontSize: 35 }} children='required'>
                   {this.state.userSelectedActivity.title}
                 </Dialog.Title>
                 :
@@ -385,24 +385,24 @@ export default class HomeScreen extends React.Component {
               }
               {this.state.postType != 0 ?
                 <View>
-                  <Dialog.Description>
+                  <Dialog.Description style={{fontSize: 25}}>
                     <Text>
                       {this.state.userSelectedInterestCategory.name}
                     </Text>
                   </Dialog.Description>
-                  <Dialog.Description>
+                  <Dialog.Description style={{fontSize: 25}}>
                     <Text>
                       {this.state.userSelectedActivity.startTime} ~ {this.state.userSelectedActivity.endTime}
                     </Text>
                   </Dialog.Description>
 
-                  <Dialog.Description>
+                  <Dialog.Description style={{fontSize: 25}}>
                     <Text>
                       {this.state.userSelectedActivity.place} {this.state.userSelectedActivity.placeDetail}
                     </Text>
                   </Dialog.Description>
 
-                  <Dialog.Description>
+                  <Dialog.Description style={{fontSize: 25}}>
                     <Text>
                       {this.state.userSelectedActivity.content}
                     </Text>
@@ -423,7 +423,7 @@ export default class HomeScreen extends React.Component {
                 </View>
               }
               {this.state.related == false && this.state.userSelectedActivity.statue == 1 &&
-                <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' onPress={
+                <Dialog.Button label="봉사자 지원" title="봉사자 지원" color='#000' style={{fontSize: 25}} onPress={
                   () => {
                     this.fetchPost('http://saevom06.cafe24.com/requestdata/register', {
                       id: this.state.userSelectedActivity.id, // id of the activity that user chose
@@ -434,7 +434,7 @@ export default class HomeScreen extends React.Component {
                   }
                 } />
               }
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+              <Dialog.Button label="취소" color='gray' style={{fontSize: 25}} onPress={() => { this.setState({ dialogVisible: false }); }} />
             </Dialog.Container>
 
 
@@ -460,7 +460,7 @@ export default class HomeScreen extends React.Component {
                   this.setState({ noticeNum: 1 })
                 }}
               >
-                <Ionicons style={styles.informationButton} name="ios-information-circle" size={40} color="#FFF" />
+                <Ionicons style={styles.informationButton} name="ios-information-circle" size={70} color="#FFF" />
               </TouchableOpacity>
             </View>
 
@@ -563,9 +563,6 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'center',
   },
-  userManual:{
-    fontSize: 18,
-  },
   background: {
     flex: 1,
   },
@@ -579,7 +576,7 @@ const styles = StyleSheet.create({
   },
   topText: {
     color: '#FFF',
-    fontSize: 30,
+    fontSize: 45,
     padding: 5,
     paddingLeft: 20,
   },
@@ -610,18 +607,19 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 19,
+    fontSize: 35,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
   },
   titleButton: {
     alignSelf: 'flex-end',
     justifyContent: 'center',
-    color: 'rgb(140,140,140)'
+    color: 'rgb(140,140,140)',
+    fontSize: 30,
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 105,
+    height: 30,
     resizeMode: 'contain',
     marginLeft: 10,
   },
@@ -646,4 +644,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderColor: 'rgb(220,220,220)',
   },
+  text: {
+    fontSize: 25,
+  }
 });

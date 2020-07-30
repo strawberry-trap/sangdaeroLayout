@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import Dialog from "react-native-dialog";
 import { ListItem } from 'react-native-elements';
+import * as GoogleSignIn from 'expo-google-sign-in'; // *** Current version only works for android.
 
 export default class MypageScreen extends React.Component {
 
@@ -355,6 +356,13 @@ console.log(url);
 
   }
 
+  signOutAsync = async () => {
+    console.log('signOut clicked')
+    await GoogleSignIn.signOutAsync();
+    global.loggedIn = false;
+    // this.props.navigation.navigate('Log');
+  };
+
   render() {
 
     console.disableYellowBox = true;
@@ -367,31 +375,31 @@ console.log(url);
           <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
 
           <View>
-            <Dialog.Description>
+            <Dialog.Description style={{fontSize: 25}}>
               <Text>
                 {this.state.userSelectedInterestCategory.name}
               </Text>
             </Dialog.Description>
-            <Dialog.Description>
+            <Dialog.Description style={{fontSize: 25}}>
               <Text>
                 {this.state.userSelectedActivity.startTime} ~ {this.state.userSelectedActivity.endTime}
               </Text>
             </Dialog.Description>
 
-            <Dialog.Description>
+            <Dialog.Description style={{fontSize: 25}}>
               <Text>
                 {this.state.userSelectedActivity.place} {this.state.userSelectedActivity.placeDetail}
               </Text>
             </Dialog.Description>
 
-            <Dialog.Description>
+            <Dialog.Description style={{fontSize: 25}}>
               <Text>
                 {this.state.userSelectedActivity.content}
               </Text>
             </Dialog.Description>
           </View>
 
-          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+          <Dialog.Button label="취소" color='gray' style={{fontSize: 25}} onPress={() => { this.setState({ dialogVisible: false }); }} />
 
 
         </Dialog.Container>
@@ -401,7 +409,7 @@ console.log(url);
         >
           <View style={styles.topSpace}>
             <Text style={styles.topText}>{global.googleUserName}님,</Text>
-            <Text style={styles.topText}>좋은 하루 되세요.</Text>
+            <Text style={styles.topText}>좋은 하루 되세요</Text>
           </View>
         </ImageBackground>
 
@@ -421,7 +429,7 @@ console.log(url);
               <Ionicons
                 onPress={() => { this.changeNickName(); }}
                 name={'ios-build'}
-                size={30}
+                size={40}
                 style={{ marginTop: 7 }}
                 color={'rgb(220,220,220)'}
               />
@@ -497,16 +505,8 @@ console.log(url);
             >
               <Text style={styles.item}>설정</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.list}
-              onPress={() => {
-                global.loggedIn = false;
-                this.props.navigation.navigate('Log', {params: {set: true}})
-              }}
-            >
-              <Text style={styles.item}>로그아웃</Text>
-            </TouchableOpacity>
           </View>
+
         </View>
       </ScrollView>
     )
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   },
   topText: {
     color: '#FFF',
-    fontSize: 25,
+    fontSize: 45,
     padding: 0,
     paddingLeft: 20,
   },
@@ -548,14 +548,15 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 15,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#888',
   },
   titleButton: {
     alignSelf: 'flex-end',
     justifyContent: 'center',
-    color: 'rgb(140,140,140)'
+    color: 'rgb(140,140,140)',
+    fontSize: 30
   },
   listBox: {
     backgroundColor: '#FFF',
@@ -568,8 +569,8 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 105,
+    height: 30,
     resizeMode: 'contain',
     marginLeft: 10,
   },
@@ -590,14 +591,14 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     textAlign:'left',
-    fontSize: 20,
+    fontSize: 30,
     paddingTop: 8,
     paddingBottom: 8,
   },
   itemReverse: {
     flex: 1,
     textAlign:'right',
-    fontSize: 20,
+    fontSize: 30,
     paddingTop: 8,
     paddingBottom: 8,
   },

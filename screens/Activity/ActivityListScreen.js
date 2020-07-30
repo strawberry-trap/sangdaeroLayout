@@ -189,7 +189,7 @@ export default class ActivityListScreen extends React.Component {
     if (urgent) {
       return (
         <View style={styles.imageGroup}>
-          <Ionicons name="ios-alert" size={20} color="rgb(29,140,121)" />
+          <Ionicons name="ios-alert" size={30} color="rgb(29,140,121)" />
           <Image
             source={path}
             style={styles.statusButton}
@@ -460,7 +460,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart" size={45} color="#F77" />
+            <Ionicons name="md-heart" size={55} color="#F77" />
           </TouchableOpacity>
         )
       } else {
@@ -472,7 +472,7 @@ export default class ActivityListScreen extends React.Component {
             }}
             style={styles.nameButton}
           >
-            <Ionicons name="md-heart-empty" size={45} color="#F77" />
+            <Ionicons name="md-heart-empty" size={55} color="#F77" />
           </TouchableOpacity>
         )
       }
@@ -525,6 +525,7 @@ export default class ActivityListScreen extends React.Component {
                 this.setList(this.state.filterStatus, text))
               }}
               value={this.state.search}
+              inputStyle={{fontSize:35}}
             />
             <TouchableOpacity
               style={styles.filterContainer}
@@ -540,6 +541,7 @@ export default class ActivityListScreen extends React.Component {
                 <ListItem
                   key={0}
                   title='등록된 활동이 없습니다'
+                  titleStyle={styles.noActivityList}
                   containerStyle={styles.listFirst}
                 />
               || isLoading &&
@@ -574,6 +576,7 @@ const styles = StyleSheet.create({
   },
   inputContainerStyle: {
     backgroundColor: 'transparent',
+    fontSize:35,
   },
   filterContainer: {
     flex:1,
@@ -581,8 +584,8 @@ const styles = StyleSheet.create({
     justifyContent:'center',
   },
   filterButton: {
-    width: 70,
-    height: 20,
+    width: 105,
+    height: 30,
     resizeMode: 'contain',
   },
   statusListButton: {
@@ -597,7 +600,7 @@ const styles = StyleSheet.create({
   },
   noActivityList: {
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 45,
   },
   button: {
     textAlign: 'center',
@@ -605,7 +608,7 @@ const styles = StyleSheet.create({
     marginRight: 35,
     marginBottom: 10,
     marginTop: 20,
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
     backgroundColor: 'rgb(223,244,243)',
@@ -637,7 +640,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'flex-start',
     textAlignVertical:'center',
-    fontSize: 35,
+    fontSize: 45,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
   },
@@ -679,20 +682,15 @@ const styles = StyleSheet.create({
   },
   title: {
     margin: 5,
-    fontSize: 16,
+    fontSize: 30,
   },
   imageGroup: {
     flexDirection: 'row',
   },
   statusButton: {
-    width: 70,
-    height: 20,
+    width: 105,
+    height: 30,
     resizeMode: 'contain',
     marginLeft: 10,
   },
-  arrow: {
-    width: 12,
-    height: 20,
-    resizeMode: 'center',
-  }
 });

@@ -331,7 +331,7 @@ export default class ShareProductScreen extends React.Component {
         <Dialog.Container visible={this.state.dialogVisible}>
           {!image &&
             <Dialog.Title style={styles.photoHeader}>
-              <Text>사진을 등록해 주세요.</Text>
+              <Text>사진을 등록해 주세요</Text>
             </Dialog.Title>
           }
           {image &&
@@ -343,15 +343,15 @@ export default class ShareProductScreen extends React.Component {
 
           {!image &&
             <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
-              <Dialog.Button title="갤러리에서 선택" label="갤러리에서 선택" color='#000' onPress={() => this.pickImageFromGallery(url)} />
-              <Dialog.Button title='지금 사진 촬영' label='지금 사진 촬영' color='#000' onPress={() => this.takeAndUploadPhotoAsync(url)} />
+              <Dialog.Button label="취소" color='gray' style={{fontSize:25}} onPress={() => { this.setState({ dialogVisible: false }); }}/>
+              <Dialog.Button title="사진 선택" label="사진 선택" color='#000' style={{fontSize:25}} onPress={() => this.pickImageFromGallery(url)} />
+              <Dialog.Button title='사진 촬영' label='사진 촬영' color='#000' style={{fontSize:25}} onPress={() => this.takeAndUploadPhotoAsync(url)} />
             </View>
           }
           {image &&
             <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end' }}>
-              <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ isImageConfirmed: false, dialogVisible: false }); }} />
-              <Dialog.Button label="확인" color='#000'
+              <Dialog.Button label="취소" color='gray' style={{fontSize:25}} onPress={() => { this.setState({ isImageConfirmed: false, dialogVisible: false }); }} />
+              <Dialog.Button label="확인" color='#000' style={{fontSize:25}}
                 onPress={() => {
                   this.setState({ isImageConfirmed: true });
                   this.setState({ dialogVisible: false });
@@ -370,6 +370,7 @@ export default class ShareProductScreen extends React.Component {
               name='title'
               placeholder='제목을 입력하세요'
               onChangeText={(input) => { this.title = input; }}
+              inputStyle={{fontSize:35}}
             />
           </View>
           <View style={styles.list}>
@@ -391,7 +392,7 @@ export default class ShareProductScreen extends React.Component {
                 }}
               >
                 {this.state.isStartTimeSelected ?
-                  <Text style={styles.text}>{this.parseDate(this.state.startTime)}</Text>
+                  <Text style={styles.date}>{this.parseDate(this.state.startTime)}</Text>
                   : <Text style={styles.touchSelectTime}>전달 시간 선택</Text>}
               </TouchableOpacity>
             </View>
@@ -412,6 +413,7 @@ export default class ShareProductScreen extends React.Component {
               name='memo'
               placeholder='메모를 입력하세요'
               onChangeText={(input) => { this.memo = input; }}
+              inputStyle={{fontSize:35}}
             />
           </View>
 
@@ -469,14 +471,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 3,
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: 'bold',
   },
   text: {
     flex: 1,
     padding: 5,
     paddingLeft: 10,
-    fontSize: 18,
+    fontSize: 25,
     textAlignVertical: 'center',
   },
   time: {
@@ -501,7 +503,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     paddingRight: 10,
-    fontSize: 15,
+    fontSize: 25,
     textAlignVertical: 'center',
     textAlign:'center',
     borderColor: 'black',
@@ -512,14 +514,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     paddingRight: 10,
-    fontSize: 15,
+    fontSize: 35,
     textAlignVertical: 'center',
   },
   selectButton: {
     textAlign: 'center',
-    marginLeft: 35,
-    marginRight: 35,
-    fontSize: 22,
+    marginLeft: 10,
+    marginRight: 10,
+    fontSize: 30,
     backgroundColor: 'rgb(1, 192, 99)',
     color:'#FFF',
     borderRadius: 50,
@@ -531,7 +533,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    fontSize: 22,
+    marginBottom: 15,
+    fontSize: 35,
     color: '#FFF',
     backgroundColor: 'rgb(29,140,121)',
     borderRadius: 50,
@@ -544,6 +547,7 @@ const styles = StyleSheet.create({
   photoHeader: {
     color: '#000',
     marginBottom: 30,
+    fontSize:35,
   },
   photo: {
     width: 200,

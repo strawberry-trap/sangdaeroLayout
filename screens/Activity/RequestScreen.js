@@ -238,6 +238,7 @@ export default class RequestScreen extends React.Component {
               name='title'
               placeholder='제목을 입력하세요'
               onChangeText={(input) => { this.title = input; }}
+              inputStyle={{fontSize:35}}
             />
           </View>
           <View style={styles.list}>
@@ -292,6 +293,7 @@ export default class RequestScreen extends React.Component {
               name='memo'
               placeholder='메모를 입력하세요'
               onChangeText={(input) => { this.memo = input; }}
+              inputStyle={{fontSize:35}}
             />
           </View>
         </View>
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     paddingRight: 10,
-    fontSize: 15,
+    fontSize: 25,
     textAlignVertical: 'center',
     borderColor: 'black',
     borderWidth:0.5,
@@ -346,14 +348,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 3,
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: 'bold',
   },
   text: {
     flex: 1,
     padding: 5,
     paddingLeft: 10,
-    fontSize: 15,
+    fontSize: 25,
     textAlignVertical: 'center',
   },
   time: {
@@ -368,14 +370,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     paddingRight: 10,
-    fontSize: 15,
+    fontSize: 35,
     textAlignVertical: 'center',
   },
   button: {
     textAlign: 'center',
     marginLeft: 35,
     marginRight: 35,
-    fontSize: 22,
+    marginBottom: 15,
+    fontSize: 35,
     color: '#FFF',
     backgroundColor: 'rgb(29,140,121)',
     borderRadius: 50,

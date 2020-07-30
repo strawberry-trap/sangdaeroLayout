@@ -19,7 +19,7 @@ export default function MypageStackScreen({ navigation, route }) {
             style={styles.rightIconContainer}>
             <Ionicons
               name='ios-notifications-outline'
-              size={30}
+              size={45}
               style={{ marginBottom: -3 }}
               color={'#FFF'}
             />
@@ -35,6 +35,7 @@ export default function MypageStackScreen({ navigation, route }) {
         ),
         headerLeft: null,
         headerTintColor: '#FFF',
+        headerTitleStyle: {fontSize:30, fontWeight:'bold'}
       }}
     >
       <MypageStack.Screen name='내 정보' component={MypageScreen} />

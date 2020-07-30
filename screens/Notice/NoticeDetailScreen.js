@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { WebView } from 'react-native-webview';
 
 export default class NoticeDetailScreen extends React.Component {
@@ -10,10 +9,6 @@ export default class NoticeDetailScreen extends React.Component {
 
     this.state = {
       data: props.route.params.data, // single notice data
-    }
-
-    if (this.state.data.modDate.charAt(4) != '/') {
-      this.state.data.modDate = this.parseDate(this.state.data.modDate);
     }
   };
 
@@ -37,35 +32,14 @@ export default class NoticeDetailScreen extends React.Component {
   
   render() {
 
-    return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.box}>
-          <View style={styles.list}>
-            <View style={styles.titleList}>
-              <Text style={styles.title}>{this.state.data.title}</Text>
-            </View>
-            <View style={styles.dataList}>
-              <View style={styles.data}>
-                <Text style={styles.header}>작성자</Text>
-                <Text style={styles.content}>{this.state.data.writer}</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.header}>작성일시</Text>
-                <Text style={styles.content}>{this.state.data.modDate}</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.line} />
-          <View style={styles.list}>
-            <View style={styles.dataList}>
-              <View style={styles.data}>
-                <Text style={styles.content}>{this.state.data.content}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    )
+    var url = 'http://saevom06.cafe24.com/notice/mobile/detail/' + this.state.data; // *** Must fix the url, given from Server developers.
+
+    return ( 
+    <WebView
+      source={{ uri: url}}
+      style={{ marginTop: 20 }}
+    />)
+
   }
 }
 

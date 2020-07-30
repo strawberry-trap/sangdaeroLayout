@@ -22,7 +22,7 @@ export default function ActivityStackScreen({ navigation, route }) {
             style={styles.rightIconContainer}>
             <Ionicons
               name='ios-notifications-outline'
-              size={30}
+              size={45}
               style={{ marginBottom: -3 }}
               color={'#FFF'}
             />
@@ -38,6 +38,7 @@ export default function ActivityStackScreen({ navigation, route }) {
         ),
         headerLeft: null,
         headerTintColor: '#FFF',
+        headerTitleStyle: {fontSize:30, fontWeight:'bold'}
       }}
     >
       <ActivityStack.Screen name='활동 목록' component={ActivityListScreen} />

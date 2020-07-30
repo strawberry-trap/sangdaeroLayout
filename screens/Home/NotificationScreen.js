@@ -69,7 +69,7 @@ export default class NotificationScreen extends React.Component {
                 leftElement={
                   <Ionicons
                     name='ios-notifications-outline'
-                    size={27}
+                    size={45}
                     style={{ marginBottom: -3 }}
                     color={'rgb(1, 192, 99)'}
                   />}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgb(220,220,220)',
   },
   text: {
-    fontSize: 17,
+    fontSize: 30,
     paddingLeft: 8,
     color: '#000',
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 30,
+    fontSize: 45,
     alignSelf: 'center',
     justifyContent: 'center',
   }

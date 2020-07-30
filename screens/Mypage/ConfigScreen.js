@@ -48,27 +48,27 @@ export default class ConfigScreen extends React.Component {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: '#000' }} children='required'>
+          <Dialog.Title style={{ color: '#000', fontSize: 35 }} children='required'>
             개인정보 제공 동의
           </Dialog.Title>
 
-          <Dialog.Description>
+          <Dialog.Description style={{fontSize: 25}}>
             1. 제공 받는 자 : 활동으로 연결된 이용자
           </Dialog.Description>
 
-          <Dialog.Description>
+          <Dialog.Description style={{fontSize: 25}}>
             2. 이용 목적 : 이용자와 봉사자 간의 소통
           </Dialog.Description>
 
-          <Dialog.Description>
+          <Dialog.Description style={{fontSize: 25}}>
             3. 제공 항목 : 이름, 전화번호
           </Dialog.Description>
 
-          <Dialog.Description>
+          <Dialog.Description style={{fontSize: 25}}>
             4. 보유 기간 : 활동 종료 시까지 보유
           </Dialog.Description>
 
-          <Dialog.Button label="취소" color='gray' onPress={() => { this.setState({ dialogVisible: false }); }} />
+          <Dialog.Button label="취소" color='gray'  style={{fontSize: 25}} onPress={() => { this.setState({ dialogVisible: false }); }} />
 
 
         </Dialog.Container>
@@ -86,7 +86,7 @@ export default class ConfigScreen extends React.Component {
                 >
                   <Ionicons
                     name='ios-checkmark-circle'
-                    size={30}
+                    size={40}
                     style={{ marginTop: 7 }}
                     color={'#000'}
                   />
@@ -100,7 +100,7 @@ export default class ConfigScreen extends React.Component {
                 >
                   <Ionicons
                     name='ios-checkmark-circle-outline'
-                    size={30}
+                    size={40}
                     style={{ marginTop: 7 }}
                     color={'#000'}
                   />
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   item: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 35,
     paddingTop: 8,
     paddingBottom: 8,
   },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   subText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 15,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#888',
   },

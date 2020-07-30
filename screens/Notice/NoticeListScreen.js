@@ -1,103 +1,91 @@
 import * as React from 'react';
-import { StyleSheet, View, Button, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-
-import * as Notifications from 'expo-notifications';
-import * as Permissions from 'expo-permissions';
-
+import { ListItem } from 'react-native-elements'
 
 export default class NoticeListScreen extends React.Component {
 
     // constructor
     constructor(props) {
         super(props);
+
+        this.state = {
+            data: [],
+            isLoading: true,
+        }
+        this.getData();
     }
-    
 
-    async registerForPushNotification() {
+    componentDidUpdate() {
+        if (this.props.route.params?.set) {
 
-        let token;
-    
-        // get exisitng permission
-        const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-        let finalStatus = existingStatus;
-    
-        // if no existing permission, ask one
-        if (existingStatus !== 'granted') {
-          const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-          finalStatus = status;
+            if (this.props.route.params.set) {
+                console.log("Get new data");
+                this.props.route.params.set = false;
+                this.getData();
+            }
         }
-    
-        // if user didn't give permission, just return nothing
-        if (finalStatus !== 'granted') {
-          alert('Failed to get push token for push notification!');
-          return;
-        }
-    
-        console.log('[[Android device permission status : ', finalStatus,']]');
-    
-        token = (await Notifications.getExpoPushTokenAsync()).data; // *** ERROR LINE ***
-    
-        if (token == undefined) {
-          console.log('[[undefined token]]');
+    }
+
+    getData() {
+        
+        fetch('http://saevom06.cafe24.com/noticedata/getNotices', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                async: false,
+            },
+        })
+            .then((response) => response.json())
+            .then((responseInJson) => {
+                this.setState({ data: responseInJson });
+            })
+            .catch((e) => console.log(e))
+            .finally(() => {
+                this.setState({ isLoading: false });
+            })
+    }
+
+    createListItem(l, i) {
+        if (i == 0) {
+            return (
+                <ListItem
+                    key={i}
+                    title={l.title}
+                    titleStyle={styles.title}
+                    onPress={() => this.props.navigation.navigate('공지 내용', { data: l.id })}
+                    containerStyle={styles.listFirst}
+                />
+            )
         } else {
-          console.log('[[Android device token fetch : ', token,']]');
-        }
-    
-        if (Platform.OS === 'android') {
-          Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-          });
-        }
-        return token;
-      }
+            return (
+                <ListItem
+                    key={i}
+                    title={l.title}
+                    titleStyle={styles.title}
+                    onPress={() => this.props.navigation.navigate('공지 내용', { data: l.id })}
+                    containerStyle={styles.list}
+                />
 
-      async sendPushNotification(expoPushToken) {
-
-        const message = {
-          to: global.token,
-          sound: 'default',
-          title: 'Original Title',
-          body: 'And here is the body!',
-          data: { data: 'goes here' },
-        };
-    
-        console.log('in sendPush function,', message,);
-    
-        await fetch('https://exp.host/--/api/v2/push/send', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(message),
-        });
-      }
-    
+            )
+        }
+    }
 
     render() {
+        const { data, isLoading } = this.state;
 
         return (
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
                 <View style={styles.box}>
-                    <Button
-                        title="토큰 가져오기"
-                        onPress={this.registerForPushNotification}
-                        >
-                    </Button>
-
-                    <Button
-                        title="푸시 보내기"
-                        onPress={this.sendPushNotification}
-                    >
-
-                    </Button>
-
+                    <View style={styles.listBox}>
+                        {isLoading ? <View /> : (
+                            data.map((l, i) => (
+                                this.createListItem(l, i)
+                            ))
+                        )}
+                    </View>
                 </View>
 
             </ScrollView>
@@ -165,7 +153,7 @@ const styles = StyleSheet.create({
     },
     title: {
         margin: 5,
-        fontSize: 16,
+        fontSize: 30,
     },
     subTitle: {
         margin: 0,
