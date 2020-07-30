@@ -505,6 +505,15 @@ console.log(url);
             >
               <Text style={styles.item}>설정</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.list}
+              onPress={() => {
+                global.loggedIn = false;
+                this.props.navigation.navigate('Log', {params: {set: true}})
+              }}
+            >
+              <Text style={styles.item}>로그아웃</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.listBox}>
@@ -540,7 +549,7 @@ const styles = StyleSheet.create({
   },
   topText: {
     color: '#FFF',
-    fontSize: 30,
+    fontSize: 25,
     padding: 0,
     paddingLeft: 20,
   },
@@ -557,15 +566,14 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     alignSelf: 'flex-start',
-    fontSize: 25,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#888',
   },
   titleButton: {
     alignSelf: 'flex-end',
     justifyContent: 'center',
-    color: 'rgb(140,140,140)',
-    fontSize: 22,
+    color: 'rgb(140,140,140)'
   },
   listBox: {
     backgroundColor: '#FFF',
@@ -578,8 +586,8 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   statusButton: {
-    width: 100,
-    height: 40,
+    width: 70,
+    height: 20,
     resizeMode: 'contain',
     marginLeft: 10,
   },
@@ -600,14 +608,14 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     textAlign:'left',
-    fontSize: 25,
+    fontSize: 20,
     paddingTop: 8,
     paddingBottom: 8,
   },
   itemReverse: {
     flex: 1,
     textAlign:'right',
-    fontSize: 25,
+    fontSize: 20,
     paddingTop: 8,
     paddingBottom: 8,
   },

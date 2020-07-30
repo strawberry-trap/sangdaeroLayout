@@ -189,7 +189,7 @@ export default class ActivityListScreen extends React.Component {
     if (urgent) {
       return (
         <View style={styles.imageGroup}>
-          <Ionicons name="ios-alert" size={30} color="rgb(29,140,121)" />
+          <Ionicons name="ios-alert" size={20} color="rgb(29,140,121)" />
           <Image
             source={path}
             style={styles.statusButton}
@@ -510,20 +510,13 @@ export default class ActivityListScreen extends React.Component {
         }
         <View style={styles.box}>
           <View style={styles.name}>
-            <TouchableOpacity
-              style={styles.nameTextBox}
-              onPress={() => this.props.navigation.navigate('Activity', {screen: '관심사 목록', params: {set: true, listType:0}})}
-              >
-              <Text style={styles.nameText}>{this.state.name}</Text>
-            </TouchableOpacity>
+            <Text style={styles.nameText}>{this.state.name}</Text>
             {this.checkInterest(this.state.id, this.state.interest)}
           </View>
           <View style={{flexDirection:'row'}}>
             <SearchBar
               containerStyle={styles.searchContainerStyle}
               inputContainerStyle={styles.inputContainerStyle}
-              searchIcon={{size:30}}
-              inputStyle={{fontSize:25}}
               placeholder="제목 검색"
               lightTheme
               round
@@ -581,7 +574,6 @@ const styles = StyleSheet.create({
   },
   inputContainerStyle: {
     backgroundColor: 'transparent',
-    
   },
   filterContainer: {
     flex:1,
@@ -602,7 +594,6 @@ const styles = StyleSheet.create({
   urgentText: {
     color: 'red',
     fontWeight: 'bold',
-    fontSize: 20,
   },
   noActivityList: {
     textAlign: "center",
@@ -643,20 +634,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   nameText: {
+    flex: 1,
     alignSelf: 'flex-start',
-    textAlign:'center',
     textAlignVertical:'center',
-    fontSize: 25,
+    fontSize: 35,
     fontWeight: 'bold',
     color: 'rgb(29,140,121)',
-    borderWidth:2,
-    borderRadius:50,
-    paddingRight:10,
-    paddingLeft:10,
-    paddingTop:5,
-    paddingBottom:5,
-    borderColor: 'rgb(29,140,121)',
-    backgroundColor: 'rgb(223,244,243)',
   },
   nameButton: {
     color: 'rgb(140,140,140)',
@@ -696,14 +679,14 @@ const styles = StyleSheet.create({
   },
   title: {
     margin: 5,
-    fontSize: 25,
+    fontSize: 16,
   },
   imageGroup: {
     flexDirection: 'row',
   },
   statusButton: {
-    width: 100,
-    height: 40,
+    width: 70,
+    height: 20,
     resizeMode: 'contain',
     marginLeft: 10,
   },

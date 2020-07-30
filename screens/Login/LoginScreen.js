@@ -99,7 +99,10 @@ export default class LoginScreen extends Component {
         } else {
           this.setState({ isExistingUser: false });
         }
-        this.addToken(userName, userEmail, global.token);
+        if (token != null) {
+          this.addToken(userName, userEmail, global.token);
+        }
+        
         this.setState({ isProcedureCompleted: true });
       })
       .catch((e) => console.log(e))
@@ -131,6 +134,7 @@ export default class LoginScreen extends Component {
   }
 
   componentDidUpdate() {
+    console.log(global.loggedIn);
     if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
       this.props.navigation.navigate('Agreement');
     }
@@ -140,15 +144,16 @@ export default class LoginScreen extends Component {
   }
 
   render() {
-
     // for debugging, move to homeScreen right away
 
-    // global.googleUserName = "권현우";
-    // global.googleUserEmail = "21400045@handong.edu";
-    // global.loggedIn = true;
 
-    // this.props.navigation.navigate('Main');
-
+    console.log('login');
+    
+    global.googleUserName = "윤하늘";
+    global.googleUserEmail = "hnsamuel1226@gmail.com";
+    global.loggedIn = true;
+    if (global.loggedIn)
+      this.props.navigation.navigate('Main');
 
     return (
       <View style={styles.container}>

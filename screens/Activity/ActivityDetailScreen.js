@@ -19,7 +19,7 @@ export default class ActivityDetailScreen extends React.Component {
       dialogVisible: false, // dialog for image picking
       memoDialogVisible: false,
       pictureSendingUrl: "",
-      memo: null,
+      memo: "복지관에 전달 할 메모를 남겨 주세요.",
       isMemoWritten: false,
     };
 
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 2,
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   dataList: {
@@ -649,23 +649,22 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   header: {
-    flex: 4,
-    fontSize: 25,
+    flex: 3,
+    fontSize: 14,
   },
   content: {
     flex: 10,
-    fontSize: 22,
+    fontSize: 14,
   },
   date: {
     flex: 10,
   },
   time: {
     flex: 1,
-    fontSize: 22,
   },
   statusButton: {
-    width: 100,
-    height: 40,
+    width: 90,
+    height: 35,
     resizeMode: 'contain',
   },
   button: {

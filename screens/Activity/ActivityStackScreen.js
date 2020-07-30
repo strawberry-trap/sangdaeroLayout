@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import ActivityScreen from './ActivityScreen';
@@ -36,6 +36,7 @@ export default function ActivityStackScreen({ navigation, route }) {
             end={{ x: 1, y: 0 }}
           />
         ),
+        headerLeft: null,
         headerTintColor: '#FFF',
       }}
     >
