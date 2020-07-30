@@ -7,7 +7,6 @@ import Dialog from "react-native-dialog";
 
 import HomeScreen from './HomeScreen';
 import NotificationScreen from './NotificationScreen';
-import HomeNoticeScreen from './HomeNoticeScreen';
 
 
 const HomeStack = createStackNavigator();
