@@ -357,10 +357,11 @@ console.log(url);
   }
 
   signOutAsync = async () => {
-    console.log('signOut clicked')
-    await GoogleSignIn.signOutAsync();
+    console.log('signOut clicked');
     global.loggedIn = false;
-    // this.props.navigation.navigate('Log');
+
+    await GoogleSignIn.signOutAsync();
+    this.props.navigation.navigate('Log', {data : 1});
   };
 
   render() {
@@ -372,7 +373,7 @@ console.log(url);
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
         <Dialog.Container visible={this.state.dialogVisible}>
-          <Dialog.Title style={{ color: '#000' }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
+          <Dialog.Title style={{ color: '#000', fontSize: 35 }} children='required'>{this.state.userSelectedActivity.title}</Dialog.Title>
 
           <View>
             <Dialog.Description style={{fontSize: 25}}>
@@ -504,6 +505,15 @@ console.log(url);
               onPress={() => this.props.navigation.navigate('설정', {params: {phoneAgree : this.state.userInfo.phoneAgree}})}
             >
               <Text style={styles.item}>설정</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.listBox}>
+            <TouchableOpacity
+              style={styles.list}
+              onPress={() => this.signOutAsync()}
+            >
+              <Text style={styles.item}>로그아웃</Text>
             </TouchableOpacity>
           </View>
 

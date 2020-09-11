@@ -8,13 +8,13 @@ export default class LoginScreen extends Component {
     super(props);
     console.log("[ LoginScreen.js ]");
     global.loggedIn = false;
+    global.isExistingUser=false;
   }
 
   state = {
     user: null,
     userName: '',
     userEmail: '',
-    isExistingUser: true,
     isProcedureCompleted: false,
   }
 
@@ -95,9 +95,9 @@ export default class LoginScreen extends Component {
         console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
 
         if (responseInJson == false || responseInJson == "false") {
-          this.setState({ isExistingUser: true }); 
+          global.isExistingUser = true;
         } else {
-          this.setState({ isExistingUser: false });
+          global.isExistingUser = false;
         }
         if (token != null) {
           this.addToken(userName, userEmail, global.token);
@@ -134,19 +134,19 @@ export default class LoginScreen extends Component {
   }
 
   componentDidUpdate() {
-    console.log(global.loggedIn);
-    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
+    console.log("logged");
+    if (this.state.isProcedureCompleted && global.loggedIn == true && global.isExistingUser == false) {
       this.props.navigation.navigate('Agreement');
     }
-    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
+    if (this.state.isProcedureCompleted && global.loggedIn == true && global.isExistingUser == true) {
       this.props.navigation.navigate('Main');
     }
   }
 
   render() {
     // for debugging, move to homeScreen right away
-
 /*
+
     console.log('login');
     
     global.googleUserName = "윤하늘";
@@ -154,7 +154,11 @@ export default class LoginScreen extends Component {
     global.loggedIn = true;
     if (global.loggedIn)
       this.props.navigation.navigate('Main');
+
 */
+    this.componentDidUpdate();
+
+
     return (
       <View style={styles.container}>
         {!global.loggedIn &&

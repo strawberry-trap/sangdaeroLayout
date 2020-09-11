@@ -29,6 +29,7 @@ export default class AgreementScreen extends Component {
 
   addUser() {
     console.log('Pass this method');
+    global.isExistingUser = true;
     var data = {
       name: global.googleUserName,
       email: global.googleUserEmail,
@@ -209,7 +210,7 @@ export default class AgreementScreen extends Component {
                 <TouchableOpacity
                   onPress={() => {
                     this.addUser();
-                    this.props.navigation.navigate('Main')
+                    this.props.navigation.navigate('Main');
                   }}
                 >
                   <Text style={styles.agreeButton}>
