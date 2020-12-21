@@ -8,13 +8,13 @@ export default class LoginScreen extends Component {
     super(props);
     console.log("[ LoginScreen.js ]");
     global.loggedIn = false;
-    global.isExistingUser=false;
   }
 
   state = {
     user: null,
     userName: '',
     userEmail: '',
+    isExistingUser: true,
     isProcedureCompleted: false,
   }
 
@@ -95,9 +95,9 @@ export default class LoginScreen extends Component {
         console.log(responseInJson); // if server returns false, it means the user is already saved in Database.
 
         if (responseInJson == false || responseInJson == "false") {
-          global.isExistingUser = true;
+          this.setState({ isExistingUser: true }); 
         } else {
-          global.isExistingUser = false;
+          this.setState({ isExistingUser: false }); 
         }
         if (token != null) {
           this.addToken(userName, userEmail, global.token);
@@ -135,10 +135,10 @@ export default class LoginScreen extends Component {
 
   componentDidUpdate() {
     console.log("logged");
-    if (this.state.isProcedureCompleted && global.loggedIn == true && global.isExistingUser == false) {
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == false) {
       this.props.navigation.navigate('Agreement');
     }
-    if (this.state.isProcedureCompleted && global.loggedIn == true && global.isExistingUser == true) {
+    if (this.state.isProcedureCompleted && global.loggedIn == true && this.state.isExistingUser == true) {
       this.props.navigation.navigate('Main');
     }
   }
@@ -152,10 +152,12 @@ export default class LoginScreen extends Component {
     global.googleUserName = "윤하늘";
     global.googleUserEmail = "hnsamuel1226@gmail.com";
     global.loggedIn = true;
+
+    */
     if (global.loggedIn)
       this.props.navigation.navigate('Main');
 
-*/
+
     this.componentDidUpdate();
 
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "상대로",
     "slug": "sangdaero",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "scheme": "myapp",
     "platforms": [
@@ -24,7 +24,7 @@
     ],
     "android": {
       "package": "com.sangdaero.app",
-      "versionCode": 3,
+      "versionCode": 4,
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "config" :{
